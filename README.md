@@ -46,7 +46,7 @@ npm run build
 
 Bubble spacing is 0.26 world units throughout the room and 0.22 on loose parcels, down from 0.62 and 0.4. Smaller per-cell geometry and deduplicated pop waves keep the denser wrap bounded.
 
-- Three.js renders instanced hemispheres with a sealed rim, clearcoat, subtle iridescence, environment reflections, and short collapse animations. Popped cells stay flat until reset.
+- Three.js renders clear, nonmetallic packing film over the colored backing. Instanced molded pockets taper into broad heat-welded lips; physical transmission, fine film normals, restrained clearcoat, and panel reflections make the air pockets readable. Continuous backing sheets carry grain and contact shading. Popping blends each pocket into a folded empty shape with matching normals, while reinflation restores it. Neutral studio lighting, overhead area lights, and soft shadow filtering ground the room. Balanced quality reduces the transmission-buffer resolution; high quality restores full resolution.
 - Rapier provides a fixed 60 Hz rigid-body simulation, a capsule character controller, gravity, contact events, object mass, friction, restitution, continuous collision detection, and collision-preserving object grabbing.
 - Bowling balls, parcels, pellets, and bombs are dynamic bodies. Contact position and impact speed determine pop radius. Explosions apply distance-based impulses and schedule outward-moving crackles.
 - Web Audio synthesizes rounded pressure pops with a short, warm membrane body and a softly filtered air transient. There are no crinkle tails, distortion, or added room echoes. Twenty-four variants and stereo placement provide variation; dense impacts resolve into distinct pops spaced 20–28 ms apart. Conservative voice gain, a short queue, filtered treble, and a gentle limiter prevent harsh stacking. Impact thumps are quieter and rate-limited. No audio assets or external services are needed during play.
@@ -65,7 +65,8 @@ Browser playtesting is a separate optional step, pending the user's choice in th
 
 - `app/page.tsx`: game HUD, tool belt, pause and settings UI, touch input.
 - `lib/game/game.ts`: game loop, input, targeting, impacts, pop waves, and effects.
-- `lib/game/arena.ts`: room geometry and bubble instance state.
+- `lib/game/arena.ts`: room geometry, lighting, continuous backing sheets, and bubble instance state.
+- `lib/game/plastic.ts`: molded and folded pocket geometry, procedural film maps, physical plastic shader, and reflection environment.
 - `lib/game/physics.ts`: Rapier bodies, character movement, grabbing, and impulses.
 - `lib/game/tools.ts`: physical tool models.
 - `lib/game/audio.ts`: procedural sound routing.

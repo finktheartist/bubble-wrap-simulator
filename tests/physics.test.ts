@@ -17,7 +17,10 @@ await test('bubble pops once, animates flat, and can be reinflated',()=>{
   const m=new THREE.Matrix4();surface.mesh.getMatrixAt(4,m);
   const scale=new THREE.Vector3().setFromMatrixScale(m);
   assert.ok(scale.y<scale.x*.08,'a spent dome remains visibly flat');
+  assert.equal(surface.mesh.geometry.getAttribute('collapse').getX(4), 1, 'the GPU receives the crumpled-film state');
+  assert.equal(surface.mesh.geometry.getAttribute('collapse').getX(5), 0, 'neighboring pockets stay inflated');
   surface.reset();
+  assert.equal(surface.mesh.geometry.getAttribute('collapse').getX(4), 0, 'reinflation resets the film shape as well as the counter');
   assert.equal(surface.cells[4].state,0);
   assert.equal(surface.pop(4,3),true);
   surface.dispose();

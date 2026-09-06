@@ -130,6 +130,7 @@ export class BubbleGame {
   setSettings(partial:Partial<GameSettings>) {
     this.settings={...this.settings,...partial};this.audio.volume=this.settings.volume;this.audio.muted=this.settings.muted;this.audio.update();
     const r=this.arena.renderer;r.setPixelRatio(Math.min(window.devicePixelRatio,this.settings.quality==='high'?2:1.25));
+    r.transmissionResolutionScale=this.settings.quality==='high'?1:.6;
     r.shadowMap.enabled=true;this.arena.scene.traverse(o=>{if(o instanceof THREE.DirectionalLight&&o.castShadow){const size=this.settings.quality==='high'?2048:1024;if(o.shadow.mapSize.x!==size){o.shadow.mapSize.set(size,size);o.shadow.map?.dispose();o.shadow.map=null;}}});this.resize();
   }
   selectTool(tool:number) {

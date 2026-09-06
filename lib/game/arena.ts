@@ -1,18 +1,16 @@
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
-import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
+import { createBubbleGeometry, createFilmMaps, createPackingEnvironment, createPlasticMaterial } from './plastic';
 
-export const PALETTE = { pearl: 0xd5e5e8, blue: 0x77cbdc, pink: 0xeeb8bf, yellow: 0xe3db91, mint: 0x95c7af };
+export const PALETTE = { pearl: 0xd8dddb, blue: 0x92b6bf, pink: 0xcdaeb0, yellow: 0xcec5a0, mint: 0xa8bcae };
 const up = new THREE.Vector3(0, 1, 0);
 const dummy = new THREE.Object3D();
-const dome = new THREE.SphereGeometry(1, 8, 5, 0, Math.PI * 2, 0, Math.PI / 2);
-const rim = new THREE.TorusGeometry(0.99, 0.035, 3, 8);
-rim.rotateX(-Math.PI / 2);
-export const bubbleGeometry = mergeGeometries([dome, rim]);
-dome.dispose(); rim.dispose();
+export const bubbleGeometry = createBubbleGeometry();
+let sharedMaps: ReturnType<typeof createFilmMaps> | undefined;
+let mapUsers = 0;
 
-export type BubbleCell = { x: number; z: number; radius: number; state: number; poppedAt: number; pressure: number; scheduled: boolean };
+export type BubbleCell = { x: number; z: number; radius: number; state: number; poppedAt: number; pressure: number; scheduled: boolean; variation: number };
 export class WrapSurface {
   group = new THREE.Group();
   mesh: THREE.InstancedMesh;
@@ -21,57 +19,72 @@ export class WrapSurface {
   rows: number;
   dirty = true;
   material: THREE.MeshPhysicalMaterial;
+  private collapse: THREE.InstancedBufferAttribute;
+  private sheet: THREE.Mesh<THREE.PlaneGeometry, THREE.MeshPhysicalMaterial>;
+  private sheetNormal: THREE.Texture;
+  private sheetBacking: THREE.Texture;
+  private disposed = false;
   constructor(public width: number, public depth: number, public color: number, public spacing = 0.26) {
     this.cols = Math.max(1, Math.floor(width / spacing));
     this.rows = Math.max(1, Math.floor(depth / spacing));
-    this.material = new THREE.MeshPhysicalMaterial({
-      color: 0xffffff, roughness: 0.23, metalness: 0.14,
-      clearcoat: 1, clearcoatRoughness: 0.075, envMapIntensity: 1.35,
-      iridescence: 0.25, iridescenceIOR: 1.3, iridescenceThicknessRange: [180, 330],
-      transparent: true, opacity: 0.91, depthWrite: true,
-    });
-    this.mesh = new THREE.InstancedMesh(bubbleGeometry, this.material, this.cols * this.rows);
+    const maps = sharedMaps ??= createFilmMaps(); mapUsers++;
+    this.material = createPlasticMaterial(maps.normal);
+    const geometry = bubbleGeometry.clone();
+    this.collapse = new THREE.InstancedBufferAttribute(new Float32Array(this.cols * this.rows), 1).setUsage(THREE.DynamicDrawUsage);
+    geometry.setAttribute('collapse', this.collapse);
+    this.mesh = new THREE.InstancedMesh(geometry, this.material, this.cols * this.rows);
     this.mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
     this.mesh.receiveShadow = true;
     this.mesh.castShadow = false;
     this.mesh.userData.surface = this;
-    const base = new THREE.Color(color);
     for (let z = 0; z < this.rows; z++) for (let x = 0; x < this.cols; x++) {
       const i = this.cells.length;
-      const radius = Math.min(width / this.cols, depth / this.rows) * 0.445;
-      this.cells.push({ x: (x + .5) * width / this.cols - width / 2, z: (z + .5) * depth / this.rows - depth / 2, radius, state: 0, poppedAt: -1, pressure: 0, scheduled: false });
-      this.mesh.setColorAt(i, base.clone().multiplyScalar(.95 + Math.random() * .1));
+      const seed = Math.sin((i + 1) * 127.1 + width * 311.7 + depth * 74.7) * 43758.5453;
+      const variation = seed - Math.floor(seed);
+      const radius = Math.min(width / this.cols, depth / this.rows) * .445;
+      this.cells.push({ x: (x + .5) * width / this.cols - width / 2, z: (z + .5) * depth / this.rows - depth / 2, radius, state: 0, poppedAt: -1, pressure: 0, scheduled: false, variation });
       this.updateCell(i, 0);
     }
     this.mesh.computeBoundingSphere();
-    this.group.add(this.mesh);
+    // A continuous backing film joins the cells and carries fine contact shadows
+    // around their welds. Color belongs to the backing; the air pocket is clear.
+    this.sheetNormal = maps.normal.clone(); this.sheetNormal.repeat.set(this.cols / 3, this.rows / 3);
+    this.sheetBacking = maps.backing.clone(); this.sheetBacking.repeat.set(this.cols, this.rows);
+    this.sheet = new THREE.Mesh(new THREE.PlaneGeometry(width, depth), new THREE.MeshPhysicalMaterial({
+      color: new THREE.Color(color).lerp(new THREE.Color(0xffffff), .06),
+      map: this.sheetBacking, normalMap: this.sheetNormal, normalScale: new THREE.Vector2(.16, .16),
+      metalness: 0, roughness: .46, clearcoat: .5, clearcoatRoughness: .28, envMapIntensity: .55,
+    }));
+    this.sheet.rotation.x = -Math.PI / 2; this.sheet.position.y = .013;
+    this.sheet.receiveShadow = true;
+    this.group.add(this.sheet, this.mesh);
+    this.flush();
   }
   updateCell(i: number, now: number) {
     const c = this.cells[i];
-    let height = .6 * (1 - c.pressure * .62);
+    let collapse = c.state === 2 ? 1 : 0;
     if (c.state === 1) {
       const age = Math.max(0, now - c.poppedAt);
-      height = age < .12 ? .6 * Math.pow(1 - age / .12, 3) + .045 : .045;
+      collapse = 1 - Math.pow(Math.max(0, 1 - age / .12), 3);
       if (age >= .12) c.state = 2;
-    } else if (c.state === 2) height = .045;
+    }
+    const inflated = .60 * (1 - c.pressure * .62) * (.97 + c.variation * .06);
+    const height = THREE.MathUtils.lerp(inflated, .045, collapse);
     dummy.position.set(c.x, .017, c.z);
-    dummy.rotation.set(0, 0, 0);
-    dummy.scale.set(c.radius * (c.state ? 1.025 : 1), c.radius * height, c.radius * (c.state ? 1.025 : 1));
+    dummy.rotation.set(0, c.variation * Math.PI * 2, 0);
+    dummy.scale.set(c.radius * (.99 + c.variation * .02), c.radius * height, c.radius * (1.01 - c.variation * .02));
     dummy.updateMatrix(); this.mesh.setMatrixAt(i, dummy.matrix);
+    this.collapse.setX(i, collapse);
     this.dirty = true;
   }
   reset() {
-    const base = new THREE.Color(this.color);
-    this.cells.forEach((c, i) => { c.state = 0; c.poppedAt = -1; c.pressure = 0; c.scheduled = false; this.mesh.setColorAt(i, base); this.updateCell(i, 0); });
-    if (this.mesh.instanceColor) this.mesh.instanceColor.needsUpdate = true;
+    this.cells.forEach((c, i) => { c.state = 0; c.poppedAt = -1; c.pressure = 0; c.scheduled = false; this.updateCell(i, 0); });
     this.flush();
   }
   pop(i: number, now: number) {
     const c = this.cells[i];
     if (!c || c.state) return false;
     c.state = 1; c.scheduled = false; c.poppedAt = now; c.pressure = 0;
-    this.mesh.setColorAt(i, new THREE.Color(this.color).multiplyScalar(.73));
-    if (this.mesh.instanceColor) this.mesh.instanceColor.needsUpdate = true;
     this.updateCell(i, now);
     return true;
   }
@@ -79,8 +92,13 @@ export class WrapSurface {
     const c = this.cells[i];
     return this.group.localToWorld(target.set(c.x, .09, c.z));
   }
-  flush() { if (this.dirty) { this.mesh.instanceMatrix.needsUpdate = true; this.dirty = false; } }
-  dispose() { this.material.dispose(); this.mesh.dispose(); }
+  flush() { if (this.dirty) { this.mesh.instanceMatrix.needsUpdate = true; this.collapse.needsUpdate = true; this.dirty = false; } }
+  dispose() {
+    if (this.disposed) return; this.disposed = true;
+    this.material.dispose(); this.mesh.geometry.dispose(); this.mesh.dispose();
+    this.sheet.geometry.dispose(); this.sheet.material.dispose(); this.sheetNormal.dispose(); this.sheetBacking.dispose();
+    if (--mapUsers === 0) { sharedMaps?.normal.dispose(); sharedMaps?.backing.dispose(); sharedMaps = undefined; }
+  }
 }
 
 export type WrappedObject = { group: THREE.Group; size: THREE.Vector3; surfaces: WrapSurface[]; dynamic: boolean; name: string; color: number };
@@ -88,8 +106,8 @@ export type Arena = { scene: THREE.Scene; camera: THREE.PerspectiveCamera; rende
 
 export function createArena(container: HTMLElement): Arena {
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xe1eaed);
-  scene.fog = new THREE.Fog(0xe1eaed, 22, 64);
+  scene.background = new THREE.Color(0xcbd2d5);
+  scene.fog = new THREE.Fog(0xcbd2d5, 30, 78);
   const camera = new THREE.PerspectiveCamera(66, container.clientWidth / container.clientHeight, .06, 100);
   camera.position.set(10.8, 7.7, 13.2);
   camera.lookAt(-2, 2.1, -5);
@@ -97,23 +115,30 @@ export function createArena(container: HTMLElement): Arena {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
   renderer.setSize(container.clientWidth, container.clientHeight);
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFShadowMap;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.17;
+  renderer.toneMappingExposure = 1.0;
+  renderer.transmissionResolutionScale = .75;
   container.appendChild(renderer.domElement);
   const pmrem = new THREE.PMREMGenerator(renderer);
-  const roomEnv = new RoomEnvironment();
-  const environment = pmrem.fromScene(roomEnv, .025);
+  const roomEnv = createPackingEnvironment();
+  const environment = pmrem.fromScene(roomEnv.scene, .018);
   scene.environment = environment.texture;
   roomEnv.dispose(); pmrem.dispose();
-  scene.add(new THREE.HemisphereLight(0xe6f9ff, 0x83918d, 2.6));
-  const sun = new THREE.DirectionalLight(0xfff7eb, 3.4);
-  sun.position.set(-6, 14, 9); sun.castShadow = true;
+  scene.environmentIntensity = .65;
+  scene.add(new THREE.HemisphereLight(0xe9f0f5, 0x6e7473, .85));
+  const sun = new THREE.DirectionalLight(0xfff5e4, 2.5);
+  sun.position.set(-10, 8.5, 8); sun.target.position.set(1, 0, -7); sun.castShadow = true;
   sun.shadow.mapSize.set(2048, 2048);
   Object.assign(sun.shadow.camera, { left:-19, right:19, top:24, bottom:-24, near:.1, far:48 });
-  sun.shadow.normalBias = .04; sun.shadow.bias = -.00015;
-  scene.add(sun);
-  const fill = new THREE.DirectionalLight(0xb1ecff, 1.7); fill.position.set(11, 6, -13); scene.add(fill);
+  sun.shadow.normalBias = .012; sun.shadow.bias = -.00008; sun.shadow.radius = 2;
+  scene.add(sun, sun.target);
+  const fill = new THREE.DirectionalLight(0xdcecff, .65); fill.position.set(11, 6, -13); scene.add(fill);
+  RectAreaLightUniformsLib.init();
+  for (const x of [-8, 0, 8]) {
+    const light = new THREE.RectAreaLight(0xfffcf5, 2.2, .65, 20);
+    light.position.set(x, 8.9, -2); light.lookAt(x, 0, -2); scene.add(light);
+  }
   const surfaces: WrapSurface[] = [];
   const objects: WrappedObject[] = [];
   const ownedGeometries = new Set<THREE.BufferGeometry>();
@@ -121,7 +146,7 @@ export function createArena(container: HTMLElement): Arena {
   function box(name: string, size: [number, number, number], position: [number, number, number], color: number, dynamic = false, faces = ['top','front','back','left','right']) {
     const group = new THREE.Group(); group.position.set(...position);
     const geometry = new RoundedBoxGeometry(...size, 2, .09);
-    const material = new THREE.MeshStandardMaterial({ color, roughness:.58, metalness:.025 });
+    const material = new THREE.MeshStandardMaterial({ color, roughness:.72, metalness:0 });
     ownedGeometries.add(geometry); ownedMaterials.add(material);
     const core = new THREE.Mesh(geometry, material); core.castShadow = true; core.receiveShadow = true;
     group.add(core); scene.add(group);
@@ -174,10 +199,10 @@ export function createArena(container: HTMLElement): Arena {
   box('Wrapped cube', [.85,.85,.85], [2.8,1.9,2], PALETTE.blue, true, allFaces);
   box('Wrapped parcel', [1.5,.75,.85], [5,.6,-2.8], PALETTE.yellow, true, allFaces);
   // Real light fixtures and thin seam rails give scale without cluttering the room.
-  const lightMaterial = new THREE.MeshBasicMaterial({ color:0xf5ffff });
+  const lightMaterial = new THREE.MeshBasicMaterial({ color:new THREE.Color(0xfffcf5).multiplyScalar(3), toneMapped:false });
   ownedMaterials.add(lightMaterial);
   for (const x of [-8,0,8]) {
-    const g = new THREE.BoxGeometry(.3,.06,21); ownedGeometries.add(g);
+    const g = new THREE.BoxGeometry(.65,.06,20); ownedGeometries.add(g);
     const strip = new THREE.Mesh(g,lightMaterial); strip.position.set(x,8.97,-2); scene.add(strip);
   }
   const railMaterial = new THREE.MeshStandardMaterial({ color:0x8fa4aa,roughness:.5,metalness:.4 }); ownedMaterials.add(railMaterial);
