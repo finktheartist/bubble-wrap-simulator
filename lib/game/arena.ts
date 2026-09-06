@@ -6,13 +6,13 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 export const PALETTE = { pearl: 0xd5e5e8, blue: 0x77cbdc, pink: 0xeeb8bf, yellow: 0xe3db91, mint: 0x95c7af };
 const up = new THREE.Vector3(0, 1, 0);
 const dummy = new THREE.Object3D();
-const dome = new THREE.SphereGeometry(1, 12, 7, 0, Math.PI * 2, 0, Math.PI / 2);
-const rim = new THREE.TorusGeometry(0.99, 0.045, 3, 12);
+const dome = new THREE.SphereGeometry(1, 8, 5, 0, Math.PI * 2, 0, Math.PI / 2);
+const rim = new THREE.TorusGeometry(0.99, 0.035, 3, 8);
 rim.rotateX(-Math.PI / 2);
 export const bubbleGeometry = mergeGeometries([dome, rim]);
 dome.dispose(); rim.dispose();
 
-export type BubbleCell = { x: number; z: number; radius: number; state: number; poppedAt: number; pressure: number };
+export type BubbleCell = { x: number; z: number; radius: number; state: number; poppedAt: number; pressure: number; scheduled: boolean };
 export class WrapSurface {
   group = new THREE.Group();
   mesh: THREE.InstancedMesh;
@@ -21,7 +21,7 @@ export class WrapSurface {
   rows: number;
   dirty = true;
   material: THREE.MeshPhysicalMaterial;
-  constructor(public width: number, public depth: number, public color: number, public spacing = 0.62) {
+  constructor(public width: number, public depth: number, public color: number, public spacing = 0.26) {
     this.cols = Math.max(1, Math.floor(width / spacing));
     this.rows = Math.max(1, Math.floor(depth / spacing));
     this.material = new THREE.MeshPhysicalMaterial({
@@ -39,7 +39,7 @@ export class WrapSurface {
     for (let z = 0; z < this.rows; z++) for (let x = 0; x < this.cols; x++) {
       const i = this.cells.length;
       const radius = Math.min(width / this.cols, depth / this.rows) * 0.445;
-      this.cells.push({ x: (x + .5) * width / this.cols - width / 2, z: (z + .5) * depth / this.rows - depth / 2, radius, state: 0, poppedAt: -1, pressure: 0 });
+      this.cells.push({ x: (x + .5) * width / this.cols - width / 2, z: (z + .5) * depth / this.rows - depth / 2, radius, state: 0, poppedAt: -1, pressure: 0, scheduled: false });
       this.mesh.setColorAt(i, base.clone().multiplyScalar(.95 + Math.random() * .1));
       this.updateCell(i, 0);
     }
@@ -62,14 +62,14 @@ export class WrapSurface {
   }
   reset() {
     const base = new THREE.Color(this.color);
-    this.cells.forEach((c, i) => { c.state = 0; c.poppedAt = -1; c.pressure = 0; this.mesh.setColorAt(i, base); this.updateCell(i, 0); });
+    this.cells.forEach((c, i) => { c.state = 0; c.poppedAt = -1; c.pressure = 0; c.scheduled = false; this.mesh.setColorAt(i, base); this.updateCell(i, 0); });
     if (this.mesh.instanceColor) this.mesh.instanceColor.needsUpdate = true;
     this.flush();
   }
   pop(i: number, now: number) {
     const c = this.cells[i];
     if (!c || c.state) return false;
-    c.state = 1; c.poppedAt = now; c.pressure = 0;
+    c.state = 1; c.scheduled = false; c.poppedAt = now; c.pressure = 0;
     this.mesh.setColorAt(i, new THREE.Color(this.color).multiplyScalar(.73));
     if (this.mesh.instanceColor) this.mesh.instanceColor.needsUpdate = true;
     this.updateCell(i, now);
@@ -97,7 +97,7 @@ export function createArena(container: HTMLElement): Arena {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
   renderer.setSize(container.clientWidth, container.clientHeight);
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.type = THREE.PCFShadowMap;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.17;
   container.appendChild(renderer.domElement);
@@ -137,7 +137,7 @@ export function createArena(container: HTMLElement): Arena {
     };
     for (const f of faces) {
       const c = configs[f];
-      const wrap = new WrapSurface(c.w-.045, c.d-.045, color, dynamic ? .4 : .62);
+      const wrap = new WrapSurface(c.w-.045, c.d-.045, color, dynamic ? .22 : .26);
       wrap.group.position.set(...c.p);
       wrap.group.quaternion.setFromUnitVectors(up, new THREE.Vector3(...c.n));
       wrap.group.userData.wrappedObject = obj;

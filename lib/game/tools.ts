@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 export const TOOL_INFO = [
-  {name:'Fingertip',verb:'Hold to pop',detail:'One bubble at a time. Take it slow.',key:'1'},
+  {name:'Fingertip',verb:'Click POP or press F',detail:'One bubble at a time. Take it slow.',key:'1'},
   {name:'Mallet',verb:'Click to smash',detail:'A reassuringly excessive rubber mallet.',key:'2'},
   {name:'Bat',verb:'Click to whack',detail:'A wide swing. A very good crackle.',key:'3'},
   {name:'Bowling ball',verb:'Hold & release to throw',detail:'Seven kilos of excellent decisions.',key:'4'},

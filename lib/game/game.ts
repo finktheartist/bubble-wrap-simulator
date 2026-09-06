@@ -2,11 +2,12 @@ import * as THREE from 'three';
 import { createArena, WrapSurface, type Arena } from './arena';
 import { ArenaPhysics, initPhysics, type PhysicsItem } from './physics';
 import { PopAudio } from './audio';
+import { bindToolInput } from './input';
 import { makeTool, disposeTool, TOOL_INFO } from './tools';
 
-export type GameSnapshot={ready:boolean;playing:boolean;started:boolean;tool:number;pops:number;total:number;combo:number;best:number;hint:string;target:boolean;charge:number;held:string;fps:number;error:string};
+export type GameSnapshot={ready:boolean;playing:boolean;started:boolean;tool:number;pops:number;total:number;combo:number;best:number;hint:string;target:boolean;charge:number;held:string;fps:number;error:string;pointerLocked:boolean};
 export type GameSettings={volume:number;sensitivity:number;shake:boolean;footsteps:boolean;muted:boolean;quality:'high'|'balanced'};
-const DEFAULT:GameSnapshot={ready:false,playing:false,started:false,tool:0,pops:0,total:0,combo:0,best:0,hint:'',target:false,charge:0,held:'',fps:60,error:''};
+const DEFAULT:GameSnapshot={ready:false,playing:false,started:false,tool:0,pops:0,total:0,combo:0,best:0,hint:'',target:false,charge:0,held:'',fps:60,error:'',pointerLocked:false};
 type Hit={surface:WrapSurface;index:number;point:THREE.Vector3;distance:number};
 type Particle={p:THREE.Vector3;v:THREE.Vector3;life:number;max:number};
 type ScheduledPop={surface:WrapSurface;index:number;at:number;strength:number};
@@ -29,7 +30,7 @@ export class BubbleGame {
   private uiCallback:(s:GameSnapshot)=>void;private disposed=false;private touch=false;private touchMove={x:0,y:0};
   private movementX=0;private movementZ=0;private fpsSamples=0;private fpsElapsed=0;
   private resizeObserver:ResizeObserver;
-  private abort=new AbortController();
+  private abort=new AbortController();private unlockToCursor=false;
   constructor(private container:HTMLElement,onChange:(s:GameSnapshot)=>void) {
     this.uiCallback=onChange;
     this.arena=createArena(container);
@@ -56,17 +57,24 @@ export class BubbleGame {
   private bindEvents() {
     const signal=this.abort.signal,canvas=this.arena.renderer.domElement;
     canvas.addEventListener('contextmenu',e=>e.preventDefault(),{signal});
+    bindToolInput(canvas,document,{
+      playing:()=>this.snapshot.playing,
+      locked:()=>document.pointerLockElement===canvas,
+      down:()=>this.actionDown(),up:()=>this.actionUp(),look:(x,y)=>this.look(x,y),
+    },signal);
     document.addEventListener('pointerlockchange',()=>{
       if(this.disposed)return;
-      if(document.pointerLockElement===canvas){this.snapshot.playing=true;this.publish();}
-      else if(this.snapshot.playing&&!this.touch)this.pause(false);
+      const wasLocked=this.snapshot.pointerLocked;
+      this.snapshot.pointerLocked=document.pointerLockElement===canvas;
+      if(wasLocked&&!this.snapshot.pointerLocked&&!this.unlockToCursor)this.pause(false);
+      this.unlockToCursor=false;this.publish();
     },{signal});
     document.addEventListener('pointerlockerror',()=>{
-      if(this.snapshot.playing&&!this.touch){this.snapshot.hint='Click the arena to capture your mouse';this.publish();}
+      this.snapshot.pointerLocked=false;this.publish();
     },{signal});
     document.addEventListener('keydown',e=>{
       if(e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement)return;
-      if(this.snapshot.playing && ['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Tab'].includes(e.code))e.preventDefault();
+      if(this.snapshot.playing && ['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();
       if(e.code==='Escape'){this.pause();return;}
       if(!this.snapshot.playing)return;
       this.keys.add(e.code);
@@ -74,20 +82,10 @@ export class BubbleGame {
       if(/^Digit[1-6]$/.test(e.code))this.selectTool(Number(e.code.at(-1))-1);
       if(e.code==='KeyE')this.grab();
       if(e.code==='KeyR')this.reset();
-      if(e.code==='KeyM')this.setSettings({muted:!this.settings.muted});
+      if(e.code==='KeyL')void this.toggleMouseLook();
       if(e.code==='KeyQ')this.physics?.release();
     },{signal});
     document.addEventListener('keyup',e=>this.keys.delete(e.code),{signal});
-    document.addEventListener('mousemove',e=>{
-      if(this.snapshot.playing&&document.pointerLockElement===canvas)this.look(e.movementX,e.movementY);
-    },{signal});
-    canvas.addEventListener('pointerdown',e=>{
-      if(e.pointerType==='touch')return;
-      if(!this.snapshot.playing)return;
-      if(document.pointerLockElement!==canvas){void this.capture();return;}
-      if(e.button===2)this.grab();else if(e.button===0)this.actionDown();
-    },{signal});
-    document.addEventListener('pointerup',e=>{if(e.pointerType!=='touch'&&e.button===0)this.actionUp();},{signal});
     canvas.addEventListener('wheel',e=>{
       if(!this.snapshot.playing)return;e.preventDefault();this.selectTool((this.snapshot.tool+(e.deltaY>0?1:5))%6);
     },{signal,passive:false});
@@ -97,15 +95,25 @@ export class BubbleGame {
   }
   private async capture(){
     try {await this.arena.renderer.domElement.requestPointerLock();}
-    catch {this.snapshot.hint='Mouse capture needs another click. Click the arena to continue.';this.publish();}
+    catch {this.snapshot.pointerLocked=false;this.publish();}
   }
+  async toggleMouseLook() {
+    if(!this.snapshot.playing)return;
+    if(document.pointerLockElement===this.arena.renderer.domElement){this.unlockToCursor=true;document.exitPointerLock();}
+    else await this.capture();
+  }
+  async previewPop(){await this.audio.preview();}
   async start(touch=false) {
     if(!this.physics||!this.snapshot.ready)return;
     this.touch=touch;
     void this.audio.start().catch(()=>{this.snapshot.hint='Sound is unavailable in this browser.';});
     if(!this.snapshot.started){this.startedAt=this.time;this.yaw=0;this.pitch=-.08;}
+    const position=this.physics.player.translation();
+    this.arena.camera.position.set(position.x,position.y+.76,position.z);
+    this.arena.camera.rotation.set(this.pitch,this.yaw,0,'YXZ');this.arena.camera.updateMatrixWorld();
     this.snapshot.started=true;this.snapshot.playing=true;this.snapshot.hint='';this.keys.clear();this.down=false;this.publish();
-    if(!touch)await this.capture();
+    // Cursor mode keeps the action button and tool belt reachable immediately.
+    // Mouse lock is an optional control, never a requirement for using a tool.
   }
   pause(exit=true) {
     this.snapshot.playing=false;this.down=false;this.keys.clear();this.touchMove={x:0,y:0};this.clearPressure();
@@ -124,18 +132,40 @@ export class BubbleGame {
   selectTool(tool:number) {
     if(tool===this.snapshot.tool)return;
     this.down=false;this.clearPressure();this.snapshot.charge=0;
-    this.snapshot.tool=tool;this.toolScene.remove(this.toolModel);disposeTool(this.toolModel);this.toolModel=makeTool(tool);this.toolScene.add(this.toolModel);this.recoil=.2;this.publish();
+    this.snapshot.tool=tool;this.nextAction=0;this.toolScene.remove(this.toolModel);disposeTool(this.toolModel);this.toolModel=makeTool(tool);this.toolScene.add(this.toolModel);this.recoil=.2;this.publish();
   }
   actionDown() {
-    if(!this.snapshot.playing)return;
+    if(!this.snapshot.playing||this.down)return;
+    void this.audio.start().catch(()=>{});
+    this.findAim();
     this.down=true;this.pressedAt=this.time;
     if(this.physics?.held) return;
-    if([1,2,5].includes(this.snapshot.tool))this.useTool();
+    if(this.snapshot.tool===0)this.poke();
+    if([1,2,4,5].includes(this.snapshot.tool))this.useTool();
   }
+  tapTool(){this.actionDown();this.actionUp();}
   actionUp() {
     if(!this.down)return;
     if(this.snapshot.playing&&(this.snapshot.tool===3||this.physics?.held))this.throwItem();
     this.down=false;this.snapshot.charge=0;this.clearPressure();
+  }
+  private availableCell(hit:Hit):number|null {
+    const local=hit.surface.group.worldToLocal(hit.point.clone());
+    const s=hit.surface;
+    let nearest:number|null=null,distance=.42*.42;
+    const col=hit.index%s.cols,row=Math.floor(hit.index/s.cols);
+    for(let z=Math.max(0,row-2);z<=Math.min(s.rows-1,row+2);z++)for(let x=Math.max(0,col-2);x<=Math.min(s.cols-1,col+2);x++){
+      const index=z*s.cols+x,c=s.cells[index];if(c.state||c.scheduled)continue;
+      const d=(c.x-local.x)**2+(c.z-local.z)**2;
+      if(d<distance){distance=d;nearest=index;}
+    }
+    return nearest;
+  }
+  private poke() {
+    const hit=this.aimed;
+    if(!hit||hit.distance>=3||this.time<this.nextAction)return;
+    const index=this.availableCell(hit);if(index===null)return;
+    this.clearPressure();this.pop(hit.surface,index,1.1);this.recoil=.16;this.nextAction=this.time+.085;
   }
   private clearPressure() {
     const p=this.pressedBubble;if(p){p.surface.cells[p.index].pressure=0;p.surface.updateCell(p.index,this.time);p.surface.flush();}this.pressedBubble=null;
@@ -211,10 +241,10 @@ export class BubbleGame {
       const minZ=Math.max(0,Math.floor((local.z-radius+s.depth/2)/s.depth*s.rows));
       const maxZ=Math.min(s.rows-1,Math.floor((local.z+radius+s.depth/2)/s.depth*s.rows));
       for(let z=minZ;z<=maxZ;z++)for(let x=minX;x<=maxX;x++) {
-        const index=z*s.cols+x,c=s.cells[index];if(c.state)continue;
+        const index=z*s.cols+x,c=s.cells[index];if(c.state||c.scheduled)continue;
         const distance=Math.hypot(c.x-local.x,local.y,c.z-local.z);
         if(distance>radius)continue;
-        if(spread)this.queued.push({surface:s,index,at:this.time+distance*spread+Math.random()*.025,strength});
+        if(spread){c.scheduled=true;this.queued.push({surface:s,index,at:this.time+distance*spread+Math.random()*.025,strength});}
         else this.pop(s,index,strength);
       }
     }
@@ -265,31 +295,27 @@ export class BubbleGame {
       }
     }
     const range=this.snapshot.tool===0?3:this.snapshot.tool===1?3.7:this.snapshot.tool===2?4.1:45;
-    this.snapshot.target=Boolean(hit&&hit.distance<range&&hit.surface.cells[hit.index].state===0)||Boolean(this.pickup);
+    const available=hit&&(this.snapshot.tool===0?this.availableCell(hit)!==null:hit.surface.cells[hit.index].state===0);
+    this.snapshot.target=Boolean(hit&&hit.distance<range&&available)||Boolean(this.pickup);
     this.snapshot.held=this.physics?.held?.name??'';
     if(this.physics?.held)this.snapshot.hint='Hold & release to throw · E to drop';
     else if(this.pickup)this.snapshot.hint=`E · Pick up ${this.pickup.name.toLowerCase()}`;
-    else if(hit&&hit.distance<range){this.snapshot.hint=hit.surface.cells[hit.index].state?'Already popped. There are plenty more.':TOOL_INFO[this.snapshot.tool].verb;}
+    else if(hit&&hit.distance<range){this.snapshot.hint=!available?'Aim at some fresh bubbles':this.snapshot.tool===0?'Click POP or press F · Hold for a crackle':TOOL_INFO[this.snapshot.tool].verb;}
     else this.snapshot.hint=this.snapshot.tool<=2?'Move closer to the bubbles':TOOL_INFO[this.snapshot.tool].verb;
   }
-  private updateInteraction(dt:number) {
+  private updateInteraction() {
     if(!this.physics)return;
     this.findAim();
     const tool=this.snapshot.tool;
     if(this.down&&(tool===3||this.physics.held)){this.snapshot.charge=Math.min(1,(this.time-this.pressedAt)/1.05);return;}
-    if(this.down&&tool===4)this.useTool();
-    if(this.down&&tool===0) {
-      const hit=this.aimed;
-      if(hit&&hit.distance<3&&!hit.surface.cells[hit.index].state) {
-        if(this.pressedBubble?.surface!==hit.surface || this.pressedBubble.index!==hit.index)this.clearPressure();
-        this.pressedBubble={surface:hit.surface,index:hit.index};
-        const c=hit.surface.cells[hit.index];c.pressure=Math.min(1,c.pressure+dt*10);hit.surface.updateCell(hit.index,this.time);
-        if(c.pressure>=1){this.pop(hit.surface,hit.index);this.recoil=.12;this.clearPressure();}
-      } else this.clearPressure();
-    }
+    if(this.down&&[1,2,4].includes(tool))this.useTool();
+    if(this.down&&tool===0)this.poke();
   }
+
   private updateEffects(dt:number) {
-    for(let i=this.queued.length-1;i>=0;i--)if(this.queued[i].at<=this.time){const p=this.queued[i];this.pop(p.surface,p.index,p.strength);this.queued.splice(i,1);}
+    let remaining=0;
+    for(const pop of this.queued){if(pop.at<=this.time)this.pop(pop.surface,pop.index,pop.strength);else this.queued[remaining++]=pop;}
+    this.queued.length=remaining;
     for(const [s,indices] of this.activePops){for(const i of indices){s.updateCell(i,this.time);if(s.cells[i].state===2)indices.delete(i);}if(!indices.size)this.activePops.delete(s);}
     for(const s of this.arena.surfaces)s.flush();
     let count=0;
@@ -325,7 +351,7 @@ export class BubbleGame {
       if(this.settings.footsteps&&this.physics.grounded&&Math.hypot(this.movementX,this.movementZ)>1&&this.time-this.lastFootstep>(speed>5?.2:.34)) {
         this.burst(new THREE.Vector3(p.x,p.y-.81,p.z),speed>5?.5:.31,.7);this.lastFootstep=this.time;
       }
-      this.updateInteraction(dt);
+      this.updateInteraction();
       // Snapshot: removing an expired projectile mutates the live array.
       for(const item of this.physics.items.slice()) {
         if(item.kind==='bomb'&&this.time>=item.fuse)this.explode(item);

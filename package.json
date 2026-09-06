@@ -9,9 +9,9 @@
     "dev": "vinext dev",
     "build": "vinext build",
     "start": "wrangler dev --config dist/server/wrangler.json",
-    "lint": "oxlint app lib tests",
+    "lint": "oxlint app lib tests components/game",
     "format": "oxfmt",
-    "test": "tsx --test tests/*.test.ts",
+    "test": "tsx --test tests/*.test.ts tests/*.test.tsx",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
