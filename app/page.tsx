@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useRef, useState, type PointerEvent } from 'react';
-import { ArrowUpRight, AudioLines, Bomb, Circle, Crosshair, Hand, Hammer, HelpCircle, Maximize, MousePointer2, MoveUp, Pause, Play, RotateCcw, Settings2, Volume2, VolumeX, X, Zap } from 'lucide-react';
+import Image from 'next/image';
+import { ArrowUpRight, AudioLines, Circle, Hand, HelpCircle, Maximize, MousePointer2, MoveUp, Pause, Play, RotateCcw, Settings2, Volume2, VolumeX, X } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
@@ -8,12 +9,12 @@ import { UseToolButton } from '@/components/game/use-tool-button';
 import type { BubbleGame, GameSettings, GameSnapshot } from '@/lib/game/game';
 
 const TOOLS=[
-  {name:'Fingertip',icon:Hand,verb:'Click POP or press F',description:'One bubble at a time. Take it slow.'},
-  {name:'Mallet',icon:Hammer,verb:'Click to smash',description:'A reassuringly excessive rubber mallet.'},
-  {name:'Bat',icon:Zap,verb:'Click to whack',description:'A wide swing. A very good crackle.'},
-  {name:'Bowling ball',icon:Circle,verb:'Hold & release to throw',description:'Seven kilos of excellent decisions.'},
-  {name:'Pop blaster',icon:Crosshair,verb:'Hold to shoot',description:'Little pellets. Rapid-fire satisfaction.'},
-  {name:'Pop bomb',icon:Bomb,verb:'Click to throw',description:'A short fuse. A room-shaking ripple.'},
+  {name:'Fingertip',verb:'Click POP or press F',description:'One bubble at a time. Take it slow.'},
+  {name:'Mallet',verb:'Click to smash',description:'A reassuringly excessive rubber mallet.'},
+  {name:'Bat',verb:'Click to whack',description:'A wide swing. A very good crackle.'},
+  {name:'Bowling ball',verb:'Hold & release to throw',description:'Seven kilos of excellent decisions.'},
+  {name:'Pop blaster',verb:'Hold to shoot',description:'Little pellets. Rapid-fire satisfaction.'},
+  {name:'Pop bomb',verb:'Click to throw',description:'A short fuse. A room-shaking ripple.'},
 ];
 const INITIAL:GameSnapshot={ready:false,playing:false,started:false,tool:0,pops:0,total:0,combo:0,best:0,hint:'',target:false,charge:0,held:'',fps:60,error:'',pointerLocked:false};
 const SETTINGS:GameSettings={volume:.65,sensitivity:1,shake:true,footsteps:true,muted:false,quality:'balanced'};
@@ -21,6 +22,7 @@ export default function Home() {
   const mount=useRef<HTMLDivElement>(null);
   const engine=useRef<BubbleGame|null>(null);
   const [state,setState]=useState(INITIAL);
+  const [toolIcons,setToolIcons]=useState<string[]>([]);
   const [settings,setSettings]=useState(SETTINGS);
   const [panel,setPanel]=useState<'settings'|'help'|null>(null);
   const [touch,setTouch]=useState(false);
@@ -34,7 +36,7 @@ export default function Home() {
     import('@/lib/game/game').then(async({BubbleGame})=>{
       if(disposed||!mount.current)return;
       setTouch(window.matchMedia('(pointer: coarse)').matches);setSettings(prefs);
-      const game=new BubbleGame(mount.current,setState);engine.current=game;game.setSettings(prefs);await game.init();
+      const game=new BubbleGame(mount.current,setState);engine.current=game;setToolIcons(game.toolIcons);game.setSettings(prefs);await game.init();
     }).catch(error=>{console.error('Arena initialization failed',error);if(!disposed)setLoadError('The arena could not start. Try reloading in a browser with WebGL enabled.');});
     return()=>{disposed=true;engine.current?.dispose();engine.current=null;};
   },[]);
@@ -95,7 +97,7 @@ export default function Home() {
     </>}
     {state.started&&<div className={`tool-area ${state.playing?'':'tool-area-paused'}`}>
       <div className="tool-description"><strong>{state.held||tool.name}</strong><span>{state.held?'Hold to build power. Release to throw.':tool.description}</span></div>
-      <nav className="toolbelt" aria-label="Choose a tool">{TOOLS.map((t,i)=>{const Icon=t.icon;return <button key={t.name} aria-label={`${i+1}: ${t.name}`} aria-pressed={state.tool===i} onClick={()=>engine.current?.selectTool(i)} className={state.tool===i?'selected':''}><kbd>{i+1}</kbd><Icon strokeWidth={1.7}/><span>{t.name}</span></button>;})}</nav>
+      <nav className="toolbelt" aria-label="Choose a tool">{TOOLS.map((t,i)=>{return <button key={t.name} aria-label={`${i+1}: ${t.name}`} aria-pressed={state.tool===i} onClick={()=>engine.current?.selectTool(i)} className={state.tool===i?'selected':''}><kbd>{i+1}</kbd>{toolIcons[i]&&<Image className="tool-portrait" src={toolIcons[i]} alt="" width={48} height={48} draggable={false} unoptimized/>}<span>{t.name}</span></button>;})}</nav>
     </div>}
     {state.playing&&!touch&&<footer className="game-footer"><span><kbd>WASD</kbd> move <kbd>SPACE</kbd> jump <kbd>SHIFT</kbd> run</span><span><kbd>F</kbd> use tool <kbd>E</kbd> grab / drop <kbd>R</kbd> fresh wrap <kbd>ESC</kbd> pause</span></footer>}
     {notice&&<output className="notice">{notice}</output>}

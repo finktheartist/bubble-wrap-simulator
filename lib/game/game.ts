@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { createArena, WrapSurface, type Arena } from './arena';
 import { ArenaPhysics, initPhysics, type PhysicsItem } from './physics';
 import { PopAudio } from './audio';
+import { renderToolIcons } from './tool-icons';
 import { bindToolInput } from './input';
 import { makeTool, disposeTool, TOOL_INFO } from './tools';
 
@@ -15,6 +16,7 @@ export class BubbleGame {
   arena: Arena;
   physics: ArenaPhysics|null=null;
   audio=new PopAudio();
+  toolIcons:string[]=[];
   snapshot={...DEFAULT};
   settings:GameSettings={volume:.65,sensitivity:1,shake:true,footsteps:true,muted:false,quality:'balanced'};
   keys=new Set<string>();
@@ -34,6 +36,7 @@ export class BubbleGame {
   constructor(private container:HTMLElement,onChange:(s:GameSnapshot)=>void) {
     this.uiCallback=onChange;
     this.arena=createArena(container);
+    this.toolIcons=renderToolIcons(this.arena.renderer,this.arena.environment.texture);
     this.snapshot.total=this.arena.surfaces.reduce((n,s)=>n+s.cells.length,0);
     this.particleGeometry.setAttribute('position',new THREE.BufferAttribute(this.particleArray,3).setUsage(THREE.DynamicDrawUsage));
     this.particleGeometry.setDrawRange(0,0);

@@ -49,14 +49,15 @@ Bubble spacing is 0.26 world units throughout the room and 0.22 on loose parcels
 - Three.js renders instanced hemispheres with a sealed rim, clearcoat, subtle iridescence, environment reflections, and short collapse animations. Popped cells stay flat until reset.
 - Rapier provides a fixed 60 Hz rigid-body simulation, a capsule character controller, gravity, contact events, object mass, friction, restitution, continuous collision detection, and collision-preserving object grabbing.
 - Bowling balls, parcels, pellets, and bombs are dynamic bodies. Contact position and impact speed determine pop radius. Explosions apply distance-based impulses and schedule outward-moving crackles.
-- Web Audio synthesizes each pop from a sharp membrane snap, a brief pressure body, and five irregular plastic micro-crinkles. Twenty-four variants, stereo placement, a quiet room reflection, and bounded 4.5 ms voice scheduling preserve the crackle of simultaneous pops. A compressor controls peaks. No audio assets or external services are needed during play.
+- Web Audio synthesizes rounded pressure pops with a short, warm membrane body and a softly filtered air transient. There are no crinkle tails, distortion, or added room echoes. Twenty-four variants and stereo placement provide variation; dense impacts resolve into distinct pops spaced 20–28 ms apart. Conservative voice gain, a short queue, filtered treble, and a gentle limiter prevent harsh stacking. Impact thumps are quieter and rate-limited. No audio assets or external services are needed during play.
+- Menu icons are transparent portraits rendered once from the same Three.js models and materials used by the held tools. Shapes, colors, grips, and bowling-ball finger holes match the items in the arena.
 - GPU instancing, bounded projectiles, bounded particles, and a balanced render setting keep the room practical for a browser.
 
 The wrap itself uses a hybrid approximation: rigid backing plus individually animated cells. It does not simulate tearing sheets, cloth, or air pressure. The six tools are stylized sandbox objects rather than engineering-accurate weapon simulations.
 
 ## Validation
 
-Eleven automated tests exercise tool-button availability, mouse and keyboard use without capture, quick-tap activation of all six tools, bounded audio transients and multi-pop scheduling, one-time popping and reinflation, walking/wall collision/jumping/landing, high-speed contact detection, collision-preserving grabbing, and blast falloff/reset. TypeScript checks the full project. Lint checks application, game, and test sources; the untouched generated component catalog has pre-existing lint failures and is outside that command.
+Twelve automated tests exercise tool-button availability, mouse and keyboard use without capture, quick-tap activation of all six tools, rounded audio transients, separated multi-pop scheduling, sustained-burst mixing headroom, one-time popping and reinflation, walking/wall collision/jumping/landing, high-speed contact detection, collision-preserving grabbing, and blast falloff/reset. TypeScript checks the full project. Lint checks application, game, and test sources; the untouched generated component catalog has pre-existing lint failures and is outside that command.
 
 Browser playtesting is a separate optional step, pending the user's choice in the build conversation. Touch controls are implemented but are not yet verified on a physical device.
 
@@ -68,6 +69,7 @@ Browser playtesting is a separate optional step, pending the user's choice in th
 - `lib/game/physics.ts`: Rapier bodies, character movement, grabbing, and impulses.
 - `lib/game/tools.ts`: physical tool models.
 - `lib/game/audio.ts`: procedural sound routing.
+- `lib/game/tool-icons.ts`: menu portraits rendered from the live tool models.
 - `lib/game/pop-synthesis.ts`: pressure-release synthesis and voice scheduling.
 - `lib/game/input.ts`: tool input with or without mouse capture.
 - `components/game/use-tool-button.tsx`: pointer and keyboard action button.

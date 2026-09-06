@@ -170,3 +170,9 @@ h1 { font-size:clamp(48px,5.6vw,86px); letter-spacing:-.07em; font-weight:850; l
 @media(max-height:650px) and (min-width:601px) {.action-dock{bottom:140px;right:20px;width:124px;}.action-label{font-size:9px;}.use-tool-button{min-height:66px;padding:10px;}.use-tool-button strong{font-size:18px;}.is-touch .action-dock{bottom:24px;}.is-touch .tool-area{width:430px;}}
 
 @media(max-width:600px){.is-touch .tool-area-paused{bottom:30px;}}
+/* Rendered from the real hand-held models, so silhouettes and colors stay in sync. */
+.toolbelt .tool-portrait {width:46px;height:46px;object-fit:contain;pointer-events:none;filter:drop-shadow(0 2px 2px #20313724);}
+.toolbelt button {gap:2px;}
+@media (min-width:1500px) {.toolbelt .tool-portrait {width:50px;height:50px;}}
+@media (max-width:600px) {.toolbelt .tool-portrait {width:36px;height:36px;}}
+@media (max-height:650px) and (min-width:601px) {.toolbelt .tool-portrait {width:35px;height:35px;}}

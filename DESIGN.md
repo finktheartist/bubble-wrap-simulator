@@ -13,3 +13,5 @@ Refero MCP is unavailable. Bundled Refero color, motion, and craft references su
 | Focus-visible, semantic buttons, reduced shake option | Refero craft reference | Make control states accessible without interrupting play. |
 
 Preserve the bright room, large individually collapsing cells, restrained HUD, and physical tools. Reject a marketing layout, dark cyberpunk chrome, or decoration that obscures the scene.
+
+The tool belt uses small renders of the actual tool models, per the user's request for icons that match the objects. The existing palette, button layout, and text labels remain the reference. Audio direction is a rounded, distinct pop with no scratchy noise tails; large hits spread into brief, separate pops.
