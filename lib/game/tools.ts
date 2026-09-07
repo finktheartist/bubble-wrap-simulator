@@ -1,15 +1,8 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-export const TOOL_INFO = [
-  {name:'Fingertip',verb:'Click POP or press F',detail:'One bubble at a time. Take it slow.',key:'1'},
-  {name:'Mallet',verb:'Click to smash',detail:'A reassuringly excessive rubber mallet.',key:'2'},
-  {name:'Bat',verb:'Click to whack',detail:'A wide swing. A very good crackle.',key:'3'},
-  {name:'Bowling ball',verb:'Hold & release to throw',detail:'Seven kilos of excellent decisions.',key:'4'},
-  {name:'Pop blaster',verb:'Hold to shoot',detail:'Little pellets. Rapid-fire satisfaction.',key:'5'},
-  {name:'Pop bomb',verb:'Click to throw',detail:'A short fuse. A room-shaking ripple.',key:'6'},
-] as const;
-export const TOOL_FILES = ['fingertip','mallet','bat','bowling-ball','pop-blaster','pop-bomb'] as const;
+import { TOOL_INFO, TOOL_FILES } from './tool-info';
+export { TOOL_INFO, TOOL_FILES } from './tool-info';
 type LoadModel = (url:string) => Promise<THREE.Group>;
 
 /** Each game owns one copy of the Blender assets; held tools, portraits and projectiles share it. */
@@ -70,5 +63,7 @@ export class ToolLibrary {
 /** Removing an instance must never dispose resources still used by another ball or the tool belt. */
 export function disposeTool(group:THREE.Group) {
   if(group.userData.sharedToolAsset)return;
-  group.traverse(object=>{if(object instanceof THREE.Mesh)object.geometry.dispose();});
+  const geometry=new Set<THREE.BufferGeometry>(),materials=new Set<THREE.Material>();
+  group.traverse(object=>{if(object instanceof THREE.Mesh){geometry.add(object.geometry);for(const mat of Array.isArray(object.material)?object.material:[object.material])materials.add(mat);}});
+  geometry.forEach(value=>value.dispose());materials.forEach(value=>value.dispose());
 }

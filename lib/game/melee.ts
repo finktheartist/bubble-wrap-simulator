@@ -25,7 +25,8 @@ export function heldToolPose(tool:number,aspect:number,state:{charge?:number;rec
   const rotation:[number,number,number]=[(melee?-.2:-.08)-Math.sin((state.throwSwing??0)*Math.PI)*(melee?0:.5),tool===1?-.6:-.18,melee?-.3:-.18];
   if(state.attack){const pose=meleePose(state.attack.tool,state.attack.age);for(let i=0;i<3;i++){position[i]+=pose.position[i]*fit;rotation[i]+=pose.rotation[i];}}
   if(tool===0){position[1]=portrait?-.06:-.32;position[2]=(portrait?-.8:-.62)-(state.recoil??0)*.35;}
-  return {position,rotation,scale:(tool===2?.76:1)*fit,gripY:tool===1?.26:tool===2?.38:0,modelYaw:tool===1?Math.PI/2:0};
+  if(tool>=6){position[0]=portrait?aspect*.19:.32;position[1]=(portrait?-.19:-.285)+(state.bob??0);position[2]=(portrait?-1.05:-1.24)+(state.recoil??0)*.07;rotation[0]=-.04-(state.recoil??0)*.05;rotation[1]=.14;rotation[2]=-.08;}
+  return {position,rotation,scale:(tool===2?.76:tool===6?.73:tool===7?.58:tool===8?.74:1)*(tool>=6&&portrait?Math.min(fit,.6):fit),gripY:tool===1?.26:tool===2?.38:0,modelYaw:tool===1?Math.PI/2:0};
 }
 export class MeleeSwing {
   attack:{tool:MeleeTool;startedAt:number;contacted:boolean}|null=null;

@@ -1,8 +1,8 @@
 # Blender tool library
 
-`bubble-wrap-tools.blend` contains all six game tools, packed color and normal maps, and a neutral product studio. The `00 — Toolkit presentation (linked copies)` collection is arranged for review. The six hidden source collections retain unit scale and the game origin; show one source collection and hide the presentation to edit or export it. The presentation copies share their mesh and materials with the sources.
+`bubble-wrap-tools.blend` contains all nine game tools, packed color and normal maps, and a neutral product studio. The `00 — Toolkit presentation (linked copies)` collection is arranged for review. The nine hidden source collections retain unit scale and the game origin; show one source collection and hide the presentation to edit or export it. The presentation copies share their mesh and materials with the sources.
 
-The authoring script rebuilds the generated library, exports the six GLBs to `public/models/`, and renders previews to `outputs/toolkit/`. It runs in a separate background Blender process and does not affect an already open scene. Rebuilding overwrites this generated master and its exports, so save manual revisions separately first.
+The authoring script rebuilds the generated library, exports the nine GLBs to `public/models/`, and renders previews to `outputs/toolkit/`. It runs in a separate background Blender process and does not affect an already open scene. Rebuilding overwrites this generated master and its exports, so save manual revisions separately first.
 
 From the project root, using Blender 5.1.2:
 
@@ -21,8 +21,11 @@ The second command imports the actual exported GLBs into a fresh studio to inspe
 | Bowling ball | 16,170 | 768 px |
 | Pop blaster | 14,794 | 512 px |
 | Pop bomb | 20,040 | 512 px |
+| Rocket launcher | 14,940 | 512 px |
+| Bowling cannon | 16,184 | 512 px |
+| Pop vacuum | 19,648 | 512 px |
 
-All textures are embedded; the full set totals about 5.7 MB. `public/models/manifest.json` records exact export sizes. The game loads one library and shares geometry and textures across held tools, menu portraits, and projectiles. Procedural shading is baked locally; play requires no asset service.
+All textures are embedded; the full set totals about 8.3 MB. `public/models/manifest.json` records exact export sizes. The game loads one library and shares geometry and textures across held tools, menu portraits, and projectiles. Procedural shading is baked locally; play requires no asset service.
 
 To review actual game swing poses (without changing the open Blender scene):
 
@@ -32,3 +35,10 @@ node_modules/.bin/tsx tools/blender/swing_poses.ts
 ```
 
 The sampler reads the same grip-pivot pose function used by the renderer. Review outputs include rest, wind-up, contact, and follow-through for the hammer and bat in desktop and portrait framing.
+
+For the three new tools at rest and during recoil, in desktop, portrait and landscape:
+
+```sh
+node_modules/.bin/tsx tools/blender/toybox_poses.ts
+/Applications/Blender.app/Contents/MacOS/Blender --background --factory-startup --python tools/blender/review_toybox.py
+```

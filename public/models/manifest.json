@@ -23,7 +23,7 @@
     "triangles": 8588,
     "vertices": 4715,
     "materials": 5,
-    "bytes": 451368,
+    "bytes": 451016,
     "source": "art/bubble-wrap-tools.blend"
   },
   {
@@ -32,7 +32,7 @@
     "triangles": 16170,
     "vertices": 8473,
     "materials": 3,
-    "bytes": 830288,
+    "bytes": 830344,
     "source": "art/bubble-wrap-tools.blend"
   },
   {
@@ -50,7 +50,34 @@
     "triangles": 20040,
     "vertices": 10486,
     "materials": 10,
-    "bytes": 930160,
+    "bytes": 930716,
+    "source": "art/bubble-wrap-tools.blend"
+  },
+  {
+    "tool": 6,
+    "file": "rocket-launcher.glb",
+    "triangles": 14940,
+    "vertices": 8624,
+    "materials": 10,
+    "bytes": 806488,
+    "source": "art/bubble-wrap-tools.blend"
+  },
+  {
+    "tool": 7,
+    "file": "ball-cannon.glb",
+    "triangles": 16184,
+    "vertices": 8904,
+    "materials": 8,
+    "bytes": 792696,
+    "source": "art/bubble-wrap-tools.blend"
+  },
+  {
+    "tool": 8,
+    "file": "pop-vacuum.glb",
+    "triangles": 19648,
+    "vertices": 10838,
+    "materials": 8,
+    "bytes": 1038232,
     "source": "art/bubble-wrap-tools.blend"
   }
 ]

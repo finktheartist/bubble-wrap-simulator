@@ -57,6 +57,12 @@ Keep the existing bright packing room, graphite typography, and acid-yellow acti
 | Equipped tool directly above the action button; full grid only while choosing | User's request for intuitive integration and less obstruction | Keep tool choice beside tool use, with the center and bottom middle clear. |
 | Picker pauses play, closes on selection, and supports T / 1–6 | Existing accessible controls and Refero craft guidance | Choosing a tool should not also fire or move the player. |
 | Arena tap uses a tool; a drag only aims | User's broken-tap report and gesture-ownership rules | The old touch overlay consumed arena taps without sending a tool action. |
+
+## Toybox expansion — September 6, 2026
+
+Extend the established packing-room direction with three immediately available tools. The rocket launcher has a long teal tube, recessed bore, machined bands and offset sight. The bowling cannon uses a broad red bell, brass lip, visible air reservoir and pressure gauge. The workshop vacuum has a yellow motor body, charcoal grips, corrugated throat and wide open nozzle. Their different silhouettes remain identifiable in the small rendered portraits.
+
+The compact equipped-tool control opens a three-by-three grid. The popup scrolls within the space available on short landscape screens; choosing a tool resumes play. One shared catalog keeps all nine labels, models, numeric shortcuts, and action-button verbs aligned. Orange rocket trails and radial bursts contrast with the vacuum's contracting teal rings and inward-moving flecks. Both reuse the existing bounded effect pools. Larger tools fit below the reticle at rest, with room for recoil on phones and tablets.
 | Grip-pivot hammer strike and lateral bat sweep | User's request for convincing swings | Show preparation, a timed contact, and follow-through instead of wobbling the whole object around its center. |
 | Brief trails, air rings, film flecks and impact marker | User's VFX request and Refero feedback-purpose rule | Emphasize movement and confirmed hits while preserving the view. |
 | Three drifting bubble targets that reinflate | User's moving-target request | Add repeatable play using the same visible wrap and collision system. |

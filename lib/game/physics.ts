@@ -5,7 +5,7 @@ import { targetPosition } from './targets';
 
 let rapierReady: Promise<void> | undefined;
 export const initPhysics = () => rapierReady ??= RAPIER.init();
-export type PhysicsItem = { body:RAPIER.RigidBody; collider:RAPIER.Collider; group:THREE.Group; name:string; wrapped?:WrappedObject; kind:'parcel'|'ball'|'bomb'|'shot'; born:number; fuse:number; speed:number; initial:THREE.Vector3; radius:number };
+export type PhysicsItem = { body:RAPIER.RigidBody; collider:RAPIER.Collider; group:THREE.Group; name:string; wrapped?:WrappedObject; kind:'parcel'|'ball'|'bomb'|'shot'|'rocket'; born:number; fuse:number; speed:number; initial:THREE.Vector3; radius:number; impactPoint?:THREE.Vector3 };
 export class ArenaPhysics {
   world = new RAPIER.World({x:0,y:-9.81,z:0});
   events = new RAPIER.EventQueue(true);
@@ -57,12 +57,15 @@ export class ArenaPhysics {
     if(p.y<-5) {this.player.setTranslation({x:0,y:.88,z:9.5},true);this.verticalVelocity=0;}
   }
   spawn(group:THREE.Group,kind:PhysicsItem['kind'],position:THREE.Vector3,velocity:THREE.Vector3,now:number):PhysicsItem {
-    const radius=kind==='ball'?.28:kind==='bomb'?.19:.075;
-    const body=this.world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(position.x,position.y,position.z).setLinvel(velocity.x,velocity.y,velocity.z).setCcdEnabled(true).setLinearDamping(.035).setAngularDamping(.1));
-    const collider=this.world.createCollider(RAPIER.ColliderDesc.ball(radius).setMass(kind==='ball'?7:kind==='bomb'?1.2:.15).setRestitution(kind==='ball'?.42:kind==='bomb'?.3:.65).setFriction(.55).setActiveEvents(RAPIER.ActiveEvents.COLLISION_EVENTS),body);
-    body.setAngvel({x:velocity.z*1.3,y:1,z:-velocity.x},true);
+    const radius=kind==='ball'?.28:kind==='bomb'?.19:kind==='rocket'?.12:.075;
+    const body=this.world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(position.x,position.y,position.z).setLinvel(velocity.x,velocity.y,velocity.z).setCcdEnabled(true).setLinearDamping(kind==='rocket'?0:.035).setAngularDamping(.1));
+    const collider=this.world.createCollider(RAPIER.ColliderDesc.ball(radius).setMass(kind==='ball'?7:kind==='bomb'?1.2:kind==='rocket'?.65:.15).setRestitution(kind==='rocket'?0:kind==='ball'?.42:kind==='bomb'?.3:.65).setFriction(.55).setActiveEvents(RAPIER.ActiveEvents.COLLISION_EVENTS),body);
+    if(kind==='rocket'){
+      body.setGravityScale(0,true);body.lockRotations(true,true);
+      const q=new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,0,-1),velocity.clone().normalize());body.setRotation(q,true);group.quaternion.copy(q);
+    }else body.setAngvel({x:velocity.z*1.3,y:1,z:-velocity.x},true);
     group.position.copy(position);
-    const item:PhysicsItem={body,collider,group,name:kind==='ball'?'Bowling ball':kind==='bomb'?'Pop bomb':'Blaster pellet',kind,born:now,fuse:kind==='bomb'?now+1.5:-1,speed:velocity.length(),initial:position.clone(),radius};
+    const item:PhysicsItem={body,collider,group,name:kind==='ball'?'Bowling ball':kind==='bomb'?'Pop bomb':kind==='rocket'?'Pop rocket':'Blaster pellet',kind,born:now,fuse:kind==='bomb'?now+1.5:kind==='rocket'?now+3.5:-1,speed:velocity.length(),initial:position.clone(),radius};
     this.items.push(item);this.lookup.set(collider.handle,item);group.userData.physicsItem=item;
     return item;
   }
@@ -91,7 +94,8 @@ export class ArenaPhysics {
     this.events.drainCollisionEvents((a,b,started)=>{
       if(!started || a===this.playerCollider.handle || b===this.playerCollider.handle) return;
       const ia=this.lookup.get(a),ib=this.lookup.get(b);
-      const item=(ia?.speed??0)>(ib?.speed??0)?ia:ib;
+      // A rocket must register a contact even if the object it hits moves faster.
+      const item=ia?.kind==='rocket'?ia:ib?.kind==='rocket'?ib:(ia?.speed??0)>(ib?.speed??0)?ia:ib;
       if(!item || item===this.held || item.speed<1.05)return;
       const ca=this.world.getCollider(a),cb=this.world.getCollider(b);
       let point:THREE.Vector3|null=null;
@@ -115,6 +119,23 @@ export class ArenaPhysics {
       item.body.applyImpulse(dir.multiplyScalar(strength*(1-distance/radius)*item.body.mass()),true);
       item.body.applyTorqueImpulse({x:(Math.random()-.5)*2,y:1,z:(Math.random()-.5)*2},true);
     }
+  }
+  /** Mass-independent suction toward a hovering pile; rigid collisions remain active. */
+  suction(origin:THREE.Vector3,direction:THREE.Vector3,dt:number):THREE.Vector3[] {
+    const gathered:THREE.Vector3[]=[],target=origin.clone().addScaledVector(direction,2.1);
+    for(const item of this.items){
+      if(item===this.held||item.kind==='shot'||item.kind==='rocket')continue;
+      const position=item.group.position,offset=position.clone().sub(origin),depth=offset.dot(direction);
+      if(depth<.65||depth>8||offset.clone().addScaledVector(direction,-depth).length()>.5+depth*.46)continue;
+      const ray=new RAPIER.Ray(origin,offset.clone().normalize());
+      const obstruction=this.world.castRay(ray,offset.length(),true,undefined,undefined,this.playerCollider);
+      if(obstruction&&obstruction.collider.handle!==item.collider.handle)continue;
+      const desired=target.clone().sub(position).multiplyScalar(5).clampLength(0,13),velocity=item.body.linvel();
+      const impulse=desired.sub(new THREE.Vector3(velocity.x,velocity.y,velocity.z)).multiplyScalar(item.body.mass()*(1-Math.exp(-7*dt)));
+      impulse.y+=9.81*item.body.mass()*dt;
+      item.body.applyImpulse(impulse,true);gathered.push(position.clone());
+    }
+    return gathered;
   }
   remove(item:PhysicsItem) {
     if(this.held===item)this.release();

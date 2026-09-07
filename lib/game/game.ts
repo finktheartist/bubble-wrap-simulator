@@ -8,6 +8,8 @@ import { ToolLibrary, disposeTool, TOOL_INFO } from './tools';
 import { MeleeSwing, MELEE, heldToolPose, type MeleeTool } from './melee';
 import { MovingTargets } from './targets';
 import { WorldEffects, ToolEffects } from './effects';
+import { cycleTool, toolShortcut } from './tool-info';
+import { createRocket, toolMuzzlePosition } from './projectiles';
 
 export type GameSnapshot={ready:boolean;playing:boolean;started:boolean;tool:number;pops:number;total:number;combo:number;best:number;hint:string;target:boolean;charge:number;held:string;fps:number;error:string;pointerLocked:boolean;targets:number;impact:number};
 export type GameSettings={volume:number;sensitivity:number;shake:boolean;footsteps:boolean;muted:boolean;quality:'high'|'balanced'};
@@ -99,7 +101,7 @@ export class BubbleGame {
       if(!this.snapshot.playing)return;
       this.keys.add(e.code);
       if(e.repeat)return;
-      if(/^Digit[1-6]$/.test(e.code))this.selectTool(Number(e.code.at(-1))-1);
+      const selected=toolShortcut(e.code);if(selected!==null)this.selectTool(selected);
       if(e.code==='KeyE')this.grab();
       if(e.code==='KeyR')this.reset();
       if(e.code==='KeyL')void this.toggleMouseLook();
@@ -107,7 +109,7 @@ export class BubbleGame {
     },{signal});
     document.addEventListener('keyup',e=>this.keys.delete(e.code),{signal});
     canvas.addEventListener('wheel',e=>{
-      if(!this.snapshot.playing)return;e.preventDefault();this.selectTool((this.snapshot.tool+(e.deltaY>0?1:5))%6);
+      if(!this.snapshot.playing)return;e.preventDefault();this.selectTool(cycleTool(this.snapshot.tool,e.deltaY));
     },{signal,passive:false});
     window.addEventListener('blur',()=>this.pause(),{signal});
     window.screen.orientation?.addEventListener('change',()=>{if(this.snapshot.playing)this.pause();},{signal});
@@ -153,7 +155,7 @@ export class BubbleGame {
     r.shadowMap.enabled=true;this.arena.scene.traverse(o=>{if(o instanceof THREE.DirectionalLight&&o.castShadow){const size=this.settings.quality==='high'?2048:1024;if(o.shadow.mapSize.x!==size){o.shadow.mapSize.set(size,size);o.shadow.map?.dispose();o.shadow.map=null;}}});this.resize();
   }
   selectTool(tool:number) {
-    if(tool===this.snapshot.tool||!this.tools)return;
+    if(!Number.isInteger(tool)||!TOOL_INFO[tool]||tool===this.snapshot.tool||!this.tools)return;
     this.down=false;this.clearPressure();this.snapshot.charge=0;this.melee.reset();this.toolEffects.reset();
     this.snapshot.tool=tool;this.nextAction=0;this.toolRig.remove(this.toolModel);disposeTool(this.toolModel);this.toolModel=this.tools.create(tool);this.toolRig.add(this.toolModel);this.recoil=.2;this.publish();
   }
@@ -165,7 +167,7 @@ export class BubbleGame {
     if(this.physics?.held) return;
     if(this.snapshot.tool===0)this.poke();
     if(this.snapshot.tool===1||this.snapshot.tool===2)this.beginSwing(this.snapshot.tool,true);
-    if([4,5].includes(this.snapshot.tool))this.useTool();
+    if(this.snapshot.tool>=4)this.useTool(1/30);
   }
   tapTool(){this.actionDown();this.actionUp();}
   private beginSwing(tool:MeleeTool,buffer=false){if(this.melee.trigger(tool,this.time,buffer))this.audio.swish(tool===1);}
@@ -199,7 +201,7 @@ export class BubbleGame {
   grab() {
     if(!this.physics)return;
     if(this.physics.held){this.physics.release();this.publish();return;}
-    if(this.pickup&&this.pickup.kind!=='shot'){this.physics.grab(this.pickup);this.melee.reset();this.toolEffects.reset();this.clearPressure();this.publish();}
+    if(this.pickup&&this.pickup.kind!=='shot'&&this.pickup.kind!=='rocket'){this.physics.grab(this.pickup);this.melee.reset();this.toolEffects.reset();this.clearPressure();this.publish();}
   }
   reset() {
     if(!this.physics)return;
@@ -219,9 +221,11 @@ export class BubbleGame {
     else {const g=this.tools!.create(3,true);this.arena.scene.add(g);const pos=this.arena.camera.position.clone().addScaledVector(dir,.8).add(new THREE.Vector3(0,-.18,0));p.spawn(g,'ball',pos,velocity,this.time);}
     this.recoil=.5;this.swing=.4;this.audio.thump(.25);this.trimProjectiles();
   }
-  private useTool() {
-    if(this.time<this.nextAction||!this.physics)return;
+  private useTool(dt=1/60) {
+    if(!this.physics)return;
     const tool=this.snapshot.tool,dir=this.direction(),origin=this.arena.camera.position.clone();
+    const gathered=tool===8?this.physics.suction(origin,dir,dt):[];
+    if(this.time<this.nextAction)return;
     if(tool===4) {
       this.nextAction=this.time+.105;this.recoil=.32;this.toolEffects.fire();
       const muzzle=origin.clone().addScaledVector(dir,.7).add(new THREE.Vector3(.18,-.13,0).applyQuaternion(this.arena.camera.quaternion));
@@ -234,6 +238,31 @@ export class BubbleGame {
       const g=this.tools!.create(5,true);this.arena.scene.add(g);
       const pos=origin.addScaledVector(dir,.8);const velocity=dir.multiplyScalar(13);velocity.y+=2.5;
       this.physics.spawn(g,'bomb',pos,velocity,this.time);this.audio.thump(.35);this.trimProjectiles();
+    } else if(tool===6){
+      const muzzle=toolMuzzlePosition(tool,this.arena.camera,this.recoil);
+      const velocity=(this.aimed?.point.clone()??origin.clone().addScaledVector(dir,45)).sub(muzzle).normalize().multiplyScalar(27);
+      this.nextAction=this.time+1.05;this.recoil=1;this.toolEffects.fire();
+      const g=createRocket();this.arena.scene.add(g);
+      const item=this.physics.spawn(g,'rocket',muzzle,velocity,this.time);
+      // Close walls cannot be skipped by the initial muzzle offset.
+      if(this.aimed&&this.aimed.distance<muzzle.distanceTo(origin)+.25)item.impactPoint=this.aimed.point.clone();
+      this.audio.swish(true);this.audio.thump(.9);this.trimProjectiles();
+    } else if(tool===7){
+      const muzzle=toolMuzzlePosition(tool,this.arena.camera,this.recoil);
+      const pos=this.aimed&&this.aimed.distance<muzzle.distanceTo(origin)+.3?origin.clone().addScaledVector(dir,.4):muzzle;
+      const velocity=(this.aimed?.point.clone()??origin.clone().addScaledVector(dir,45)).sub(pos).normalize().multiplyScalar(31);velocity.y+=.65;
+      this.nextAction=this.time+.72;this.recoil=.95;this.toolEffects.fire();
+      const g=this.tools!.create(3,true);this.arena.scene.add(g);
+      this.physics.spawn(g,'ball',pos,velocity,this.time);this.effects.ripple(pos,dir,.75,0xffdda1,.3);
+      this.audio.thump(1.2);this.trimProjectiles();
+    } else if(tool===8){
+      this.nextAction=this.time+.07;this.recoil=.08;
+      const nozzle=toolMuzzlePosition(tool,this.arena.camera,this.recoil);
+      const source=this.aimed&&this.aimed.distance<8?this.aimed.point:origin.clone().addScaledVector(dir,5);
+      this.effects.suction(source,nozzle);
+      for(const point of gathered.slice(0,2))this.effects.suction(point,nozzle);
+      if(this.aimed&&this.aimed.distance<8)this.burst(this.aimed.point,.68,1.05,.035);
+      if(gathered.length)this.snapshot.impact=.45;
     }
   }
   private strikeMelee(tool:MeleeTool) {
@@ -254,8 +283,10 @@ export class BubbleGame {
     const projectiles=this.physics.items.filter(i=>i.kind!=='parcel');
     while(projectiles.length>(this.touch?24:45)){const item=projectiles.shift()!;if(item===this.physics.held)continue;this.removeItem(item);}
   }
-  private removeItem(item:PhysicsItem){this.physics?.remove(item);disposeTool(item.group);if(item.kind==='shot')item.group.traverse(o=>{if(o instanceof THREE.Mesh)(o.material as THREE.Material).dispose();});}
+  private removeItem(item:PhysicsItem){this.physics?.remove(item);disposeTool(item.group);}
   private impact(item:PhysicsItem,point:THREE.Vector3,speed:number) {
+    // Collision events only record a rocket hit. World mutation happens after step().
+    if(item.kind==='rocket'){item.impactPoint??=point.clone();return;}
     if(item.kind==='bomb')return;
     const radius=item.kind==='shot'?.48:THREE.MathUtils.clamp(.25+speed*.065+(item.kind==='ball'?.28:.16),.4,1.75);
     this.burst(point,radius,Math.min(2,speed*.14),.04);
@@ -298,12 +329,12 @@ export class BubbleGame {
     for(let i=0;i<count&&this.particles.length<1500;i++)this.particles.push({p:point.clone(),v:normal.clone().multiplyScalar(.7+Math.random()*1.5).add(new THREE.Vector3((Math.random()-.5)*2,Math.random(),(Math.random()-.5)*2)),life:.28+Math.random()*.2,max:.5});
   }
   private explode(item:PhysicsItem) {
-    const point=item.group.position.clone();
-    this.removeItem(item);this.burst(point,5.8,2.7,.085);this.physics?.blast(point,7.4,11);this.audio.thump(2.8,true);
+    const point=item.impactPoint?.clone()??item.group.position.clone(),rocket=item.kind==='rocket',radius=rocket?4.7:5.8,color=rocket?0xffc485:0xd7ffa8;
+    this.removeItem(item);this.burst(point,radius,2.7,rocket?.055:.085);this.physics?.blast(point,rocket?6.2:7.4,rocket?13:11);this.audio.thump(2.8,true);
     this.shake=.32;this.snapshot.impact=1;
-    this.effects.burst(point,new THREE.Vector3(0,1,0),3,0xd7ffa8,true);
-    for(const normal of [new THREE.Vector3(0,1,0),new THREE.Vector3(0,0,1)])this.effects.ripple(point,normal,5.8,0xe6ffc4,.6);
-    const ring=new THREE.Mesh(new THREE.SphereGeometry(1,24,12),new THREE.MeshBasicMaterial({color:0xe6ffb4,transparent:true,opacity:.18,depthWrite:false,side:THREE.DoubleSide}));
+    this.effects.burst(point,new THREE.Vector3(0,1,0),3,color,true);
+    for(const normal of [new THREE.Vector3(0,1,0),new THREE.Vector3(0,0,1)])this.effects.ripple(point,normal,radius,color,.6);
+    const ring=new THREE.Mesh(new THREE.SphereGeometry(1,24,12),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.18,depthWrite:false,side:THREE.DoubleSide}));
     ring.position.copy(point);this.arena.scene.add(ring);this.rays.push({mesh:ring,life:.42,max:.42});
   }
   private findAim() {
@@ -325,33 +356,51 @@ export class BubbleGame {
     this.aimed=hit;this.pickup=null;
     let near=3.5;
     for(const item of this.physics?.items??[]) {
-      if(item===this.physics?.held||item.kind==='shot')continue;
+      if(item===this.physics?.held||item.kind==='shot'||item.kind==='rocket')continue;
       if(ray.intersectSphere(new THREE.Sphere(item.group.position,item.radius),point)) {
         const d=point.distanceTo(origin);if(d<near&&(!hit||d<hit.distance+.55)){near=d;this.pickup=item;}
       }
     }
-    const range=this.snapshot.tool===0?3:this.snapshot.tool===1?3.7:this.snapshot.tool===2?4.1:45;
+    const range=this.snapshot.tool===0?3:this.snapshot.tool===1?3.7:this.snapshot.tool===2?4.1:this.snapshot.tool===8?8:45;
     const available=hit&&(this.snapshot.tool===0?this.availableCell(hit)!==null:hit.surface.cells[hit.index].state===0);
     this.snapshot.target=Boolean(hit&&hit.distance<range&&available)||Boolean(this.pickup);
     this.snapshot.held=this.physics?.held?.name??'';
     if(this.physics?.held)this.snapshot.hint=this.touch?'Hold THROW · Release to launch':'Hold & release to throw · E to drop';
     else if(this.pickup)this.snapshot.hint=`${this.touch?'Grab':'E'} · Pick up ${this.pickup.name.toLowerCase()}`;
     else {
-      const verb=this.touch?['Tap to pop · Hold POP for a crackle','Tap anywhere to swing','Tap anywhere to swing','Hold THROW · Release to launch','Hold FIRE · Drag to aim','Tap THROW BOMB'][this.snapshot.tool]:TOOL_INFO[this.snapshot.tool].verb;
+      const verb=this.touch?TOOL_INFO[this.snapshot.tool].touchVerb:TOOL_INFO[this.snapshot.tool].verb;
       if(hit&&hit.distance<range)this.snapshot.hint=!available?'Aim at some fresh bubbles':this.snapshot.tool===0&&!this.touch?'Click POP or press F · Hold for a crackle':verb;
       else this.snapshot.hint=this.snapshot.tool===0?'Move closer to the bubbles':this.snapshot.tool<=2?'Swing · Move closer to hit':verb;
     }
   }
-  private updateInteraction() {
+  private updateInteraction(dt=1/60) {
     if(!this.physics)return;
     this.findAim();
     const tool=this.snapshot.tool;
     if(this.down&&(tool===3||this.physics.held)){this.snapshot.charge=Math.min(1,(this.time-this.pressedAt)/1.05);return;}
     if(this.down&&(tool===1||tool===2))this.beginSwing(tool);
-    if(this.down&&tool===4)this.useTool();
+    if(this.down&&tool>=4&&TOOL_INFO[tool].mode==='hold')this.useTool(dt);
     const previous=this.melee.attack,contact=this.melee.advance(this.time);if(contact)this.strikeMelee(contact);
     if(this.melee.attack&&this.melee.attack!==previous)this.audio.swish(this.melee.attack.tool===1);
     if(this.down&&tool===0)this.poke();
+  }
+
+  private updateProjectiles(dt:number){
+    if(!this.physics)return;
+    // Snapshot: removing an expired projectile mutates the live array.
+    for(const item of this.physics.items.slice()){
+      if(item.kind==='rocket'){
+        if(item.impactPoint||this.time>=item.fuse){this.explode(item);continue;}
+        const debt=(item.group.userData.trailDebt??0)+dt;
+        if(debt>=1/40){
+          const backward=new THREE.Vector3(0,0,1).applyQuaternion(item.group.quaternion);
+          this.effects.exhaust(item.group.position.clone().addScaledVector(backward,.2),backward);
+          item.group.userData.trailDebt=debt%(1/40);
+        }else item.group.userData.trailDebt=debt;
+      }
+      if(item.kind==='bomb'&&this.time>=item.fuse)this.explode(item);
+      else if((item.kind==='shot'&&this.time-item.born>4)||(item.kind!=='parcel'&&(item.group.position.y<-5||this.time-item.born>75)))this.removeItem(item);
+    }
   }
 
   private updateEffects(dt:number) {
@@ -397,12 +446,7 @@ export class BubbleGame {
       if(this.settings.footsteps&&this.physics.grounded&&Math.hypot(this.movementX,this.movementZ)>1&&this.time-this.lastFootstep>(speed>5?.2:.34)) {
         this.burst(new THREE.Vector3(p.x,p.y-.81,p.z),speed>5?.5:.31,.7);this.lastFootstep=this.time;
       }
-      this.updateInteraction();
-      // Snapshot: removing an expired projectile mutates the live array.
-      for(const item of this.physics.items.slice()) {
-        if(item.kind==='bomb'&&this.time>=item.fuse)this.explode(item);
-        else if((item.kind==='shot'&&this.time-item.born>4)||(item.kind!=='parcel'&&(item.group.position.y<-5||this.time-item.born>75)))this.removeItem(item);
-      }
+      this.updateInteraction(dt);this.updateProjectiles(dt);
       this.updateEffects(dt);
       if(this.time-this.lastPop>1.2)this.snapshot.combo=0;
     } else if(!this.snapshot.started) {

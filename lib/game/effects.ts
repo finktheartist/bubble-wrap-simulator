@@ -1,6 +1,7 @@
 import * as THREE from 'three';
-type Fragment={p:THREE.Vector3;v:THREE.Vector3;life:number;max:number;spin:number;color:THREE.Color;size:number};
-type Ring={mesh:THREE.Mesh<THREE.RingGeometry,THREE.MeshBasicMaterial>;life:number;max:number;radius:number};
+import { TOOL_MUZZLES } from './tool-info';
+type Fragment={p:THREE.Vector3;v:THREE.Vector3;life:number;max:number;spin:number;color:THREE.Color;size:number;target?:THREE.Vector3};
+type Ring={mesh:THREE.Mesh<THREE.RingGeometry,THREE.MeshBasicMaterial>;life:number;max:number;radius:number;inward?:boolean};
 type Beam={mesh:THREE.Mesh<THREE.CylinderGeometry,THREE.MeshBasicMaterial>;life:number;max:number};
 const UP=new THREE.Vector3(0,1,0),FRONT=new THREE.Vector3(0,0,1);
 /** Bounded shared geometry: air ripples, colored film flecks, and short shot streaks. */
@@ -25,9 +26,22 @@ export class WorldEffects {
       this.fragments.push({p:point.clone(),v:normal.clone().multiplyScalar(.7+Math.random()*2).add(new THREE.Vector3((Math.random()-.5)*4,Math.random()*2,(Math.random()-.5)*4)).multiplyScalar(Math.min(2,strength)),life,max:life,spin:Math.random()*6,size:(reward?.035:.023)*(1+Math.random()),color:new THREE.Color(reward?[color,0xfaffde,0xf1bedb][i%3]:color)});
     }
   }
-  ripple(point:THREE.Vector3,normal:THREE.Vector3,radius:number,color:number,life:number){
+  ripple(point:THREE.Vector3,normal:THREE.Vector3,radius:number,color:number,life:number,inward=false){
     const ring=this.rings.find(r=>r.life<=0)??this.rings.reduce((a,b)=>a.life<b.life?a:b);
-    ring.life=ring.max=life;ring.radius=radius;ring.mesh.visible=true;ring.mesh.position.copy(point).addScaledVector(normal,.025);ring.mesh.quaternion.setFromUnitVectors(FRONT,normal);ring.mesh.material.color.setHex(color);ring.mesh.scale.setScalar(.03);
+    ring.life=ring.max=life;ring.radius=radius;ring.inward=inward;ring.mesh.visible=true;ring.mesh.position.copy(point).addScaledVector(normal,.025);ring.mesh.quaternion.setFromUnitVectors(FRONT,normal);ring.mesh.material.color.setHex(color);ring.mesh.scale.setScalar(inward?radius:.03);
+  }
+  exhaust(point:THREE.Vector3,backward:THREE.Vector3){
+    for(let i=0;i<3&&this.fragments.length<this.capacity;i++){
+      const life=.24+Math.random()*.18;
+      this.fragments.push({p:point.clone().addScaledVector(backward,Math.random()*.24),v:backward.clone().multiplyScalar(1+Math.random()).add(new THREE.Vector3(Math.random()-.5,Math.random()-.5,Math.random()-.5)),life,max:life,spin:Math.random()*6,color:new THREE.Color(i===0?0xffcc67:0xff9157),size:.028+Math.random()*.022});
+    }
+  }
+  suction(from:THREE.Vector3,to:THREE.Vector3){
+    const axis=to.clone().sub(from).normalize();this.ripple(from,axis,.6,0x83e7dd,.36,true);
+    for(let i=0;i<7&&this.fragments.length<this.capacity;i++){
+      const life=.28+Math.random()*.24;
+      this.fragments.push({p:from.clone().add(new THREE.Vector3(Math.random()-.5,Math.random()-.5,Math.random()-.5)),v:new THREE.Vector3(),target:to.clone(),life,max:life,spin:Math.random()*6,color:new THREE.Color(i%2?0xb8ffec:0xe4fffd),size:.025+Math.random()*.02});
+    }
   }
   streak(from:THREE.Vector3,to:THREE.Vector3){
     const beam=this.beams.find(b=>b.life<=0)??this.beams[0],dir=to.clone().sub(from);beam.life=beam.max=.075;beam.mesh.visible=true;
@@ -35,10 +49,11 @@ export class WorldEffects {
   }
   update(dt:number){
     let n=0;
-    for(const p of this.fragments){p.life-=dt;if(p.life<=0)continue;p.v.y-=3.8*dt;p.v.multiplyScalar(Math.exp(-1.7*dt));p.p.addScaledVector(p.v,dt);p.spin+=dt*8;
+    for(const p of this.fragments){p.life-=dt;if(p.life<=0)continue;
+      if(p.target)p.p.lerp(p.target,1-Math.exp(-9*dt));else {p.v.y-=3.8*dt;p.v.multiplyScalar(Math.exp(-1.7*dt));p.p.addScaledVector(p.v,dt);}p.spin+=dt*8;
       this.dummy.position.copy(p.p);this.dummy.rotation.set(p.spin,p.spin*.7,0);this.dummy.scale.setScalar(p.size*Math.min(1,p.life/.18));this.dummy.updateMatrix();this.mesh.setMatrixAt(n,this.dummy.matrix);this.mesh.setColorAt(n,p.color);this.fragments[n++]=p;}
     this.fragments.length=n;this.mesh.count=n;this.mesh.instanceMatrix.needsUpdate=true;if(this.mesh.instanceColor)this.mesh.instanceColor.needsUpdate=true;
-    for(const r of this.rings){r.life=Math.max(0,r.life-dt);r.mesh.visible=r.life>0;if(r.life){const p=1-r.life/r.max;r.mesh.scale.setScalar((.06+1-Math.pow(1-p,2))*r.radius);r.mesh.material.opacity=(1-p)*.62;}}
+    for(const r of this.rings){r.life=Math.max(0,r.life-dt);r.mesh.visible=r.life>0;if(r.life){const p=1-r.life/r.max;r.mesh.scale.setScalar((r.inward?Math.max(.01,1-p):.06+1-Math.pow(1-p,2))*r.radius);r.mesh.material.opacity=(1-p)*.62;}}
     for(const b of this.beams){b.life=Math.max(0,b.life-dt);b.mesh.visible=b.life>0;b.mesh.material.opacity=b.life/b.max*.8;}
   }
   reset(){this.fragments=[];this.mesh.count=0;for(const item of [...this.rings,...this.beams]){item.life=0;item.mesh.visible=false;}}
@@ -69,8 +84,8 @@ export class ToolEffects {
       }
     }
     this.ribbon.geometry.setDrawRange(0,v);this.ribbon.geometry.attributes.position.needsUpdate=true;this.ribbon.geometry.attributes.color.needsUpdate=true;
-    this.flashLife=Math.max(0,this.flashLife-dt);this.flash.visible=tool===4&&this.flashLife>0;
-    if(this.flash.visible){model.localToWorld(this.flash.position.set(0,.062,-.405));model.getWorldQuaternion(this.flash.quaternion);this.flash.scale.setScalar(.6+this.flashLife/.065);}
+    this.flashLife=Math.max(0,this.flashLife-dt);this.flash.visible=[4,6,7].includes(tool)&&this.flashLife>0;
+    if(this.flash.visible){model.localToWorld(this.flash.position.set(...TOOL_MUZZLES[tool]));model.getWorldQuaternion(this.flash.quaternion);this.flash.scale.setScalar((tool===4?1:2.3)*(.6+this.flashLife/.065));}
   }
   reset(){this.samples=[];this.ribbon.geometry.setDrawRange(0,0);this.flashLife=0;this.flash.visible=false;}
   dispose(){this.ribbon.removeFromParent();this.ribbon.geometry.dispose();this.ribbon.material.dispose();this.flash.removeFromParent();this.flash.traverse(o=>{if(o instanceof THREE.Mesh){o.geometry.dispose();o.material.dispose();}});}

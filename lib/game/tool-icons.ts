@@ -30,7 +30,7 @@ export function renderToolIcons(renderer: THREE.WebGLRenderer, environment: THRE
     for (let i = 0; i < TOOL_INFO.length; i++) {
       const model = tools.create(i);
       // Show the ball's finger holes, the blaster's profile, and each tool's grip.
-      model.rotation.set(.06, i === 4 ? 1.15 : -.16, i === 1 || i === 2 ? -.42 : -.12);
+      model.rotation.set(.06, i === 4 || i >= 6 ? 1.15 : -.16, i === 1 || i === 2 ? -.42 : -.12);
       scene.add(model); model.updateMatrixWorld(true);
       try {
         const bounds = new THREE.Box3().setFromObject(model);

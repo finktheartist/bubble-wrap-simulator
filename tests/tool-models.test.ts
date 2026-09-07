@@ -6,8 +6,8 @@ import { ToolLibrary, disposeTool, TOOL_FILES } from '../lib/game/tools';
 import { loadTestToolLibrary } from './helpers/tool-library';
 
 const tools=await loadTestToolLibrary();
-await test('all six exported Blender tools have finite geometry, UVs, useful bounds and a bounded triangle count',()=>{
-  for(let tool=0;tool<6;tool++){
+await test('all nine exported Blender tools have finite geometry, UVs, useful bounds and a bounded triangle count',()=>{
+  for(let tool=0;tool<TOOL_FILES.length;tool++){
     const model=tools.create(tool,true),bounds=new THREE.Box3().setFromObject(model),size=bounds.getSize(new THREE.Vector3());
     assert.ok(size.x>.025&&size.y>.1&&size.z>.025);assert.ok(size.length()<1.6);
     let triangles=0;
@@ -53,6 +53,6 @@ await test('all asset textures are embedded, and a failed load releases successf
     const group=new THREE.Group(),geo=new THREE.BoxGeometry();geo.addEventListener('dispose',()=>{disposed++;});
     group.add(new THREE.Mesh(geo,new THREE.MeshStandardMaterial()));return group;
   }),/tool models could not load/);
-  assert.equal(disposed,5);
+  assert.equal(disposed,TOOL_FILES.length-1);
 });
 tools.dispose();

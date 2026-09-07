@@ -327,7 +327,97 @@ def build_bomb():
     conform_sphere(lettering('Bomb series','NO. 06',(0,.011,.19),.009,labelmat),.19)
     for x in [-.07,.07]:bolt('Flush body screw',(x,.082,.155),.004)
 
-for build in [build_glove,build_mallet,build_bat,build_ball,build_blaster,build_bomb]:
+def tube(name,profile,mat,pos=(0,0,0),segments=64):
+    """Closed-wall revolved tube, axis pointing down game -Z."""
+    obj=lathe(name,profile,mat,segments);obj.rotation_euler.x=-math.pi/2;obj.location=v(pos)
+    active(obj);bpy.ops.object.transform_apply(location=False,rotation=True,scale=True);return obj
+
+yellow=material('Polymer | warm utility yellow',(.8,.55,.055),.38,coat=.35,grain=(70,(1,1,1),.00012))
+redpaint=material('Enamel | vermilion',(.56,.072,.045),.32,coat=.55,grain=(45,(1,1,1),.00009))
+lens=material('Glass | blue coated lens',(.025,.27,.32),.12,.55,coat=1)
+
+def build_launcher():
+    begin('rocket-launcher','07 — Pop rocket launcher')
+    tube('Hollow enamel launch tube',[(.118,-.37),(.147,-.37),(.157,-.33),(.157,.49),(.15,.55),(.119,.55),(.118,-.37)],tealpaint,(0,.11,0))
+    for z in [-.49,.26]:
+        tube('Machined clamp band',[(.155,-.019),(.164,-.019),(.164,.019),(.155,.019),(.155,-.019)],silver,(0,.11,z))
+        for x in [-.164,.164]:bolt('Clamp screw',(x,.11,z),.009,(1,0,0))
+    tube('Flared muzzle collar',[(.118,.53),(.151,.53),(.177,.585),(.176,.62),(.145,.632),(.121,.62),(.118,.53)],steel,(0,.11,0))
+    torus('Orange muzzle edge',(0,.11,-.626),.145,.005,orange,(0,0,1))
+    tube('Deep charcoal bore',[(.116,-.29),(.12,-.29),(.12,.555),(.116,.555),(.116,-.29)],black,(0,.11,0))
+    tube('Rear cushion',[(.12,-.43),(.172,-.43),(.176,-.395),(.157,-.34),(.12,-.34),(.12,-.43)],rubber,(0,.11,0))
+    # Two hand grips and a genuinely open trigger guard.
+    extrude_side('Angled rear grip',[(-.018,.12),(-.065,.23),(-.30,.27),(-.33,.18),(-.12,.06)],.09,rubber,radius=.016)
+    for y in [-.14,-.18,-.22,-.26]:cube('Grip molded rib',(0,y,.246),(.085,.009,.016),endrubber,.003)
+    path('Open trigger guard',[(0,-.03,.075),(0,-.13,-.008),(0,-.17,.055),(0,-.14,.15)],.009,steel)
+    path('Curved trigger',[(0,-.035,.065),(0,-.08,.046),(0,-.107,.06)],.004,silver)
+    cylinder('Forward stabilizing grip',(0,-.18,-.32),.045,.26,rubber,vertices=40,edge=.008)
+    for y in [-.10,-.145,-.19,-.235,-.28]:torus('Foregrip ring',(0,y,-.32),.046,.003,endrubber,segments=40)
+    cube('Sight riser',(-.115,.272,-.035),(.09,.08,.18),steel,.008)
+    tube('Optic body',[(.036,-.085),(.046,-.085),(.046,.12),(.036,.12),(.036,-.085)],steel,(-.115,.326,-.02),40)
+    cylinder('Recessed optic glass',(-.115,.326,-.132),.035,.004,lens,(0,0,1),40,edge=0)
+    torus('Optic rubber eyecup',(-.115,.326,.074),.041,.005,rubber,(0,0,1),40)
+    for z in [-.24,.18]:
+        path('Carrying sling loops',[(.125,.22,z),(.196,.25,z),(.2,.18,z),(.147,.17,z)],.005,steel)
+    cube('Serial plate',(.16,.11,-.05),(.003,.072,.21),steel,.002)
+    lettering('Launcher side mark','POP / 07',(.163,.10,-.05),.023,labelmat,True)
+    lettering('Launcher caution','AIRBURST',(.162,.066,-.05),.011,yellow,True)
+
+def build_cannon():
+    begin('ball-cannon','08 — Bowling-ball cannon')
+    tube('Bell-mouth cannon barrel',[(.288,-.04),(.316,-.04),(.321,.28),(.348,.43),(.35,.48),(.322,.501),(.292,.48),(.283,.30),(.288,-.04)],redpaint,(0,.085,-.02),72)
+    tube('Brass muzzle lip',[(.322,.463),(.35,.463),(.356,.487),(.349,.508),(.319,.508),(.315,.494),(.322,.463)],brass,(0,.085,-.02),72)
+    tube('Dark inner barrel',[(.279,-.03),(.286,-.03),(.286,.30),(.279,.30),(.279,-.03)],black,(0,.085,-.02),64)
+    sphere('Domed pressure chamber',(0,.085,.17),(.309,.303,.245),redpaint,48,28)
+    torus('Chamber joint band',(0,.085,.125),.302,.012,steel,(0,0,1))
+    for a in range(0,360,60):
+        angle=math.radians(a);bolt('Chamber flange fastener',(math.cos(angle)*.299,.085+math.sin(angle)*.299,.138),.012)
+    extrude_side('Rubber pistol grip',[(-.18,.18),(-.23,.30),(-.43,.33),(-.455,.215),(-.31,.105)],.12,rubber,radius=.017)
+    path('Cannon trigger guard',[(0,-.20,.1),(0,-.33,.01),(0,-.365,.13),(0,-.32,.23)],.012,steel)
+    path('Cannon trigger',[(0,-.20,.115),(0,-.26,.085),(0,-.29,.12)],.006,brass)
+    cylinder('Underslung air reservoir',(.18,-.245,-.05),.095,.39,tealpaint,(0,0,1),48,edge=.02)
+    for z in [-.17,.075]:torus('Reservoir strap',(.18,-.245,z),.097,.009,steel,(0,0,1),48)
+    path('Braided pressure line',[(.20,-.255,.17),(.28,-.28,.26),(.31,-.12,.27),(.24,-.075,.275)],.012,rubber)
+    cube('Top carrying handle mounts',(0,.396,.11),(.08,.04,.25),steel,.008)
+    path('Open carrying handle',[(0,.38,-.03),(0,.49,-.05),(0,.50,.23),(0,.35,.26)],.019,rubber)
+    cylinder('Pressure gauge housing',(.255,.26,.06),.055,.022,brass,(1,0,0),48,edge=.003)
+    cylinder('Pressure gauge enamel dial',(.269,.26,.06),.046,.003,labelmat,(1,0,0),48,edge=0)
+    path('Gauge needle',[(.272,.24,.078),(.272,.26,.06),(.272,.289,.029)],.0025,redpaint)
+    for a in [-.7,-.35,0,.35,.7]:
+        y=.26+math.cos(a)*.038;z=.06+math.sin(a)*.038
+        cube('Gauge tick',(.272,y,z),(.002,.005,.0025),steel,.0003)
+    lettering('Cannon side stamping','7 KG',(.323,.09,-.10),.036,labelmat,True)
+    lettering('Cannon edition','BOWL-O-MATIC',(.323,.046,-.10),.012,labelmat,True)
+
+def build_vacuum():
+    begin('pop-vacuum','09 — Utility pop vacuum')
+    tube('Yellow motor housing',[(.01,-.30),(.12,-.30),(.17,-.245),(.17,.13),(.143,.18),(.06,.19),(.01,.19)],yellow,(0,.015,.04))
+    tube('Rear motor cap',[(.01,-.326),(.122,-.326),(.157,-.29),(.166,-.245),(.15,-.23),(.01,-.23)],rubber,(0,.015,.04))
+    for i in range(9):
+        a=i/9*math.tau;x=math.cos(a)*.135;y=.015+math.sin(a)*.135
+        cube('Rear radial vent',(x,y,.34),(.023,.01,.008),black,.003)
+    torus('Canister seal',(0,.015,-.078),.17,.006,steel,(0,0,1))
+    tube('Dust collection drum',[(.065,.11),(.174,.11),(.18,.17),(.171,.30),(.105,.35),(.065,.35),(.065,.11)],tealpaint,(0,.015,.04))
+    cube('Canister latch',(0,.194,-.07),(.058,.035,.066),silver,.006)
+    path('Open top handle',[(0,.16,.21),(0,.305,.21),(0,.32,-.02),(0,.175,-.09)],.029,rubber)
+    cube('Yellow power paddle',(0,.311,.08),(.065,.022,.092),yellow,.006)
+    extrude_side('Integrated lower grip',[(-.12,.22),(-.18,.30),(-.35,.27),(-.35,.16),(-.15,.10)],.092,rubber,radius=.02)
+    # Corrugated flexible throat leads to a wide, open pickup head.
+    cylinder('Hose throat',(0,-.015,-.40),.071,.27,rubber,(0,0,1),48,edge=.004)
+    for j in range(11):torus('Hose corrugation',(0,-.015,-.275-j*.023),.071,.006,endrubber,(0,0,1),48)
+    # A hollow rectangular mouth with a tapered transition; side walls have real thickness.
+    nozzle=cube('Wide floor nozzle',(0,-.015,-.61),(.35,.14,.24),tealpaint,.025)
+    cut(nozzle,cube('Open mouth cutter',(0,-.015,-.699),(.30,.097,.14),None,.014))
+    cut(nozzle,cylinder('Nozzle hose socket',(0,-.015,-.492),.066,.06,None,(0,0,1),48,edge=0))
+    for x in [-.172,.172]:cube('Nozzle protective skid',(x,-.078,-.616),(.016,.026,.21),rubber,.006)
+    cube('Nozzle brushed metal lip',(0,-.077,-.724),(.305,.012,.009),silver,.003)
+    for x in [-.12,.12]:bolt('Nozzle face screw',(x,.035,-.728),.005)
+    cylinder('Airflow dial',(.174,.03,.06),.045,.022,steel,(1,0,0),40,edge=.003)
+    cube('Dial thumb ridge',(.19,.03,.06),(.011,.056,.012),yellow,.003)
+    lettering('Vacuum maker plate','POP-VAC',(.17,.061,.005),.027,steel,True)
+    lettering('Vacuum specification','SUCTION / 09',(.17,.024,.005),.011,steel,True)
+
+for build in [build_glove,build_mallet,build_bat,build_ball,build_blaster,build_bomb,build_launcher,build_cannon,build_vacuum]:
     print('BUILD',build.__name__,flush=True);build()
 
 # Pack each tool into a single UV atlas, retaining the distinct PBR material responses.
@@ -380,7 +470,7 @@ for index,(slug,col) in enumerate(TOOLS):
     manifest.append({'tool':index,'file':slug+'.glb','triangles':len(obj.data.polygons),'vertices':len(obj.data.vertices),'materials':len(obj.data.materials),'bytes':(MODELS/(slug+'.glb')).stat().st_size,'source':'art/bubble-wrap-tools.blend'})
 for _,col in TOOLS:col.hide_render=False
 (MODELS/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
-# A saved, editable library with six distinct collections, and independent studio renders.
+# A saved, editable library with distinct collections, and independent studio renders.
 COLLECTION=None
 SCENE.cycles.samples=32
 bpy.ops.mesh.primitive_plane_add(size=200,location=(0,0,-1))
@@ -399,7 +489,7 @@ for index,(slug,col) in enumerate(TOOLS):
     extent=max(height,width,depth)
     floor.location.z=min(p.z for p in bounds)-.008
     camera.data.ortho_scale=extent*1.48
-    camera.location=center+Vector((extent*(1.7 if slug=='pop-blaster' else .85),-extent*3.5,extent*.9));aim(camera,center)
+    camera.location=center+Vector((extent*(2.6 if index>=6 else 1.7 if slug=='pop-blaster' else .85),-extent*3.5,extent*1.1));aim(camera,center)
     SCENE.render.filepath=str(OUT/(slug+'.png'));print('RENDER',slug,flush=True);bpy.ops.render.render(write_still=True)
 # Arrange linked copies for review; original export collections retain unit scale and origin.
 preview=bpy.data.collections.new('00 — Toolkit presentation (linked copies)');SCENE.collection.children.link(preview)
@@ -408,11 +498,11 @@ for index,(slug,col) in enumerate(TOOLS):
     source=next(o for o in col.objects if o.type=='MESH');obj=source.copy();obj.data=source.data;obj.name='Review / '+slug;preview.objects.link(obj)
     bounds=[Vector(p) for p in obj.bound_box]
     height=max(p.z for p in bounds)-min(p.z for p in bounds);scale=.9/max(height,obj.dimensions.x,obj.dimensions.y)
-    obj.scale=(scale,)*3;obj.location=((index%3-1)*1.35,0 if index<3 else 1.3,-min(p.z for p in bounds)*scale)
+    obj.scale=(scale,)*3;obj.location=((index%3-1)*1.35,(index//3)*1.3,-min(p.z for p in bounds)*scale)
     source['game_asset']=str(MODELS/(slug+'.glb'));source['export_origin']='Unit scale, origin preserved; GLB exports game Y up'
 floor.location.z=-.01
-camera.location=(1.6,-6.7,5.4);camera.data.ortho_scale=5.6;aim(camera,(0,.5,.35))
-SCENE.render.resolution_x=1600;SCENE.render.resolution_y=1000;SCENE.render.filepath=str(OUT/'toolkit-overview.png');bpy.ops.render.render(write_still=True)
+camera.location=(1.6,-6.7,7.7);camera.data.ortho_scale=6.1;aim(camera,(0,1.2,.35))
+SCENE.render.resolution_x=1600;SCENE.render.resolution_y=1300;SCENE.render.filepath=str(OUT/'toolkit-overview.png');bpy.ops.render.render(write_still=True)
 # Opening this file presents the new toolkit, without touching any previously open project.
 for screen in bpy.data.screens:
     for a in screen.areas:

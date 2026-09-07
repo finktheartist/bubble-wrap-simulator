@@ -9,15 +9,7 @@ import { ToolPicker } from '@/components/game/tool-picker';
 import { Thumbstick, TouchLook } from '@/components/game/touch-controls';
 import { touchLookDelta } from '@/lib/game/touch';
 import type { BubbleGame, GameSettings, GameSnapshot } from '@/lib/game/game';
-
-const TOOLS=[
-  {name:'Fingertip',verb:'Click POP or press F',description:'One bubble at a time. Take it slow.'},
-  {name:'Mallet',verb:'Click to smash',description:'A reassuringly excessive rubber mallet.'},
-  {name:'Bat',verb:'Click to whack',description:'A wide swing. A very good crackle.'},
-  {name:'Bowling ball',verb:'Hold & release to throw',description:'Seven kilos of excellent decisions.'},
-  {name:'Pop blaster',verb:'Hold to shoot',description:'Little pellets. Rapid-fire satisfaction.'},
-  {name:'Pop bomb',verb:'Click to throw',description:'A short fuse. A room-shaking ripple.'},
-];
+import { TOOL_INFO as TOOLS } from '@/lib/game/tool-info';
 const INITIAL:GameSnapshot={ready:false,playing:false,started:false,tool:0,pops:0,total:0,combo:0,best:0,hint:'',target:false,charge:0,held:'',fps:60,error:'',pointerLocked:false,targets:0,impact:0};
 const SETTINGS:GameSettings={volume:.65,sensitivity:1,shake:true,footsteps:true,muted:false,quality:'balanced'};
 export default function Home() {
@@ -125,7 +117,7 @@ export default function Home() {
           <button className="secondary-button" onClick={()=>setPanel('help')}><HelpCircle size={17}/> View controls</button>
           <button className="secondary-button" onClick={fullscreen}><Maximize size={17}/> Toggle fullscreen</button>
         </div>:<div className="control-list">
-          <p><span>Move / look</span><b>{touch?'Left stick / drag the arena':'WASD / right-drag'}</b></p><p><span>{touch?'Jump':'Jump / run'}</span><b>{touch?'Jump button':'Space / Shift'}</b></p><p><span>Use your tool</span><b>{touch?'Tap the arena or use the action button':'Action button / F / left mouse'}</b></p>{touch&&<p><span>Aim while using a tool</span><b>Drag on the action button</b></p>}<p><span>Grab / drop a loose item</span><b>{touch?'Grab button':'Grab button / E'}</b></p><p><span>Throw a ball or held item</span><b>Hold, then release</b></p><p><span>Switch tools</span><b>{touch?'Tap the equipped tool':'Equipped tool / T / 1–6 / scroll'}</b></p><p><span>Reinflate the whole room</span><b>{touch?'Fresh wrap in pause':'R'}</b></p><p><span>Pause / release mouse</span><b>{touch?'Pause button':'Esc'}</b></p>
+          <p><span>Move / look</span><b>{touch?'Left stick / drag the arena':'WASD / right-drag'}</b></p><p><span>{touch?'Jump':'Jump / run'}</span><b>{touch?'Jump button':'Space / Shift'}</b></p><p><span>Use your tool</span><b>{touch?'Tap the arena or use the action button':'Action button / F / left mouse'}</b></p>{touch&&<p><span>Aim while using a tool</span><b>Drag on the action button</b></p>}<p><span>Grab / drop a loose item</span><b>{touch?'Grab button':'Grab button / E'}</b></p><p><span>Throw a ball or held item</span><b>Hold, then release</b></p><p><span>Switch tools</span><b>{touch?'Tap the equipped tool':'Equipped tool / T / 1–9 / scroll'}</b></p><p><span>Reinflate the whole room</span><b>{touch?'Fresh wrap in pause':'R'}</b></p><p><span>Pause / release mouse</span><b>{touch?'Pause button':'Esc'}</b></p>
         </div>}
         <button className="enter-button dialog-done" onClick={()=>setPanel(null)}>All good <X size={16}/></button>
       </DialogContent>
