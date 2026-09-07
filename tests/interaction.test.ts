@@ -5,6 +5,7 @@ import { bindToolInput } from '../lib/game/input';
 import { BubbleGame } from '../lib/game/game';
 import { WrapSurface } from '../lib/game/arena';
 import { ArenaPhysics, initPhysics } from '../lib/game/physics';
+import { loadTestToolLibrary } from './helpers/tool-library';
 
 function dispatch(target:EventTarget,type:string,props:Record<string,unknown>) {
   const event=new Event(type,{cancelable:true});
@@ -49,7 +50,7 @@ await test('right drag looks around without firing; F does not fire while editin
 });
 
 await initPhysics();
-await test('a quick tool-button tap pops immediately and every other tool produces its action',()=>{
+await test('a quick tool-button tap pops immediately and every other tool produces its action',async()=>{
   // Exercise the real action/aim/physics pipeline without allocating a browser renderer.
   const surface=new WrapSurface(2.4,1.8,0xd5e5e8);
   surface.group.position.set(0,.9,7.05);
@@ -61,7 +62,7 @@ await test('a quick tool-button tap pops immediately and every other tool produc
   let audiblePops=0;
   const game=Object.create(BubbleGame.prototype) as BubbleGame;
   Object.assign(game,{
-    arena:{camera,scene,surfaces:[surface]},physics,time:1,nextAction:0,down:false,
+    arena:{camera,scene,surfaces:[surface]},physics,tools:await loadTestToolLibrary(),time:1,nextAction:0,down:false,
     snapshot:{playing:true,tool:0,pops:0,combo:0,best:0,charge:0},
     audio:{start:async()=>{},pop:()=>{audiblePops++;},thump:()=>{}},
     activePops:new Map(),queued:[],particles:[],pressedBubble:null,lastPop:-10,

@@ -4,7 +4,7 @@ import { ArenaPhysics, initPhysics, type PhysicsItem } from './physics';
 import { PopAudio } from './audio';
 import { renderToolIcons } from './tool-icons';
 import { bindToolInput } from './input';
-import { makeTool, disposeTool, TOOL_INFO } from './tools';
+import { ToolLibrary, disposeTool, TOOL_INFO } from './tools';
 
 export type GameSnapshot={ready:boolean;playing:boolean;started:boolean;tool:number;pops:number;total:number;combo:number;best:number;hint:string;target:boolean;charge:number;held:string;fps:number;error:string;pointerLocked:boolean};
 export type GameSettings={volume:number;sensitivity:number;shake:boolean;footsteps:boolean;muted:boolean;quality:'high'|'balanced'};
@@ -28,7 +28,8 @@ export class BubbleGame {
   private particles:Particle[]=[];private particleGeometry=new THREE.BufferGeometry();private particleMaterial:THREE.PointsMaterial;private particleMesh:THREE.Points;
   private particleArray=new Float32Array(1500*3);
   private rays: {mesh:THREE.Mesh;life:number;max:number}[]=[];
-  private toolScene=new THREE.Scene();private toolCamera=new THREE.PerspectiveCamera(60,1,.01,10);private toolModel:THREE.Group;
+  private toolScene=new THREE.Scene();private toolCamera=new THREE.PerspectiveCamera(60,1,.01,10);private toolModel=new THREE.Group();
+  private tools:ToolLibrary|null=null;
   private uiCallback:(s:GameSnapshot)=>void;private disposed=false;private touch=false;private touchMove={x:0,y:0};
   private movementX=0;private movementZ=0;private fpsSamples=0;private fpsElapsed=0;
   private resizeObserver:ResizeObserver;
@@ -37,13 +38,12 @@ export class BubbleGame {
     this.uiCallback=onChange;
     this.touch=touch;
     this.arena=createArena(container,touch);
-    this.toolIcons=renderToolIcons(this.arena.renderer,this.arena.environment.texture);
     this.snapshot.total=this.arena.surfaces.reduce((n,s)=>n+s.cells.length,0);
     this.particleGeometry.setAttribute('position',new THREE.BufferAttribute(this.particleArray,3).setUsage(THREE.DynamicDrawUsage));
     this.particleGeometry.setDrawRange(0,0);
     this.particleMaterial=new THREE.PointsMaterial({color:0xf7ffff,size:.035,transparent:true,opacity:.8,depthWrite:false});
     this.particleMesh=new THREE.Points(this.particleGeometry,this.particleMaterial);this.particleMesh.frustumCulled=false;this.arena.scene.add(this.particleMesh);
-    this.toolModel=makeTool(0);this.toolScene.add(this.toolModel);
+    this.toolScene.add(this.toolModel);
     this.toolScene.environment=this.arena.environment.texture;
     this.toolScene.environmentIntensity=.8;
     this.toolScene.add(new THREE.HemisphereLight(0xffffff,0x536169,1.15));
@@ -54,7 +54,16 @@ export class BubbleGame {
   }
   async init() {
     try {
-      await initPhysics();if(this.disposed)return;
+      const [physics,assets]=await Promise.allSettled([initPhysics(),ToolLibrary.load()]);
+      if(assets.status==='fulfilled'){
+        if(this.disposed||physics.status==='rejected')assets.value.dispose();
+        else this.tools=assets.value;
+      }
+      if(this.disposed)return;
+      if(physics.status==='rejected')throw physics.reason;
+      if(assets.status==='rejected')throw assets.reason;
+      this.toolScene.remove(this.toolModel);this.toolModel=assets.value.create(0);this.toolScene.add(this.toolModel);
+      this.toolIcons=renderToolIcons(this.arena.renderer,this.arena.environment.texture,assets.value);
       this.physics=new ArenaPhysics(this.arena.objects,(item,p,speed)=>this.impact(item,p,speed));
       this.snapshot.ready=true;this.publish();
     } catch(error) {this.snapshot.error=error instanceof Error?error.message:'Physics could not start';this.publish();}
@@ -138,9 +147,9 @@ export class BubbleGame {
     r.shadowMap.enabled=true;this.arena.scene.traverse(o=>{if(o instanceof THREE.DirectionalLight&&o.castShadow){const size=this.settings.quality==='high'?2048:1024;if(o.shadow.mapSize.x!==size){o.shadow.mapSize.set(size,size);o.shadow.map?.dispose();o.shadow.map=null;}}});this.resize();
   }
   selectTool(tool:number) {
-    if(tool===this.snapshot.tool)return;
+    if(tool===this.snapshot.tool||!this.tools)return;
     this.down=false;this.clearPressure();this.snapshot.charge=0;
-    this.snapshot.tool=tool;this.nextAction=0;this.toolScene.remove(this.toolModel);disposeTool(this.toolModel);this.toolModel=makeTool(tool);this.toolScene.add(this.toolModel);this.recoil=.2;this.publish();
+    this.snapshot.tool=tool;this.nextAction=0;this.toolScene.remove(this.toolModel);disposeTool(this.toolModel);this.toolModel=this.tools.create(tool);this.toolScene.add(this.toolModel);this.recoil=.2;this.publish();
   }
   actionDown() {
     if(!this.snapshot.playing||this.down)return;
@@ -199,7 +208,7 @@ export class BubbleGame {
     const charge=Math.min(1,(this.time-this.pressedAt)/1.05);
     const dir=this.direction();const velocity=dir.clone().multiplyScalar(9+charge*15);velocity.y+=1.3;
     if(p.held)p.release(velocity);
-    else {const g=makeTool(3,true);this.arena.scene.add(g);const pos=this.arena.camera.position.clone().addScaledVector(dir,.8).add(new THREE.Vector3(0,-.18,0));p.spawn(g,'ball',pos,velocity,this.time);}
+    else {const g=this.tools!.create(3,true);this.arena.scene.add(g);const pos=this.arena.camera.position.clone().addScaledVector(dir,.8).add(new THREE.Vector3(0,-.18,0));p.spawn(g,'ball',pos,velocity,this.time);}
     this.recoil=.5;this.swing=.4;this.audio.thump(.25);this.trimProjectiles();
   }
   private useTool() {
@@ -222,7 +231,7 @@ export class BubbleGame {
       this.physics.spawn(g,'shot',pos,dir.multiplyScalar(42),this.time);this.audio.pop(.35,0,1);this.trimProjectiles();
     } else if(tool===5) {
       this.nextAction=this.time+.8;this.swing=.75;
-      const g=makeTool(5,true);this.arena.scene.add(g);
+      const g=this.tools!.create(5,true);this.arena.scene.add(g);
       const pos=origin.addScaledVector(dir,.8);const velocity=dir.multiplyScalar(13);velocity.y+=2.5;
       this.physics.spawn(g,'bomb',pos,velocity,this.time);this.audio.thump(.35);this.trimProjectiles();
     }
@@ -397,7 +406,7 @@ export class BubbleGame {
     this.disposed=true;this.abort.abort();this.resizeObserver.disconnect();this.arena.renderer.setAnimationLoop(null);
     if(document.pointerLockElement===this.arena.renderer.domElement)document.exitPointerLock();
     this.physics?.items.filter(i=>i.kind!=='parcel').forEach(i=>disposeTool(i.group));this.physics?.dispose();
-    this.audio.dispose();disposeTool(this.toolModel);this.particleGeometry.dispose();this.particleMaterial.dispose();
+    this.audio.dispose();disposeTool(this.toolModel);this.tools?.dispose();this.particleGeometry.dispose();this.particleMaterial.dispose();
     this.rays.forEach(r=>{r.mesh.geometry.dispose();(r.mesh.material as THREE.Material).dispose();});this.arena.dispose();
   }
 }

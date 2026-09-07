@@ -39,3 +39,7 @@ next-env.d.ts
 
 # TypeScript cache
 *.tsbuildinfo
+
+# Blender keeps local recovery copies; the editable master is versioned.
+/art/*.blend1
+/art/*.blend2

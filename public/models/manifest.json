@@ -1,0 +1,56 @@
+[
+  {
+    "tool": 0,
+    "file": "fingertip.glb",
+    "triangles": 30342,
+    "vertices": 15857,
+    "materials": 7,
+    "bytes": 1821140,
+    "source": "art/bubble-wrap-tools.blend"
+  },
+  {
+    "tool": 1,
+    "file": "mallet.glb",
+    "triangles": 9776,
+    "vertices": 5420,
+    "materials": 6,
+    "bytes": 703940,
+    "source": "art/bubble-wrap-tools.blend"
+  },
+  {
+    "tool": 2,
+    "file": "bat.glb",
+    "triangles": 8588,
+    "vertices": 4715,
+    "materials": 5,
+    "bytes": 451016,
+    "source": "art/bubble-wrap-tools.blend"
+  },
+  {
+    "tool": 3,
+    "file": "bowling-ball.glb",
+    "triangles": 16170,
+    "vertices": 8473,
+    "materials": 3,
+    "bytes": 830316,
+    "source": "art/bubble-wrap-tools.blend"
+  },
+  {
+    "tool": 4,
+    "file": "pop-blaster.glb",
+    "triangles": 11717,
+    "vertices": 6217,
+    "materials": 10,
+    "bytes": 786272,
+    "source": "art/bubble-wrap-tools.blend"
+  },
+  {
+    "tool": 5,
+    "file": "pop-bomb.glb",
+    "triangles": 20040,
+    "vertices": 10486,
+    "materials": 10,
+    "bytes": 930892,
+    "source": "art/bubble-wrap-tools.blend"
+  }
+]

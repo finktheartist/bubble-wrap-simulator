@@ -41,7 +41,8 @@ export default function Home() {
     import('@/lib/game/game').then(async({BubbleGame})=>{
       if(disposed||!mount.current)return;
       setTouch(deviceTouch);setSettings(prefs);
-      const game=new BubbleGame(mount.current,setState,deviceTouch);engine.current=game;setToolIcons(game.toolIcons);game.setSettings(prefs);await game.init();
+      const game=new BubbleGame(mount.current,setState,deviceTouch);engine.current=game;game.setSettings(prefs);await game.init();
+      if(!disposed)setToolIcons(game.toolIcons);
     }).catch(error=>{console.error('Arena initialization failed',error);if(!disposed)setLoadError('The arena could not start. Try reloading in a browser with WebGL enabled.');});
     return()=>{disposed=true;coarse.removeEventListener('change',updateTouch);engine.current?.dispose();engine.current=null;};
   },[]);

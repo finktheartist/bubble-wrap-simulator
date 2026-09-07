@@ -1,8 +1,8 @@
 import * as THREE from 'three';
-import { makeTool, disposeTool, TOOL_INFO } from './tools';
+import { type ToolLibrary, disposeTool, TOOL_INFO } from './tools';
 
 /** Menu portraits use the same geometry and materials as the tools in your hand. */
-export function renderToolIcons(renderer: THREE.WebGLRenderer, environment: THREE.Texture): string[] {
+export function renderToolIcons(renderer: THREE.WebGLRenderer, environment: THREE.Texture, tools: ToolLibrary): string[] {
   const size = 144;
   const target = new THREE.WebGLRenderTarget(size, size, { depthBuffer: true });
   target.texture.colorSpace = THREE.SRGBColorSpace;
@@ -28,7 +28,7 @@ export function renderToolIcons(renderer: THREE.WebGLRenderer, environment: THRE
     renderer.setClearColor(0x000000, 0);
     renderer.setRenderTarget(target);
     for (let i = 0; i < TOOL_INFO.length; i++) {
-      const model = makeTool(i);
+      const model = tools.create(i);
       // Show the ball's finger holes, the blaster's profile, and each tool's grip.
       model.rotation.set(.06, i === 4 ? 1.15 : -.16, i === 1 || i === 2 ? -.42 : -.12);
       scene.add(model); model.updateMatrixWorld(true);
