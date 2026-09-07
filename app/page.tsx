@@ -1,11 +1,13 @@
 'use client';
-import { useEffect, useRef, useState, type PointerEvent } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { ArrowUpRight, AudioLines, Circle, Hand, HelpCircle, Maximize, MousePointer2, MoveUp, Pause, Play, RotateCcw, Settings2, Volume2, VolumeX, X } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { UseToolButton } from '@/components/game/use-tool-button';
+import { Thumbstick, TouchLook } from '@/components/game/touch-controls';
+import { touchLookDelta } from '@/lib/game/touch';
 import type { BubbleGame, GameSettings, GameSnapshot } from '@/lib/game/game';
 
 const TOOLS=[
@@ -28,17 +30,20 @@ export default function Home() {
   const [touch,setTouch]=useState(false);
   const [loadError,setLoadError]=useState('');
   const [notice,setNotice]=useState('');
-  const lookRef=useRef<{x:number;y:number}|null>(null);
   useEffect(()=>{
     let disposed=false;
+    const coarse=window.matchMedia('(any-pointer: coarse)');
+    const deviceTouch=coarse.matches||navigator.maxTouchPoints>0;
+    const updateTouch=()=>{const enabled=coarse.matches||navigator.maxTouchPoints>0;setTouch(enabled);engine.current?.setTouchEnabled(enabled);};
+    coarse.addEventListener('change',updateTouch);
     let prefs=SETTINGS;
     try{const saved=JSON.parse(localStorage.getItem('bubble-wrap-settings')||'null');if(saved)prefs={...SETTINGS,...saved};else prefs={...SETTINGS,shake:!window.matchMedia('(prefers-reduced-motion: reduce)').matches};}catch{}
     import('@/lib/game/game').then(async({BubbleGame})=>{
       if(disposed||!mount.current)return;
-      setTouch(window.matchMedia('(pointer: coarse)').matches);setSettings(prefs);
-      const game=new BubbleGame(mount.current,setState);engine.current=game;setToolIcons(game.toolIcons);game.setSettings(prefs);await game.init();
+      setTouch(deviceTouch);setSettings(prefs);
+      const game=new BubbleGame(mount.current,setState,deviceTouch);engine.current=game;setToolIcons(game.toolIcons);game.setSettings(prefs);await game.init();
     }).catch(error=>{console.error('Arena initialization failed',error);if(!disposed)setLoadError('The arena could not start. Try reloading in a browser with WebGL enabled.');});
-    return()=>{disposed=true;engine.current?.dispose();engine.current=null;};
+    return()=>{disposed=true;coarse.removeEventListener('change',updateTouch);engine.current?.dispose();engine.current=null;};
   },[]);
   const changeSettings=(partial:Partial<GameSettings>)=>{
     const updated={...settings,...partial};setSettings(updated);engine.current?.setSettings(updated);
@@ -47,10 +52,11 @@ export default function Home() {
   const start=()=>{setPanel(null);void engine.current?.start(touch);};
   const openPanel=(p:'settings'|'help')=>{engine.current?.pause();setPanel(p);};
   const reset=()=>{engine.current?.reset();setNotice('Fresh wrap. All yours.');window.setTimeout(()=>setNotice(''),2200);};
-  const fullscreen=()=>{if(document.fullscreenElement)void document.exitFullscreen();else void document.documentElement.requestFullscreen().catch(()=>{setNotice('Fullscreen is unavailable in this browser.');window.setTimeout(()=>setNotice(''),2400);});};
+  const fullscreen=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else if(document.documentElement.requestFullscreen)await document.documentElement.requestFullscreen();else throw new Error('Unavailable');}catch{setNotice('Fullscreen is unavailable in this browser.');window.setTimeout(()=>setNotice(''),2400);}};
+  const touchLook=(x:number,y:number)=>{const delta=touchLookDelta(x,y,mount.current?.clientWidth??390);engine.current?.look(delta.x,delta.y);};
   const tool=TOOLS[state.tool];
   const error=loadError||state.error;
-  return <main className={`simulator ${state.playing?'is-playing':''} ${touch?'is-touch':''}`}>
+  return <main className={`simulator ${state.started?'has-started':''} ${state.playing?'is-playing':''} ${touch?'is-touch':''}`}>
     <div className="world" ref={mount} aria-label="Three dimensional bubble wrap arena" />
     {!state.playing&&!state.started&&<div className="welcome-veil" />}
     <header className="topbar">
@@ -72,7 +78,8 @@ export default function Home() {
       <p>A whole room of bubble wrap.<br/>Go ahead. Get carried away.</p>
       <button className="enter-button" onClick={start} disabled={!state.ready||Boolean(error)}>{error?'Arena unavailable':state.ready?'Enter the arena':'Inflating the arena…'}{state.ready&&!error&&<ArrowUpRight size={21}/>}</button>
       <span className="welcome-note"><AudioLines size={15}/> Sound on. Stress off.</span>
-      <div className="welcome-controls">{touch?'Drag to look · Thumbstick to move':<><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><span>move</span><span className="control-dot">·</span><span>Right-drag to look</span></>}</div>
+      <div className="welcome-controls">{touch?'Left thumb to move · Right thumb to look':<><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><span>move</span><span className="control-dot">·</span><span>Right-drag to look</span></>}</div>
+      {touch&&<span className="orientation-note">Plays upright or sideways.</span>}
       {error&&<p role="alert" className="error-message">{error}<button onClick={()=>window.location.reload()}>Reload arena</button></p>}
     </section>}
     {!state.started&&<div className="intro-footer"><span className="arena-tag">THE POP PLAYGROUND <span>001</span></span><span>{state.ready?`${state.total.toLocaleString()} bubbles. Entirely unnecessary.`:'Making room for a little satisfaction.'}</span></div>}
@@ -84,14 +91,14 @@ export default function Home() {
       {state.combo>=3&&<div className="combo-counter"><strong key={Math.floor(state.combo/10)}>{state.combo}<span> POPS</span></strong><small>{state.combo>120?'ABSOLUTELY UNNECESSARY':state.combo>40?'THAT’S THE STUFF':state.combo>12?'KEEP IT GOING':'A NICE LITTLE CRACKLE'}</small></div>}
       <div className="session-stats"><span className="live-dot"/> FREE PLAY <span>BEST STREAK <b>{state.best}</b></span></div>
       {touch&&<>
-        <div className="touch-look" onPointerDown={e=>{e.currentTarget.setPointerCapture(e.pointerId);lookRef.current={x:e.clientX,y:e.clientY};}} onPointerMove={e=>{if(!lookRef.current)return;engine.current?.look((e.clientX-lookRef.current.x)*1.6,(e.clientY-lookRef.current.y)*1.6);lookRef.current={x:e.clientX,y:e.clientY};}} onPointerUp={()=>{lookRef.current=null;}} onPointerCancel={()=>{lookRef.current=null;}} />
+        <TouchLook onLook={touchLook}/>
         <Thumbstick onMove={(x,y)=>engine.current?.setTouchMove(x,y)}/>
-
+        <span className="touch-look-hint">DRAG TO LOOK</span>
       </>}
       <div className="action-dock">
         <span className="action-label">USE YOUR TOOL</span>
-        <UseToolButton key={`${state.tool}-${Boolean(state.held)}`} tool={state.tool} held={Boolean(state.held)} onDown={()=>engine.current?.actionDown()} onUp={()=>engine.current?.actionUp()} onTap={()=>engine.current?.tapTool()}/>
-        <div className="action-extras"><button onClick={()=>engine.current?.grab()}><Hand size={15}/>{state.held?'Drop':'Grab'}<kbd>E</kbd></button>{touch&&<button aria-label="Jump" onClick={()=>engine.current?.jump()}><MoveUp size={16}/></button>}</div>
+        <UseToolButton key={`${state.tool}-${Boolean(state.held)}`} tool={state.tool} held={Boolean(state.held)} touch={touch} onDown={()=>engine.current?.actionDown()} onUp={()=>engine.current?.actionUp()} onCancel={()=>engine.current?.actionCancel()} onLook={touchLook} onTap={()=>engine.current?.tapTool()}/>
+        <div className="action-extras"><button onClick={()=>engine.current?.grab()}><Hand size={17}/>{state.held?'Drop':'Grab'}<kbd>E</kbd></button>{touch&&<button aria-label="Jump" onClick={()=>engine.current?.jump()}><MoveUp size={18}/><span>Jump</span></button>}</div>
       </div>
       {!touch&&<span className="look-instruction">{state.pointerLocked?'Mouse look on · L releases your cursor':'Right-drag to look · L enables mouse look'}</span>}
     </>}
@@ -111,20 +118,14 @@ export default function Home() {
           <div className="setting-range"><label id="sensitivity-label">Look sensitivity <span>{settings.sensitivity.toFixed(1)}×</span></label><Slider aria-labelledby="sensitivity-label" value={[settings.sensitivity]} min={.3} max={2.5} step={.1} onValueChange={v=>changeSettings({sensitivity:Array.isArray(v)?v[0]:v})}/></div>
           <div className="setting-row"><label htmlFor="shake">Camera shake<small>A little weight behind each impact</small></label><Switch id="shake" checked={settings.shake} onCheckedChange={v=>changeSettings({shake:v})}/></div>
           <div className="setting-row"><label htmlFor="steps">Pop as you walk<small>Every step deserves a tiny crackle</small></label><Switch id="steps" checked={settings.footsteps} onCheckedChange={v=>changeSettings({footsteps:v})}/></div>
-          <div className="setting-row"><label htmlFor="quality">Extra detail<small>Sharper reflections and cast shadows</small></label><Switch id="quality" checked={settings.quality==='high'} onCheckedChange={v=>changeSettings({quality:v?'high':'balanced'})}/></div>
+          <div className="setting-row"><label htmlFor="quality">Extra detail<small>{touch?'Sharper reflections. Uses more battery.':'Sharper reflections and cast shadows'}</small></label><Switch id="quality" checked={settings.quality==='high'} onCheckedChange={v=>changeSettings({quality:v?'high':'balanced'})}/></div>
+          <button className="secondary-button" onClick={()=>setPanel('help')}><HelpCircle size={17}/> View controls</button>
           <button className="secondary-button" onClick={fullscreen}><Maximize size={17}/> Toggle fullscreen</button>
         </div>:<div className="control-list">
-          <p><span>Move / look</span><b>{touch?'Thumbstick / drag':'WASD / right-drag'}</b></p><p><span>Jump / run</span><b>{touch?'↑ button':'Space / Shift'}</b></p><p><span>Use your tool</span><b>{touch?'Action button':'Action button / F / left mouse'}</b></p><p><span>Grab / drop a loose item</span><b>{touch?'Grab button':'Grab button / E'}</b></p><p><span>Throw a ball or held item</span><b>Hold, then release</b></p><p><span>Switch tools</span><b>{touch?'Tool belt':'1–6 or scroll'}</b></p><p><span>Reinflate the whole room</span><b>{touch?'Fresh wrap in pause':'R'}</b></p><p><span>Pause / release mouse</span><b>{touch?'Pause button':'Esc'}</b></p>
+          <p><span>Move / look</span><b>{touch?'Left stick / drag the arena':'WASD / right-drag'}</b></p><p><span>{touch?'Jump':'Jump / run'}</span><b>{touch?'Jump button':'Space / Shift'}</b></p><p><span>Use your tool</span><b>{touch?'Tap or hold the action button':'Action button / F / left mouse'}</b></p>{touch&&<p><span>Aim while using a tool</span><b>Drag on the action button</b></p>}<p><span>Grab / drop a loose item</span><b>{touch?'Grab button':'Grab button / E'}</b></p><p><span>Throw a ball or held item</span><b>Hold, then release</b></p><p><span>Switch tools</span><b>{touch?'Tool belt':'1–6 or scroll'}</b></p><p><span>Reinflate the whole room</span><b>{touch?'Fresh wrap in pause':'R'}</b></p><p><span>Pause / release mouse</span><b>{touch?'Pause button':'Esc'}</b></p>
         </div>}
         <button className="enter-button dialog-done" onClick={()=>setPanel(null)}>All good <X size={16}/></button>
       </DialogContent>
     </Dialog>
   </main>;
-}
-function Thumbstick({onMove}:{onMove:(x:number,y:number)=>void}) {
-  const [offset,setOffset]=useState({x:0,y:0});
-  const active=useRef(false);
-  const update=(e:PointerEvent<HTMLDivElement>)=>{const r=e.currentTarget.getBoundingClientRect(),x=e.clientX-r.left-r.width/2,y=e.clientY-r.top-r.height/2,m=Math.max(38,Math.hypot(x,y));const p={x:x/m*38,y:y/m*38};setOffset(p);onMove(p.x/38,p.y/38);};
-  const stop=()=>{active.current=false;setOffset({x:0,y:0});onMove(0,0);};
-  return <div className="thumbstick" aria-label="Movement thumbstick" onPointerDown={e=>{e.preventDefault();active.current=true;e.currentTarget.setPointerCapture(e.pointerId);update(e);}} onPointerMove={e=>{if(active.current)update(e);}} onPointerUp={stop} onPointerCancel={stop}><span style={{transform:`translate(${offset.x}px,${offset.y}px)`}}/></div>;
 }

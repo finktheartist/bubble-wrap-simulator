@@ -2,7 +2,7 @@ import * as THREE from 'three';
 
 // A shallow thermoformed pocket with a broad, flat heat weld. The outer lip is
 // part of the same film, rather than a separate torus that reads as a metal rim.
-export function createBubbleGeometry() {
+export function createBubbleGeometry(segments = 16) {
   const geometry = new THREE.LatheGeometry([
     new THREE.Vector2(1.055, 0),
     new THREE.Vector2(.975, .025),
@@ -11,7 +11,7 @@ export function createBubbleGeometry() {
     new THREE.Vector2(.60, .92),
     new THREE.Vector2(.30, 1),
     new THREE.Vector2(0, 1.015),
-  ], 16);
+  ], segments);
   const position = geometry.getAttribute('position');
   const uv = geometry.getAttribute('uv');
   for (let i = 0; i < position.count; i++) {

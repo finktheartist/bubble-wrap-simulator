@@ -7,6 +7,7 @@ export const PALETTE = { pearl: 0xd8dddb, blue: 0x92b6bf, pink: 0xcdaeb0, yellow
 const up = new THREE.Vector3(0, 1, 0);
 const dummy = new THREE.Object3D();
 export const bubbleGeometry = createBubbleGeometry();
+const mobileBubbleGeometry = createBubbleGeometry(10);
 let sharedMaps: ReturnType<typeof createFilmMaps> | undefined;
 let mapUsers = 0;
 
@@ -24,12 +25,12 @@ export class WrapSurface {
   private sheetNormal: THREE.Texture;
   private sheetBacking: THREE.Texture;
   private disposed = false;
-  constructor(public width: number, public depth: number, public color: number, public spacing = 0.26) {
+  constructor(public width: number, public depth: number, public color: number, public spacing = 0.26, mobile = false) {
     this.cols = Math.max(1, Math.floor(width / spacing));
     this.rows = Math.max(1, Math.floor(depth / spacing));
     const maps = sharedMaps ??= createFilmMaps(); mapUsers++;
     this.material = createPlasticMaterial(maps.normal);
-    const geometry = bubbleGeometry.clone();
+    const geometry = (mobile ? mobileBubbleGeometry : bubbleGeometry).clone();
     this.collapse = new THREE.InstancedBufferAttribute(new Float32Array(this.cols * this.rows), 1).setUsage(THREE.DynamicDrawUsage);
     geometry.setAttribute('collapse', this.collapse);
     this.mesh = new THREE.InstancedMesh(geometry, this.material, this.cols * this.rows);
@@ -104,21 +105,21 @@ export class WrapSurface {
 export type WrappedObject = { group: THREE.Group; size: THREE.Vector3; surfaces: WrapSurface[]; dynamic: boolean; name: string; color: number };
 export type Arena = { scene: THREE.Scene; camera: THREE.PerspectiveCamera; renderer: THREE.WebGLRenderer; surfaces: WrapSurface[]; objects: WrappedObject[]; environment: THREE.WebGLRenderTarget; dispose: () => void };
 
-export function createArena(container: HTMLElement): Arena {
+export function createArena(container: HTMLElement, touch = false): Arena {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0xcbd2d5);
   scene.fog = new THREE.Fog(0xcbd2d5, 30, 78);
   const camera = new THREE.PerspectiveCamera(66, container.clientWidth / container.clientHeight, .06, 100);
   camera.position.set(10.8, 7.7, 13.2);
   camera.lookAt(-2, 2.1, -5);
-  const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+  const renderer = new THREE.WebGLRenderer({ antialias: !touch, powerPreference: 'high-performance' });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, touch ? 1 : 1.5));
   renderer.setSize(container.clientWidth, container.clientHeight);
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFShadowMap;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.0;
-  renderer.transmissionResolutionScale = .75;
+  renderer.transmissionResolutionScale = touch ? .45 : .75;
   container.appendChild(renderer.domElement);
   const pmrem = new THREE.PMREMGenerator(renderer);
   const roomEnv = createPackingEnvironment();
@@ -162,7 +163,7 @@ export function createArena(container: HTMLElement): Arena {
     };
     for (const f of faces) {
       const c = configs[f];
-      const wrap = new WrapSurface(c.w-.045, c.d-.045, color, dynamic ? .22 : .26);
+      const wrap = new WrapSurface(c.w-.045, c.d-.045, color, dynamic ? .22 : .26, touch);
       wrap.group.position.set(...c.p);
       wrap.group.quaternion.setFromUnitVectors(up, new THREE.Vector3(...c.n));
       wrap.group.userData.wrappedObject = obj;

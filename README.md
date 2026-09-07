@@ -22,7 +22,7 @@ Enter the arena, look at the wrapped block directly ahead, and click the large *
 | Sound button | Mute / unmute |
 | Esc | Pause and release the mouse |
 
-Touch devices receive a movement stick, a drag-to-look region, and jump, grab, and action buttons. Settings include volume, sensitivity, camera shake, footstep popping, and rendering quality. Only preferences persist in local storage.
+Phones and tablets have safe-area-aware portrait and landscape layouts, a movement stick with a center dead zone, drag-to-look across the arena, and large jump, grab, and action buttons. Drag on the action button to aim while firing. Independent fingers can move, aim, and fire together; cancelled gestures stop cleanly without launching a charged throw. Rotating the device pauses the game. Settings include volume, sensitivity, camera shake, footstep popping, and rendering quality. Only preferences persist in local storage.
 
 ## Run locally
 
@@ -50,6 +50,8 @@ Bubble spacing is 0.26 world units throughout the room and 0.22 on loose parcels
 - Rapier provides a fixed 60 Hz rigid-body simulation, a capsule character controller, gravity, contact events, object mass, friction, restitution, continuous collision detection, and collision-preserving object grabbing.
 - Bowling balls, parcels, pellets, and bombs are dynamic bodies. Contact position and impact speed determine pop radius. Explosions apply distance-based impulses and schedule outward-moving crackles.
 - Web Audio synthesizes rounded pressure pops with a short, warm membrane body and a softly filtered air transient. There are no crinkle tails, distortion, or added room echoes. Twenty-four variants and stereo placement provide variation; dense impacts resolve into distinct pops spaced 20–28 ms apart. Conservative voice gain, a short queue, filtered treble, and a gentle limiter prevent harsh stacking. Impact thumps are quieter and rate-limited. No audio assets or external services are needed during play.
+- Physical tools now use detailed construction and shared material maps: stitched suede, matte rubber, grained hardwood, marbled resin with recessed finger wells, molded housings, threaded metal collars and braided fuse cord.
+- Mobile rendering uses 10-segment bubble pockets without changing cell counts, 1× balanced pixel density, a 45% transmission buffer, and at most 24 projectiles. Paused scenes redraw at 10 Hz; hidden tabs skip rendering.
 - Menu icons are transparent portraits rendered once from the same Three.js models and materials used by the held tools. Shapes, colors, grips, and bowling-ball finger holes match the items in the arena.
 - GPU instancing, bounded projectiles, bounded particles, and a balanced render setting keep the room practical for a browser.
 
@@ -57,7 +59,7 @@ The wrap itself uses a hybrid approximation: rigid backing plus individually ani
 
 ## Validation
 
-Twelve automated tests exercise tool-button availability, mouse and keyboard use without capture, quick-tap activation of all six tools, rounded audio transients, separated multi-pop scheduling, sustained-burst mixing headroom, one-time popping and reinflation, walking/wall collision/jumping/landing, high-speed contact detection, collision-preserving grabbing, and blast falloff/reset. TypeScript checks the full project. Lint checks application, game, and test sources; the untouched generated component catalog has pre-existing lint failures and is outside that command.
+Nineteen automated tests exercise tool-button availability, mouse and keyboard use without capture, quick-tap activation of all six tools, rounded audio transients, separated multi-pop scheduling, sustained-burst mixing headroom, one-time popping and reinflation, walking/wall collision/jumping/landing, high-speed contact detection, collision-preserving grabbing, and blast falloff/reset, simultaneous touch ownership, drift-free analog movement, viewport-scaled aiming, cancelled charged throws, mobile bubble geometry/state parity, and finite tool geometry with recessed bowling-ball wells. TypeScript checks the full project. Lint checks application, game, and test sources; the untouched generated component catalog has pre-existing lint failures and is outside that command.
 
 Browser playtesting is a separate optional step, pending the user's choice in the build conversation. Touch controls are implemented but are not yet verified on a physical device.
 
@@ -69,6 +71,9 @@ Browser playtesting is a separate optional step, pending the user's choice in th
 - `lib/game/plastic.ts`: molded and folded pocket geometry, procedural film maps, physical plastic shader, and reflection environment.
 - `lib/game/physics.ts`: Rapier bodies, character movement, grabbing, and impulses.
 - `lib/game/tools.ts`: physical tool models.
+- `lib/game/tool-materials.ts`: shared procedural wood, rubber, resin, metal and suede materials.
+- `lib/game/touch.ts`: pointer ownership, stick dead zone and touch look scaling.
+- `components/game/touch-controls.tsx`: independent look and movement controls.
 - `lib/game/audio.ts`: procedural sound routing.
 - `lib/game/tool-icons.ts`: menu portraits rendered from the live tool models.
 - `lib/game/pop-synthesis.ts`: pressure-release synthesis and voice scheduling.

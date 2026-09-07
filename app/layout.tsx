@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 
@@ -15,6 +15,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: 'Bubble Wrap Simulator',
   description: 'A first person bubble wrap playground. Pop, throw, smash, and make a wonderfully unnecessary amount of noise.',
+};
+
+export const viewport: Viewport = {
+  width: 'device-width', initialScale: 1, viewportFit: 'cover', themeColor: '#e7edf0',
 };
 
 export default function RootLayout({

@@ -8,8 +8,9 @@ export function renderToolIcons(renderer: THREE.WebGLRenderer, environment: THRE
   target.texture.colorSpace = THREE.SRGBColorSpace;
   const scene = new THREE.Scene();
   scene.environment = environment;
-  scene.add(new THREE.HemisphereLight(0xffffff, 0x7b9498, 3));
-  const light = new THREE.DirectionalLight(0xfff7eb, 3);
+  scene.environmentIntensity = .8;
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x7b9498, 1.15));
+  const light = new THREE.DirectionalLight(0xfff7eb, 2.8);
   light.position.set(-3, 4, 5); scene.add(light);
   const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, .01, 12);
   const previousTarget = renderer.getRenderTarget();

@@ -33,9 +33,10 @@ export class BubbleGame {
   private movementX=0;private movementZ=0;private fpsSamples=0;private fpsElapsed=0;
   private resizeObserver:ResizeObserver;
   private abort=new AbortController();private unlockToCursor=false;
-  constructor(private container:HTMLElement,onChange:(s:GameSnapshot)=>void) {
+  constructor(private container:HTMLElement,onChange:(s:GameSnapshot)=>void,touch=false) {
     this.uiCallback=onChange;
-    this.arena=createArena(container);
+    this.touch=touch;
+    this.arena=createArena(container,touch);
     this.toolIcons=renderToolIcons(this.arena.renderer,this.arena.environment.texture);
     this.snapshot.total=this.arena.surfaces.reduce((n,s)=>n+s.cells.length,0);
     this.particleGeometry.setAttribute('position',new THREE.BufferAttribute(this.particleArray,3).setUsage(THREE.DynamicDrawUsage));
@@ -44,8 +45,9 @@ export class BubbleGame {
     this.particleMesh=new THREE.Points(this.particleGeometry,this.particleMaterial);this.particleMesh.frustumCulled=false;this.arena.scene.add(this.particleMesh);
     this.toolModel=makeTool(0);this.toolScene.add(this.toolModel);
     this.toolScene.environment=this.arena.environment.texture;
-    this.toolScene.add(new THREE.HemisphereLight(0xffffff,0x68838a,3));
-    const key=new THREE.DirectionalLight(0xfff6de,3);key.position.set(-3,4,2);this.toolScene.add(key);
+    this.toolScene.environmentIntensity=.8;
+    this.toolScene.add(new THREE.HemisphereLight(0xffffff,0x536169,1.15));
+    const key=new THREE.DirectionalLight(0xfff6e9,2.8);key.position.set(-3,4,2);this.toolScene.add(key);
     this.resizeObserver=new ResizeObserver(()=>this.resize());this.resizeObserver.observe(container);this.resize();
     this.bindEvents();
     this.arena.renderer.setAnimationLoop(this.animate);
@@ -93,6 +95,7 @@ export class BubbleGame {
       if(!this.snapshot.playing)return;e.preventDefault();this.selectTool((this.snapshot.tool+(e.deltaY>0?1:5))%6);
     },{signal,passive:false});
     window.addEventListener('blur',()=>this.pause(),{signal});
+    window.screen.orientation?.addEventListener('change',()=>{if(this.snapshot.playing)this.pause();},{signal});
     document.addEventListener('visibilitychange',()=>{if(document.hidden)this.pause();},{signal});
     canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();this.pause();this.snapshot.error='The graphics connection was interrupted. Reload to reinflate the arena.';this.publish();},{signal});
   }
@@ -108,7 +111,7 @@ export class BubbleGame {
   async previewPop(){await this.audio.preview();}
   async start(touch=false) {
     if(!this.physics||!this.snapshot.ready)return;
-    this.touch=touch;
+    this.setTouchEnabled(touch);
     void this.audio.start().catch(()=>{this.snapshot.hint='Sound is unavailable in this browser.';});
     if(!this.snapshot.started){this.startedAt=this.time;this.yaw=0;this.pitch=-.08;}
     const position=this.physics.player.translation();
@@ -125,12 +128,13 @@ export class BubbleGame {
     this.publish();
   }
   look(dx:number,dy:number){this.yaw-=dx*.0022*this.settings.sensitivity;this.pitch=THREE.MathUtils.clamp(this.pitch-dy*.0022*this.settings.sensitivity,-1.48,1.48);}
+  setTouchEnabled(touch:boolean){if(touch===this.touch)return;this.touch=touch;this.setSettings({});}
   setTouchMove(x:number,y:number){this.touchMove={x,y};}
   jump(){if(this.snapshot.playing&&this.physics?.grounded)this.physics.verticalVelocity=5.7;}
   setSettings(partial:Partial<GameSettings>) {
     this.settings={...this.settings,...partial};this.audio.volume=this.settings.volume;this.audio.muted=this.settings.muted;this.audio.update();
-    const r=this.arena.renderer;r.setPixelRatio(Math.min(window.devicePixelRatio,this.settings.quality==='high'?2:1.25));
-    r.transmissionResolutionScale=this.settings.quality==='high'?1:.6;
+    const r=this.arena.renderer;r.setPixelRatio(Math.min(window.devicePixelRatio,this.settings.quality==='high'?(this.touch?1.5:2):(this.touch?1:1.25)));
+    r.transmissionResolutionScale=this.settings.quality==='high'?1:(this.touch?.45:.6);
     r.shadowMap.enabled=true;this.arena.scene.traverse(o=>{if(o instanceof THREE.DirectionalLight&&o.castShadow){const size=this.settings.quality==='high'?2048:1024;if(o.shadow.mapSize.x!==size){o.shadow.mapSize.set(size,size);o.shadow.map?.dispose();o.shadow.map=null;}}});this.resize();
   }
   selectTool(tool:number) {
@@ -148,6 +152,7 @@ export class BubbleGame {
     if([1,2,4,5].includes(this.snapshot.tool))this.useTool();
   }
   tapTool(){this.actionDown();this.actionUp();}
+  actionCancel(){this.down=false;this.snapshot.charge=0;this.clearPressure();}
   actionUp() {
     if(!this.down)return;
     if(this.snapshot.playing&&(this.snapshot.tool===3||this.physics?.held))this.throwItem();
@@ -225,7 +230,7 @@ export class BubbleGame {
   private trimProjectiles(){
     if(!this.physics)return;
     const projectiles=this.physics.items.filter(i=>i.kind!=='parcel');
-    while(projectiles.length>45){const item=projectiles.shift()!;if(item===this.physics.held)continue;this.removeItem(item);}
+    while(projectiles.length>(this.touch?24:45)){const item=projectiles.shift()!;if(item===this.physics.held)continue;this.removeItem(item);}
   }
   private removeItem(item:PhysicsItem){this.physics?.remove(item);disposeTool(item.group);if(item.kind==='shot')item.group.traverse(o=>{if(o instanceof THREE.Mesh)(o.material as THREE.Material).dispose();});}
   private impact(item:PhysicsItem,point:THREE.Vector3,speed:number) {
@@ -302,10 +307,13 @@ export class BubbleGame {
     const available=hit&&(this.snapshot.tool===0?this.availableCell(hit)!==null:hit.surface.cells[hit.index].state===0);
     this.snapshot.target=Boolean(hit&&hit.distance<range&&available)||Boolean(this.pickup);
     this.snapshot.held=this.physics?.held?.name??'';
-    if(this.physics?.held)this.snapshot.hint='Hold & release to throw · E to drop';
-    else if(this.pickup)this.snapshot.hint=`E · Pick up ${this.pickup.name.toLowerCase()}`;
-    else if(hit&&hit.distance<range){this.snapshot.hint=!available?'Aim at some fresh bubbles':this.snapshot.tool===0?'Click POP or press F · Hold for a crackle':TOOL_INFO[this.snapshot.tool].verb;}
-    else this.snapshot.hint=this.snapshot.tool<=2?'Move closer to the bubbles':TOOL_INFO[this.snapshot.tool].verb;
+    if(this.physics?.held)this.snapshot.hint=this.touch?'Hold THROW · Release to launch':'Hold & release to throw · E to drop';
+    else if(this.pickup)this.snapshot.hint=`${this.touch?'Grab':'E'} · Pick up ${this.pickup.name.toLowerCase()}`;
+    else {
+      const verb=this.touch?['Tap POP · Hold for a crackle','Tap SMASH','Tap WHACK','Hold THROW · Release to launch','Hold FIRE · Drag to aim','Tap THROW BOMB'][this.snapshot.tool]:TOOL_INFO[this.snapshot.tool].verb;
+      if(hit&&hit.distance<range)this.snapshot.hint=!available?'Aim at some fresh bubbles':this.snapshot.tool===0&&!this.touch?'Click POP or press F · Hold for a crackle':verb;
+      else this.snapshot.hint=this.snapshot.tool<=2?'Move closer to the bubbles':verb;
+    }
   }
   private updateInteraction() {
     if(!this.physics)return;
@@ -330,6 +338,8 @@ export class BubbleGame {
   }
   private animate=(stamp:number)=>{
     if(this.disposed)return;
+    // A paused room needs occasional redraws, not a full-rate GPU loop behind a modal.
+    if(document.hidden||(!this.snapshot.playing&&stamp-this.lastFrame<100))return;
     const dt=Math.min((stamp-this.lastFrame)/1000||1/60,.05);this.lastFrame=stamp;this.frame++;
     this.fpsElapsed+=dt;this.fpsSamples++;if(this.fpsElapsed>.75){this.snapshot.fps=Math.round(this.fpsSamples/this.fpsElapsed);this.fpsElapsed=0;this.fpsSamples=0;}
     const {camera,scene,renderer}=this.arena;
@@ -371,10 +381,12 @@ export class BubbleGame {
       const t=this.snapshot.tool,melee=t===1||t===2;
       const sw=Math.sin(this.swing*Math.PI);
       const bob=this.settings.shake?Math.sin(this.time*9)*Math.min(.018,Math.hypot(this.movementX,this.movementZ)*.005):0;
-      this.toolModel.position.set(t===0?.34:t===4?.34:.43,-.31+bob-(this.snapshot.charge*.08),-0.73+this.recoil*.13);
+      const portrait=this.toolCamera.aspect<1;
+      const fit=portrait?Math.max(.48,this.toolCamera.aspect*.85):1;
+      this.toolModel.position.set(portrait?.085:(t===0?.34:t===4?.34:.43),(portrait?-.08:-.31)+bob-(this.snapshot.charge*.08),(portrait?-.9:-.73)+this.recoil*.13);
       this.toolModel.rotation.set((melee?-.3:-.08)-sw*(melee?1.6:.5),-.18,melee?-.34-sw*.6:-.18);
-      this.toolModel.scale.setScalar(t===2?.76:1);
-      if(t===0){this.toolModel.position.y=-.32;this.toolModel.position.z=-.62-this.recoil*.35;}
+      this.toolModel.scale.setScalar((t===2?.76:1)*fit);
+      if(t===0){this.toolModel.position.y=portrait?-.06:-.32;this.toolModel.position.z=(portrait?-.8:-.62)-this.recoil*.35;}
       renderer.autoClear=false;renderer.clearDepth();renderer.render(this.toolScene,this.toolCamera);renderer.autoClear=true;
     }
     if(stamp-this.lastPublish>95){this.lastPublish=stamp;this.publish();}
