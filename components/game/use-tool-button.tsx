@@ -6,7 +6,6 @@ const ACTIONS=['POP','SMASH','WHACK','THROW','FIRE','THROW BOMB'];
 export function UseToolButton({tool,held,onDown,onUp,onTap,onCancel,onLook,touch=false}:{tool:number;held:boolean;onDown:()=>void;onUp:()=>void;onTap:()=>void;onCancel?:()=>void;onLook?:(x:number,y:number)=>void;touch?:boolean}) {
   const pressed=useRef(false);
   const gesture=useRef(new TouchGesture());
-  const keyboardClick=useRef(false);
   const cancelRef=useRef(onCancel??onUp);
   useEffect(()=>{cancelRef.current=onCancel??onUp;},[onCancel,onUp]);
   useEffect(()=>()=>{if(pressed.current)cancelRef.current();},[]);
@@ -23,10 +22,10 @@ export function UseToolButton({tool,held,onDown,onUp,onTap,onCancel,onLook,touch
     onPointerUp={event=>{if(gesture.current.end(event.pointerId))up();}}
     onPointerCancel={event=>{if(gesture.current.end(event.pointerId))cancel();}}
     onLostPointerCapture={event=>{if(gesture.current.end(event.pointerId))cancel();}}
-    onKeyDown={event=>{if(event.key===' '||event.key==='Enter'){event.preventDefault();keyboardClick.current=true;down();}}}
+    onKeyDown={event=>{if(event.key===' '||event.key==='Enter'){event.preventDefault();down();}}}
     onKeyUp={event=>{if(event.key===' '||event.key==='Enter'){event.preventDefault();up();}}}
     onBlur={cancel}
     onContextMenu={event=>event.preventDefault()}
-    onClick={event=>{if(event.detail===0&&!pressed.current&&!keyboardClick.current)onTap();keyboardClick.current=false;}}
+    onClick={event=>{if(event.detail===0&&!pressed.current)onTap();}}
   ><strong>{held?'THROW':ACTIONS[tool]}</strong><span>{charged?'Hold, then release':tool===5?(touch?'Tap to throw':'Click to throw'):(touch?'Tap or hold':'Click or hold')} <kbd>F</kbd></span></button>;
 }

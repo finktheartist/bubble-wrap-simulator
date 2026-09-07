@@ -225,6 +225,7 @@ button {touch-action:manipulation;-webkit-tap-highlight-color:#708e3b28;}
 .is-touch .tool-area-paused {display:none;}
 .is-touch .pause-card {margin:0;max-height:calc(100dvh - var(--safe-top) - var(--safe-bottom) - 24px);overflow-y:auto;}
 .is-touch .pause-tip {font-size:12px;}
+.is-touch .text-button {min-height:44px;}
 .is-touch .aim-caption {font-size:12px;min-width:0;width:calc(100% - 28px);max-width:340px;}
 .is-touch .aim-caption>span {white-space:normal;display:inline-block;max-width:100%;}
 .is-touch .combo-counter {top:calc(125px + var(--safe-top));right:calc(18px + var(--safe-right));}
@@ -293,7 +294,7 @@ button {touch-action:manipulation;-webkit-tap-highlight-color:#708e3b28;}
   .is-touch .pause-card h2 {font-size:28px;margin:10px 0;}
   .is-touch .pause-card p {margin-bottom:14px;font-size:14px;}
   .is-touch .pause-card .enter-button {padding:12px 18px;}
-  .is-touch .pause-card .text-button {margin-top:14px;min-height:36px;}
+  .is-touch .pause-card .text-button {margin-top:8px;min-height:44px;}
   .is-touch .pause-tip {display:none;}
 }
 @media (orientation:landscape) and (max-height:600px) and (max-width:700px) {
