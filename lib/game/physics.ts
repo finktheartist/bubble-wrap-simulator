@@ -1,6 +1,7 @@
 import RAPIER from '@dimforge/rapier3d-compat';
 import * as THREE from 'three';
 import type { WrappedObject } from './arena';
+import { targetPosition } from './targets';
 
 let rapierReady: Promise<void> | undefined;
 export const initPhysics = () => rapierReady ??= RAPIER.init();
@@ -16,17 +17,19 @@ export class ArenaPhysics {
   grounded=false;
   verticalVelocity=0;
   held:PhysicsItem|null=null;
+  movingTargets:{object:WrappedObject;body:RAPIER.RigidBody}[]=[];
   constructor(objects:WrappedObject[], public onImpact:(item:PhysicsItem,point:THREE.Vector3,speed:number)=>void) {
     this.world.timestep=1/60;
     for(const o of objects) {
       const p=o.group.position;
-      const desc=(o.dynamic?RAPIER.RigidBodyDesc.dynamic():RAPIER.RigidBodyDesc.fixed()).setTranslation(p.x,p.y,p.z);
+      const desc=(o.motion?RAPIER.RigidBodyDesc.kinematicPositionBased():o.dynamic?RAPIER.RigidBodyDesc.dynamic():RAPIER.RigidBodyDesc.fixed()).setTranslation(p.x,p.y,p.z);
       if(o.dynamic) desc.setCcdEnabled(true).setLinearDamping(.14).setAngularDamping(.28);
       const body=this.world.createRigidBody(desc);
       const size=o.size;
       const cd=RAPIER.ColliderDesc.cuboid(size.x/2,size.y/2,size.z/2).setFriction(.62).setRestitution(.16);
       if(o.dynamic) cd.setMass(2.5).setActiveEvents(RAPIER.ActiveEvents.COLLISION_EVENTS);
       const collider=this.world.createCollider(cd,body);
+      if(o.motion)this.movingTargets.push({object:o,body});
       if(o.dynamic) {
         const item:PhysicsItem={body,collider,group:o.group,name:o.name,wrapped:o,kind:'parcel',born:0,fuse:-1,speed:0,initial:p.clone(),radius:size.length()/2};
         this.items.push(item);this.lookup.set(collider.handle,item);o.group.userData.physicsItem=item;
@@ -83,6 +86,7 @@ export class ArenaPhysics {
   step() {
     for(const item of this.items){const v=item.body.linvel();item.speed=Math.hypot(v.x,v.y,v.z);}
     this.world.step(this.events);
+    for(const {object,body} of this.movingTargets){const p=body.translation(),q=body.rotation();object.group.position.set(p.x,p.y,p.z);object.group.quaternion.set(q.x,q.y,q.z,q.w);object.group.updateMatrixWorld(true);}
     for(const item of this.items){const p=item.body.translation(),r=item.body.rotation();item.group.position.set(p.x,p.y,p.z);item.group.quaternion.set(r.x,r.y,r.z,r.w);item.group.updateMatrixWorld(true);}
     this.events.drainCollisionEvents((a,b,started)=>{
       if(!started || a===this.playerCollider.handle || b===this.playerCollider.handle) return;
@@ -94,6 +98,12 @@ export class ArenaPhysics {
       this.world.contactPair(ca,cb,m=>{if(point)return;const p=m.solverContactPoint(0);if(p)point=new THREE.Vector3(p.x,p.y,p.z);});
       if(point) this.onImpact(item,point,item.speed);
     });
+  }
+  moveTargets(now:number) {
+    for(const {object,body} of this.movingTargets){
+      const motion=object.motion!;body.setNextKinematicTranslation(targetPosition(motion,now));
+      body.setNextKinematicRotation(new THREE.Quaternion().setFromEuler(new THREE.Euler(0,Math.sin(now*motion.speed+motion.phase)*.18,Math.sin(now*.8+motion.phase)*.05)));
+    }
   }
   blast(point:THREE.Vector3,radius:number,strength:number) {
     this.release();

@@ -2,11 +2,12 @@
 import { useEffect, useRef, useState, type PointerEvent } from 'react';
 import { TouchGesture, thumbstickVector } from '../../lib/game/touch';
 
-export function TouchLook({ onLook }: { onLook: (x: number, y: number) => void }) {
+export function TouchLook({ onLook, onTap }: { onLook: (x: number, y: number) => void; onTap:()=>void }) {
   const gesture = useRef(new TouchGesture());
   const stop = (event: PointerEvent) => { gesture.current.end(event.pointerId); };
   return <div className="touch-look" aria-label="Drag to look around"
     onPointerDown={event => {
+      if(event.button!==0)return;
       if (gesture.current.start(event.pointerId, event.clientX, event.clientY)) {
         event.preventDefault(); event.currentTarget.setPointerCapture(event.pointerId);
       }
@@ -15,7 +16,7 @@ export function TouchLook({ onLook }: { onLook: (x: number, y: number) => void }
       const delta = gesture.current.move(event.pointerId, event.clientX, event.clientY);
       if (delta) onLook(delta.x, delta.y);
     }}
-    onPointerUp={stop} onPointerCancel={stop} onLostPointerCapture={stop}
+    onPointerUp={event=>{if(gesture.current.finishTap(event.pointerId,event.clientX,event.clientY))onTap();}} onPointerCancel={stop} onLostPointerCapture={stop}
     onContextMenu={event => event.preventDefault()}
   />;
 }

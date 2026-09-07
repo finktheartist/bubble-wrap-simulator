@@ -23,7 +23,7 @@
     "triangles": 8588,
     "vertices": 4715,
     "materials": 5,
-    "bytes": 451016,
+    "bytes": 451368,
     "source": "art/bubble-wrap-tools.blend"
   },
   {
@@ -32,16 +32,16 @@
     "triangles": 16170,
     "vertices": 8473,
     "materials": 3,
-    "bytes": 830316,
+    "bytes": 830288,
     "source": "art/bubble-wrap-tools.blend"
   },
   {
     "tool": 4,
     "file": "pop-blaster.glb",
-    "triangles": 11717,
-    "vertices": 6217,
-    "materials": 10,
-    "bytes": 786272,
+    "triangles": 14794,
+    "vertices": 8115,
+    "materials": 12,
+    "bytes": 928972,
     "source": "art/bubble-wrap-tools.blend"
   },
   {
@@ -50,7 +50,7 @@
     "triangles": 20040,
     "vertices": 10486,
     "materials": 10,
-    "bytes": 930892,
+    "bytes": 930160,
     "source": "art/bubble-wrap-tools.blend"
   }
 ]

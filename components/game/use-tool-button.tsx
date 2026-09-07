@@ -17,7 +17,7 @@ export function UseToolButton({tool,held,onDown,onUp,onTap,onCancel,onLook,touch
     type="button"
     className="use-tool-button"
     aria-label={`Use tool: ${held?'throw held item':ACTIONS[tool].toLowerCase()}`}
-    onPointerDown={event=>{if(event.button!==0||!gesture.current.start(event.pointerId,event.clientX,event.clientY))return;event.preventDefault();event.currentTarget.setPointerCapture(event.pointerId);down();}}
+    onPointerDown={event=>{if(event.button!==0||!gesture.current.start(event.pointerId,event.clientX,event.clientY))return;event.preventDefault();down();try{event.currentTarget.setPointerCapture(event.pointerId);}catch{}}}
     onPointerMove={event=>{const delta=gesture.current.move(event.pointerId,event.clientX,event.clientY);if(delta&&event.pointerType!=='mouse')onLook?.(delta.x,delta.y);}}
     onPointerUp={event=>{if(gesture.current.end(event.pointerId))up();}}
     onPointerCancel={event=>{if(gesture.current.end(event.pointerId))cancel();}}
@@ -27,5 +27,5 @@ export function UseToolButton({tool,held,onDown,onUp,onTap,onCancel,onLook,touch
     onBlur={cancel}
     onContextMenu={event=>event.preventDefault()}
     onClick={event=>{if(event.detail===0&&!pressed.current)onTap();}}
-  ><strong>{held?'THROW':ACTIONS[tool]}</strong><span>{charged?'Hold, then release':tool===5?(touch?'Tap to throw':'Click to throw'):(touch?'Tap or hold':'Click or hold')} <kbd>F</kbd></span></button>;
+  ><strong>{held?'THROW':ACTIONS[tool]}</strong><span>{charged?'Hold, then release':tool===1||tool===2?(touch?'Tap to swing':'Click to swing'):tool===5?(touch?'Tap to throw':'Click to throw'):(touch?'Tap or hold':'Click or hold')} <kbd>F</kbd></span></button>;
 }

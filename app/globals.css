@@ -306,3 +306,50 @@ button {touch-action:manipulation;-webkit-tap-highlight-color:#708e3b28;}
   .is-touch .toolbelt button {height:48px;min-width:44px;}
   .is-touch .tool-description {display:block;margin-bottom:5px;}
 }
+
+/* Equipped-tool dock: the arena stays clear until the player opens the picker. */
+.action-dock {bottom:44px;width:154px;gap:8px;}
+.equipped-tool {display:flex;align-items:center;gap:7px;min-height:52px;padding:5px 10px 5px 5px;border-radius:16px;background:#f0f6f0ed;color:#263e43;border:1px solid #ffffffb8;box-shadow:0 3px 16px #1c30371a;cursor:pointer;transition:background 120ms,transform 120ms;}
+.equipped-tool:hover {background:#fff;transform:translateY(-1px);}
+.equipped-tool>img {width:38px;height:38px;object-fit:contain;pointer-events:none;}
+.equipped-tool>span {display:flex;flex:1;min-width:0;flex-direction:column;gap:2px;text-align:left;}
+.equipped-tool small {font:8px var(--font-geist-mono),monospace;letter-spacing:1px;color:#5e7275;}
+.equipped-tool strong {font-size:12px;line-height:1.2;font-weight:650;}
+.equipped-tool>svg {flex:none;opacity:.6;}
+.equipped-tool:focus-visible,.tool-picker-grid button:focus-visible {outline:3px solid #456254;outline-offset:3px;}
+.tool-picker-panel {width:min(330px,calc(100vw - 24px));max-height:calc(100dvh - 24px);overflow:auto;padding:16px;border:1px solid #fff;border-radius:22px;background:#f3f7efeF;color:#213b41;box-shadow:0 14px 70px #12252f36;backdrop-filter:blur(16px);}
+.tool-picker-heading {display:flex;align-items:center;justify-content:space-between;font-size:16px;}
+.tool-picker-heading kbd {padding:2px 5px;border:1px solid #bac9c2;border-radius:5px;font:10px var(--font-geist-mono),monospace;}
+.tool-picker-description {font-size:11px;color:#536b70;margin:0 0 7px;}
+.tool-picker-grid {border:0;margin:0;padding:0;min-width:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;}
+.tool-picker-grid button {position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:100px;padding:8px 3px;border:1px solid #c9d6c880;border-radius:14px;background:#e7eee580;color:#344f54;transition:background 120ms,transform 120ms;}
+.tool-picker-grid button:hover {background:#e0e9dd;transform:translateY(-2px);}
+.tool-picker-grid button[aria-pressed=true] {background:var(--primary);border-color:#afc667;color:#21352a;}
+.tool-picker-grid img {width:58px;height:58px;object-fit:contain;pointer-events:none;filter:drop-shadow(0 2px 3px #1b343a20);}
+.tool-picker-grid span {font-size:11px;line-height:1.25;font-weight:600;}
+.tool-picker-grid kbd {position:absolute;left:8px;top:5px;font:9px var(--font-geist-mono),monospace;opacity:.55;}
+.tool-check {position:absolute;right:6px;top:6px;}
+.inventory-open .topbar,.inventory-open .topbar * {pointer-events:none;}
+.inventory-open .use-tool-button,.inventory-open .action-extras {visibility:hidden;}
+.target-score {display:block;margin-top:4px;font:8px var(--font-geist-mono),monospace;letter-spacing:.5px;color:#566e72;}
+.target-score b {color:#28484f;font-weight:700;}
+.hit-marker {position:absolute;top:50%;left:50%;width:36px;height:36px;transform:translate(-50%,-50%);z-index:10;pointer-events:none;}
+.hit-marker i {position:absolute;width:9px;height:3px;background:#f3ffb0;border-radius:2px;box-shadow:0 0 4px #51764f;}
+.hit-marker i:nth-child(1) {left:0;top:4px;transform:rotate(45deg);}.hit-marker i:nth-child(2) {right:0;top:4px;transform:rotate(-45deg);}.hit-marker i:nth-child(3) {left:0;bottom:4px;transform:rotate(-45deg);}.hit-marker i:nth-child(4) {right:0;bottom:4px;transform:rotate(45deg);}
+.is-touch .action-dock {bottom:calc(14px + var(--safe-bottom));width:138px;gap:7px;}
+.is-touch .equipped-tool {min-height:48px;border-radius:15px;padding-right:7px;gap:4px;}
+.is-touch .equipped-tool strong {font-size:11px;}
+.is-touch .equipped-tool small {font-size:8px;}
+.is-touch .equipped-tool>img {width:34px;height:34px;}
+.is-touch .use-tool-button {min-height:70px;}
+.is-touch .touch-look-hint {display:none;}
+.is-touch .target-score {font-size:9px;}
+@media (max-width:600px) {.action-dock {right:16px;bottom:20px;width:138px;}.game-footer {display:none;}}
+@media (max-height:600px) and (orientation:landscape) {
+  .action-dock,.is-touch .action-dock {bottom:calc(12px + var(--safe-bottom));width:126px;gap:5px;}
+  .equipped-tool,.is-touch .equipped-tool {min-height:44px;}.equipped-tool>img,.is-touch .equipped-tool>img {width:30px;height:30px;}
+  .is-touch .use-tool-button {min-height:60px;}.is-touch .use-tool-button>span {font-size:10px;}
+  .tool-picker-grid button {min-height:82px;}.tool-picker-grid img {width:44px;height:44px;}
+  .tool-picker-panel {padding:12px;}.target-score {margin:0;}
+}
+@media (prefers-reduced-motion:reduce) {.equipped-tool,.tool-picker-grid button {transition:none;}.tool-picker-panel {animation:none;}}

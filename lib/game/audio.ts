@@ -72,5 +72,14 @@ export class PopAudio {
     osc.onended = () => { osc.disconnect(); gain.disconnect(); };
   }
   async preview() { await this.start(); this.pop(1.2, 0, .4); }
+  swish(heavy=false) {
+    const ctx=this.context;if(!ctx||ctx.state!=='running'||this.muted)return;
+    const duration=heavy?.18:.14,buffer=ctx.createBuffer(1,Math.ceil(ctx.sampleRate*duration),ctx.sampleRate),data=buffer.getChannelData(0);
+    for(let i=0;i<data.length;i++){const t=i/data.length;data[i]=(Math.random()*2-1)*Math.sin(Math.PI*t)**2;}
+    const source=ctx.createBufferSource();source.buffer=buffer;
+    const filter=ctx.createBiquadFilter();filter.type='bandpass';filter.Q.value=.6;filter.frequency.setValueAtTime(heavy?450:720,ctx.currentTime);filter.frequency.exponentialRampToValueAtTime(180,ctx.currentTime+duration);
+    const gain=ctx.createGain();gain.gain.value=.065;
+    source.connect(filter);filter.connect(gain);gain.connect(this.input!);source.onended=()=>{source.disconnect();filter.disconnect();gain.disconnect();};source.start();
+  }
   dispose() { void this.context?.close(); this.context = null; this.buffers = []; this.voices.reset(); this.lastThump = -Infinity; }
 }

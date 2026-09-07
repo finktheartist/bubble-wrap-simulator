@@ -258,34 +258,52 @@ def extrude_side(name,outline,width,mat,center_x=0,radius=.01):
     active(o);bpy.ops.object.mode_set(mode='EDIT');bpy.ops.mesh.select_all(action='SELECT');bpy.ops.mesh.normals_make_consistent(inside=False);bpy.ops.object.mode_set(mode='OBJECT');return bevel(o,radius,4)
 
 def build_blaster():
-    begin('pop-blaster','05 — Pneumatic pop blaster')
-    outline=[(.09,-.26),(.136,-.19),(.133,.157),(.08,.21),(-.027,.192),(-.065,.06),(-.061,-.195),(-.015,-.26)]
-    shell=extrude_side('Contoured molded housing',outline,.15,teal,radius=.019)
-    # Center gasket follows the actual casing outline.
-    for x in [-.076,.076]:
-        inset=[(.075,-.215),(.102,-.162),(.1,.126),(.065,.154),(-.007,.139),(-.025,-.14)]
-        plate=extrude_side('Recessed side panel',inset,.009,rubber,center_x=x,radius=.008)
-        for j in range(4):
-            cut(plate,cube('Vent slot cutter',(x,.017,-.143+j*.038),(.023,.041,.01),None,.003))
-        for z in [-.182,.125]:cylinder('Case fastener',(x+math.copysign(.008,x),.071,z),.007,.004,steel,(1,0,0),32,edge=.0006)
-    grip=extrude_side('Angled ergonomic handle',[(-.04,.054),(-.065,-.03),(-.248,.026),(-.286,.095),(-.251,.151),(-.102,.153)],.09,rubber,radius=.018)
-    for j in range(5):
-        y=-.105-j*.029;z=.015+(j*.008)
-        path('Grip molded checkering',[(-.043,y,z),(-.025,y-.003,z+.003),(.025,y-.003,z+.003),(.043,y,z)],.0011,endrubber,2)
-    # The trigger guard has an open middle, and the trigger sits inside it.
-    path('Open metal trigger guard',[(-.006,-.047,-.179),(-.006,-.14,-.18),(-.006,-.182,-.125),(-.006,-.163,-.014)],.007,steel,8)
-    trig=extrude_side('Pivoting orange trigger',[(-.057,-.108),(-.104,-.114),(-.133,-.075),(-.115,-.061),(-.075,-.085)],.02,orange,radius=.004)
-    cylinder('Barrel collar',(0,.03,-.263),.058,.066,steel,(0,0,1),64,edge=.003)
-    barrel=lathe('Hollow machined barrel',[(.034,-.115),(.044,-.115),(.047,-.107),(.047,.107),(.044,.115),(.034,.115),(.034,-.115)],silver,64)
-    barrel.rotation_euler.x=math.pi/2;barrel.location=v((0,.03,-.404));active(barrel);bpy.ops.object.transform_apply(location=False,rotation=True,scale=True)
-    cylinder('Dark barrel depth',(0,.03,-.334),.034,.004,black,(0,0,1),48,edge=0)
-    torus('Orange safety muzzle',(0,.03,-.52),.043,.005,orange,(0,0,1))
-    for z in [-.3,-.32]:torus('Barrel retaining groove',(0,.03,z),.047,.0011,steel,(0,0,1))
-    cube('Sight dovetail',(0,.146,-.028),(.036,.017,.097),steel,.003)
-    cube('Front sight',(0,.16,-.096),(.017,.022,.014),teal,.003)
-    cube('Sight insert',(0,.171,-.087),(.004,.006,.002),labelmat,.001)
-    lettering('Housing serial','POP / 01',(.082,.096,-.025),.016,labelmat,side=True)
-    cylinder('Grip air fitting',(0,-.278,.099),.009,.02,brass,vertices=6,edge=.001)
+    begin('pop-blaster','05 — Machined pneumatic sidearm')
+    graphite=material('Polymer | stippled graphite',(.025,.033,.038),.78,grain=(115,(1,1,1),.00055))
+    gunmetal=material('Steel | bead blasted slide',(.135,.16,.175),.31,.9,grain=(80,(1,1,.07),.000045))
+    insetmetal=material('Steel | slide recess',(.025,.032,.037),.42,.75)
+    # A slim continuous upper, distinct lower frame, swept grip and real open guard.
+    slide=extrude_side('Beveled machined upper',[(.036,-.338),(.098,-.338),(.12,-.306),(.12,.074),(.097,.108),(.036,.108)],.079,gunmetal,radius=.006)
+    for side in [-1,1]:
+        for j in range(6):
+            for z in [.02+j*.012,-.274+j*.013]:
+                cut(slide,cube('Cut slide serration',(side*.04,.078,z),(.006,.058,.005),None,.001))
+        plate=extrude_side('Recessed receiver facet',[(.048,-.182),(.101,-.182),(.101,.003),(.048,.003)],.0018,insetmetal,center_x=side*.0396,radius=.001)
+    # The open ejection recess has inset surfaces, not a sticker on the side.
+    cut(slide,cube('Ejection port recess',(.039,.085,-.12),(.016,.029,.068),None,.003))
+    cube('Polished chamber visible in recess',(.032,.084,-.121),(.005,.021,.056),silver,.002)
+    frame=extrude_side('Glass filled lower frame',[(.036,-.304),(-.022,-.303),(-.049,-.17),(-.055,-.033),(-.092,.06),(-.065,.113),(.036,.106)],.073,graphite,radius=.009)
+    grip=extrude_side('Swept ergonomic grip',[(-.044,.009),(-.062,.098),(-.228,.175),(-.264,.137),(-.258,.052),(-.133,-.01)],.071,graphite,radius=.013)
+    for side in [-1,1]:
+        extrude_side('Inset stippled grip panel',[(-.089,.028),(-.09,.091),(-.229,.146),(-.243,.13),(-.23,.07)],.0035,rubber,center_x=side*.035,radius=.005)
+        for j in range(7):
+            y=-.105-j*.017;z=.028+j*.007
+            path('Diagonal grip traction rib',[(side*.037,y,z),(side*.038,y-.009,z+.052)],.0012,endrubber,2)
+        cylinder('Recessed grip screw',(side*.039,-.125,.07),.004,.002,steel,(1,0,0),24,edge=.0005)
+        cylinder('Frame cross pin',(side*.039,-.013,.039),.006,.002,steel,(1,0,0),24,edge=.0005)
+    # Guard connects at both ends to the frame and contains a curved metal trigger.
+    path('Squared trigger guard',[(0,-.029,-.184),(0,-.109,-.182),(0,-.143,-.14),(0,-.141,-.072),(0,-.067,-.022)],.0065,graphite,8)
+    path('Curved trigger',[(0,-.035,-.082),(0,-.082,-.107),(0,-.114,-.077)],.006,steel,8)
+    path('Trigger face insert',[(0,-.063,-.098),(0,-.091,-.092)],.0025,orange,4)
+    # Barrel profile includes the front chamfer, inner wall and recessed dark bore.
+    barrel=lathe('Recessed crown and hollow muzzle',[(.013,-.04),(.021,-.04),(.023,-.034),(.023,.028),(.021,.034),(.014,.034),(.013,.028),(.013,-.04)],silver,64)
+    barrel.rotation_euler.x=math.pi/2;barrel.location=v((0,.062,-.366));active(barrel);bpy.ops.object.transform_apply(location=False,rotation=True,scale=True)
+    cylinder('Dark inner barrel',(0,.062,-.341),.013,.003,black,(0,0,1),48,edge=0)
+    torus('Safety edge at muzzle',(0,.062,-.404),.021,.0017,orange,(0,0,1),64)
+    cube('Under barrel guide',(0,.002,-.273),(.032,.024,.087),steel,.003)
+    for j in range(4):cube('Accessory rail channel',(0,-.013,-.299+j*.016),(.049,.006,.007),insetmetal,.001)
+    sight=cube('Notched rear sight',(0,.13,.058),(.05,.021,.021),steel,.002)
+    cut(sight,cube('Rear sight center notch',(0,.14,.057),(.011,.02,.028),None,.001))
+    cube('Front sight blade',(0,.133,-.292),(.009,.025,.018),steel,.002)
+    cube('Front sight white bead',(0,.14,-.281),(.005,.006,.002),labelmat,.001)
+    for x in [-.016,.016]:cube('Rear sight bead',(x,.136,.069),(.004,.004,.002),labelmat,.0005)
+    cube('Thumb slide catch',(.041,-.008,-.014),(.011,.016,.048),steel,.003)
+    cube('Magazine release',(.04,-.062,.016),(.008,.013,.019),steel,.002)
+    heel=extrude_side('Grip base plate',[(-.251,.052),(-.271,.06),(-.275,.15),(-.253,.172)],.081,steel,radius=.004)
+    lettering('Laser etched maker', 'BWRP',(.041,.074,-.219),.011,labelmat,side=True)
+    lettering('Laser etched caliber label', 'AIR  /  06',(.041,.053,-.084),.0065,labelmat,side=True)
+    # A small teal medallion keeps the model tied to the packing-room palette.
+    cylinder('Grip enamel medallion',(.04,-.181,.102),.01,.002,teal,(1,0,0),32,edge=.0005)
 
 def build_bomb():
     begin('pop-bomb','06 — Enamel pop bomb')

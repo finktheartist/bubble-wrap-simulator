@@ -46,3 +46,20 @@ Implementation references: [MDN pointer events](https://developer.mozilla.org/en
 Judge the objects at silhouette scale first: a single connected glove, useful handle and barrel proportions, recessed holes and vents, and hardware attached to the body. Surface detail must follow the shape. Glove panels and stitches conform to the suede surface, and printed marks follow the ball and bomb curvature.
 
 The source library preserves game-scale origins and has separate linked copies for its studio presentation. Exported GLBs are re-imported into a fresh Blender scene for visual review, so the review includes actual baked textures and export conversions. The runtime shares asset resources across tool changes and projectiles. Ball and bomb shell radii still match their existing physics colliders.
+
+
+## Swing, target, and tool-dock pass — September 6, 2026
+
+Keep the existing bright packing room, graphite typography, and acid-yellow action accent. The user's request to uncover the arena sets the layout direction. Refero's bundled motion and craft references supply the bounded interaction rules: deliberate press feedback, gesture ownership, visible keyboard focus, and a picker anchored to its trigger. No live Refero MCP is configured.
+
+| Decision | Reference and role | Reason |
+| --- | --- | --- |
+| Equipped tool directly above the action button; full grid only while choosing | User's request for intuitive integration and less obstruction | Keep tool choice beside tool use, with the center and bottom middle clear. |
+| Picker pauses play, closes on selection, and supports T / 1–6 | Existing accessible controls and Refero craft guidance | Choosing a tool should not also fire or move the player. |
+| Arena tap uses a tool; a drag only aims | User's broken-tap report and gesture-ownership rules | The old touch overlay consumed arena taps without sending a tool action. |
+| Grip-pivot hammer strike and lateral bat sweep | User's request for convincing swings | Show preparation, a timed contact, and follow-through instead of wobbling the whole object around its center. |
+| Brief trails, air rings, film flecks and impact marker | User's VFX request and Refero feedback-purpose rule | Emphasize movement and confirmed hits while preserving the view. |
+| Three drifting bubble targets that reinflate | User's moving-target request | Add repeatable play using the same visible wrap and collision system. |
+| Slim machined upper, recessed crown, grip panels and slide serrations | User's more-realistic gun request | Replace the thick toy housing with recognizable material separation and proportions. |
+
+The game pose function is also sampled into Blender review renders, including phone framing. The new blaster export is re-imported for material review. Browser playtesting remains a separate optional step until authorized.

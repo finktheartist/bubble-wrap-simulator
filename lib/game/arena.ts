@@ -102,7 +102,8 @@ export class WrapSurface {
   }
 }
 
-export type WrappedObject = { group: THREE.Group; size: THREE.Vector3; surfaces: WrapSurface[]; dynamic: boolean; name: string; color: number };
+export type TargetMotion = {center:THREE.Vector3;amplitude:number;speed:number;phase:number};
+export type WrappedObject = { group: THREE.Group; size: THREE.Vector3; surfaces: WrapSurface[]; dynamic: boolean; name: string; color: number; motion?:TargetMotion };
 export type Arena = { scene: THREE.Scene; camera: THREE.PerspectiveCamera; renderer: THREE.WebGLRenderer; surfaces: WrapSurface[]; objects: WrappedObject[]; environment: THREE.WebGLRenderTarget; dispose: () => void };
 
 export function createArena(container: HTMLElement, touch = false): Arena {

@@ -6,6 +6,8 @@ import { BubbleGame } from '../lib/game/game';
 import { WrapSurface } from '../lib/game/arena';
 import { ArenaPhysics, initPhysics } from '../lib/game/physics';
 import { loadTestToolLibrary } from './helpers/tool-library';
+import { MeleeSwing, MELEE } from '../lib/game/melee';
+import { WorldEffects, ToolEffects } from '../lib/game/effects';
 
 function dispatch(target:EventTarget,type:string,props:Record<string,unknown>) {
   const event=new Event(type,{cancelable:true});
@@ -61,10 +63,11 @@ await test('a quick tool-button tap pops immediately and every other tool produc
   const physics=new ArenaPhysics([],()=>{});
   let audiblePops=0;
   const game=Object.create(BubbleGame.prototype) as BubbleGame;
+  const tools=await loadTestToolLibrary(),effects=new WorldEffects(scene),toolEffects=new ToolEffects(new THREE.Scene());
   Object.assign(game,{
-    arena:{camera,scene,surfaces:[surface]},physics,tools:await loadTestToolLibrary(),time:1,nextAction:0,down:false,
+    arena:{camera,scene,surfaces:[surface]},physics,tools,effects,toolEffects,melee:new MeleeSwing(),movingTargets:{notePop:()=>null},time:1,nextAction:0,down:false,
     snapshot:{playing:true,tool:0,pops:0,combo:0,best:0,charge:0},
-    audio:{start:async()=>{},pop:()=>{audiblePops++;},thump:()=>{}},
+    audio:{start:async()=>{},pop:()=>{audiblePops++;},thump:()=>{},swish:()=>{}},
     activePops:new Map(),queued:[],particles:[],pressedBubble:null,lastPop:-10,
   });
   game.tapTool();
@@ -72,11 +75,13 @@ await test('a quick tool-button tap pops immediately and every other tool produc
   assert.equal(audiblePops,1);
   game.time+=.12;game.tapTool();
   assert.equal(game.snapshot.pops,2,'nearby fresh cells can be popped without perfect pixel aiming');
-  const internal=game as unknown as {queued:unknown[];swing:number};
+  const internal=game as unknown as {queued:unknown[];melee:MeleeSwing;updateInteraction:()=>void};
   for(const tool of [1,2]){
     game.snapshot.tool=tool;game.time+=1;game.tapTool();
-    assert.ok(internal.swing>0,'melee tool swings');
-    assert.ok(internal.queued.length>0,'melee tool schedules nearby bubbles');
+    assert.ok(internal.melee.attack,'a quick tap commits a full swing even after pointer release');
+    internal.queued.length=0;game.time+=MELEE[tool as 1|2].contact;internal.updateInteraction();
+    assert.ok(internal.queued.length>0,'contact during the visible strike schedules nearby bubbles');
+    game.time+=1;internal.updateInteraction();
   }
   game.snapshot.tool=3;game.time+=1;game.actionDown();game.time+=.8;game.actionUp();
   assert.ok(physics.items.some(i=>i.kind==='ball'&&i.speed>20),'hold and release throws a charged ball');
@@ -84,5 +89,5 @@ await test('a quick tool-button tap pops immediately and every other tool produc
   assert.ok(physics.items.some(i=>i.kind==='shot'),'quick taps fire the blaster too');
   game.snapshot.tool=5;game.time+=1;game.tapTool();
   assert.ok(physics.items.some(i=>i.kind==='bomb'&&i.fuse>game.time),'bomb tool spawns a fused bomb');
-  physics.dispose();surface.dispose();
+  physics.dispose();surface.dispose();tools.dispose();effects.dispose();toolEffects.dispose();
 });

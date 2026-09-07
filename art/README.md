@@ -19,7 +19,16 @@ The second command imports the actual exported GLBs into a fresh studio to inspe
 | Rubber mallet | 9,776 | 512 px |
 | Maple bat | 8,588 | 512 px |
 | Bowling ball | 16,170 | 768 px |
-| Pop blaster | 11,717 | 512 px |
+| Pop blaster | 14,794 | 512 px |
 | Pop bomb | 20,040 | 512 px |
 
-All textures are embedded; the full set totals about 5.5 MB. `public/models/manifest.json` records exact export sizes. The game loads one library and shares geometry and textures across held tools, menu portraits, and projectiles. Procedural shading is baked locally; play requires no asset service.
+All textures are embedded; the full set totals about 5.7 MB. `public/models/manifest.json` records exact export sizes. The game loads one library and shares geometry and textures across held tools, menu portraits, and projectiles. Procedural shading is baked locally; play requires no asset service.
+
+To review actual game swing poses (without changing the open Blender scene):
+
+```sh
+node_modules/.bin/tsx tools/blender/swing_poses.ts
+/Applications/Blender.app/Contents/MacOS/Blender --background --factory-startup --python tools/blender/review_swings.py
+```
+
+The sampler reads the same grip-pivot pose function used by the renderer. Review outputs include rest, wind-up, contact, and follow-through for the hammer and bat in desktop and portrait framing.

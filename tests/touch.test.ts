@@ -28,6 +28,14 @@ await test('phone and landscape swipes cover a comparable look angle',()=>{
   const portrait=touchLookDelta(390/4,0,390),landscape=touchLookDelta(844/4,0,844);
   assert.ok(Math.abs(portrait.x-landscape.x)<1e-10);
 });
+await test('an arena tap activates once, while a drag, long press, cancelled gesture or another finger never becomes a tap',()=>{
+  const gesture=new TouchGesture();
+  gesture.start(1,180,300,0);assert.ok(gesture.finishTap(1,183,303,120));assert.equal(gesture.finishTap(1,183,303,150),false);
+  gesture.start(2,180,300,200);gesture.move(2,230,300);gesture.move(2,180,300);
+  assert.equal(gesture.finishTap(2,180,300,300),false,'returning a drag to its start must not fire');
+  gesture.start(3,180,300,400);assert.equal(gesture.finishTap(4,180,300,410),false);assert.equal(gesture.finishTap(3,180,300,900),false);
+  gesture.start(5,180,300,1000);gesture.end(5);assert.equal(gesture.finishTap(5,180,300,1100),false);
+});
 await test('interrupted charged throws cancel without throwing a ball or held parcel',()=>{
   const game=Object.create(BubbleGame.prototype) as BubbleGame;
   let throws=0;
