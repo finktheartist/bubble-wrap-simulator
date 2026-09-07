@@ -2,6 +2,12 @@
 
 A first person Three.js playground built around the extremely reasonable desire to pop an entire room of bubble wrap.
 
+**[Play in your browser](https://bubble-wrap-simulator.vercel.app)** · **[Watch the gameplay video](docs/gameplay.mp4)**
+
+[![Bubble Wrap Simulator gameplay: nine tools in a room made of bubble wrap](docs/gameplay-poster.jpg)](docs/gameplay.mp4)
+
+Nine tools. Three moving targets. A room with more than 43,000 bubbles. Built with React, Three.js, Rapier physics, Blender models, and synthesized Web Audio. Plays on desktop, phones, and tablets.
+
 ## Play
 
 Enter the arena, look at the wrapped block directly ahead, and click the large **POP** button or press **F** for your first pop. On a phone, a short tap on the arena also uses the equipped tool; drag to look around. Explore the wrapped room, stairs, arch, platforms, loose parcels, and three moving pop targets. All nine tools are available immediately.
@@ -36,17 +42,20 @@ Phones and tablets have safe-area-aware portrait and landscape layouts, a moveme
 Requires Node 22.13 or newer.
 
 ```sh
+git clone https://github.com/finktheartist/bubble-wrap-simulator.git
+cd bubble-wrap-simulator
 npm ci
-npm run dev
+npm run dev:standalone
 ```
 
-Open the local URL printed by the server. Audio begins with the Enter button; optional mouse capture requires a browser user gesture, but tool use never requires capture. The app needs WebGL2 and WebAssembly.
+Open the local URL printed by the server. This standalone entry needs no accounts, environment variables, database, or API keys. Audio begins with the Enter button; optional mouse capture requires a browser user gesture, but tool use never requires capture. The app needs WebGL2 and WebAssembly.
 
 ```sh
 npm test
 npm run typecheck
 npm run lint
-npm run build
+npm run build:vercel
+npm run preview:vercel
 ```
 
 ## Implementation
@@ -60,7 +69,9 @@ npm run preview:vercel
 
 This builds the same React interface, game engine, nine models and local Geist fonts into `outputs/vercel/site/`. It needs no server, database, API key or Sites sign-in. The existing `npm run build` command continues to produce the Sites version. `outputs/vercel/manifest.json` records every deployable file's size and SHA-256.
 
-Deploy the generated static directory to Vercel, scoped to `finktheartist-5591s-projects` (organization `team_MIC5cycgd9LcCIvLGGlmRPN1`) and project `bubble-wrap-simulator`. Verify the linked organization before deploying. The staged configuration serves hashed assets with immutable caching and revalidates model filenames, so future model updates do not leave stale tools in the browser. It uploads the playable web assets; the Blender source library stays in this repository.
+Deploy the generated `outputs/vercel/site` directory to your own Vercel project using the **Other** framework preset. The staged `vercel.json` disables install and build steps because the directory is already built. Its configuration serves hashed assets with immutable caching and revalidates model filenames, so future model updates do not leave stale tools in the browser. Only the playable web assets are deployed; the Blender source library stays in this repository.
+
+The original Sites integration remains available through `npm run dev` and `npm run build`.
 
 The static entry is in `platform/vercel/`; its Vite configuration is `vite.vercel.config.ts`. Tool portraits are already-rendered data URLs, so native image elements work without an image-optimization server.
 
@@ -85,7 +96,7 @@ Thirty-five automated tests cover all nine tool actions, mouse/keyboard/touch ge
 
 The nine GLBs are re-imported and rendered in Blender to inspect exported materials and silhouettes. Desktop and phone swing poses, plus the new tools in desktop, portrait, and landscape, are rendered using matrices sampled from the actual game pose function. TypeScript checks the full project. Lint checks application, game, and test sources; the untouched generated component catalog has pre-existing lint failures and is outside that command.
 
-Browser playtesting is a separate optional step, pending the user's choice in the build conversation. Touch controls are implemented but are not yet verified on a physical device.
+The [gameplay recording](docs/gameplay.mp4) uses the actual browser build, physics, UI, and game audio, with scripted camera direction and tool inputs. Touch controls have automated coverage but have not yet been verified on a physical device.
 
 ## Architecture
 
