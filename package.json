@@ -8,6 +8,8 @@
   "scripts": {
     "dev": "vinext dev",
     "build": "vinext build",
+    "build:vercel": "vite build --config vite.vercel.config.ts && node tools/vercel/stage.mjs",
+    "preview:vercel": "vite preview --config vite.vercel.config.ts --host 127.0.0.1",
     "start": "wrangler dev --config dist/server/wrangler.json",
     "lint": "oxlint app lib tests components/game",
     "format": "oxfmt",

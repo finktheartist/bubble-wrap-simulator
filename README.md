@@ -51,6 +51,19 @@ npm run build
 
 ## Implementation
 
+### Standalone Vercel build
+
+```sh
+npm run build:vercel
+npm run preview:vercel
+```
+
+This builds the same React interface, game engine, nine models and local Geist fonts into `outputs/vercel/site/`. It needs no server, database, API key or Sites sign-in. The existing `npm run build` command continues to produce the Sites version. `outputs/vercel/manifest.json` records every deployable file's size and SHA-256.
+
+Deploy the generated static directory to Vercel, scoped to `finktheartist-5591s-projects` (organization `team_MIC5cycgd9LcCIvLGGlmRPN1`) and project `bubble-wrap-simulator`. Verify the linked organization before deploying. The staged configuration serves hashed assets with immutable caching and revalidates model filenames, so future model updates do not leave stale tools in the browser. It uploads the playable web assets; the Blender source library stays in this repository.
+
+The static entry is in `platform/vercel/`; its Vite configuration is `vite.vercel.config.ts`. Tool portraits are already-rendered data URLs, so native image elements work without an image-optimization server.
+
 Bubble spacing is 0.26 world units throughout the room and 0.22 on loose parcels, down from 0.62 and 0.4. Smaller per-cell geometry and deduplicated pop waves keep the denser wrap bounded.
 
 - Three.js renders clear, nonmetallic packing film over the colored backing. Instanced molded pockets taper into broad heat-welded lips; physical transmission, fine film normals, restrained clearcoat, and panel reflections make the air pockets readable. Continuous backing sheets carry grain and contact shading. Popping blends each pocket into a folded empty shape with matching normals, while reinflation restores it. Neutral studio lighting, overhead area lights, and soft shadow filtering ground the room. Balanced quality reduces the transmission-buffer resolution; high quality restores full resolution.
