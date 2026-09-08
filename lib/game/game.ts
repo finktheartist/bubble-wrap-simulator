@@ -223,7 +223,7 @@ export class BubbleGame {
     const dir=this.direction();const velocity=dir.clone().multiplyScalar(9+charge*15);velocity.y+=1.3;
     if(p.held)p.release(velocity);
     else {const g=this.tools!.create(3,true);this.arena.scene.add(g);const pos=this.arena.camera.position.clone().addScaledVector(dir,.8).add(new THREE.Vector3(0,-.18,0));p.spawn(g,'ball',pos,velocity,this.time);}
-    this.recoil=.5;this.swing=.4;this.audio.thump(.25);this.trimProjectiles();
+    this.recoil=.5;this.swing=.4;this.audio.toss();this.trimProjectiles();
   }
   private useTool(dt=1/60) {
     if(!this.physics)return;
@@ -242,7 +242,7 @@ export class BubbleGame {
       this.nextAction=this.time+.8;this.swing=.75;
       const g=this.tools!.create(5,true);this.arena.scene.add(g);
       const pos=origin.addScaledVector(dir,.8);const velocity=dir.multiplyScalar(13);velocity.y+=2.5;
-      this.physics.spawn(g,'bomb',pos,velocity,this.time);this.audio.thump(.35);this.trimProjectiles();
+      this.physics.spawn(g,'bomb',pos,velocity,this.time);this.audio.toss(true);this.trimProjectiles();
     } else if(tool===6){
       const muzzle=toolMuzzlePosition(tool,this.arena.camera,this.recoil);
       const velocity=(this.aimed?.point.clone()??origin.clone().addScaledVector(dir,45)).sub(muzzle).normalize().multiplyScalar(27);
@@ -277,10 +277,10 @@ export class BubbleGame {
       this.burst(hit.point,config.radius,tool===1?2:1.5,.045);
       this.physics?.blast(hit.point,tool===1?1.45:1.9,tool===1?4:6);
       const normal=new THREE.Vector3(0,1,0).transformDirection(hit.surface.group.matrixWorld);
-      this.effects.burst(hit.point,normal,tool===1?1.7:1.25);this.audio.thump(tool===1?1.5:.8);
+      this.effects.burst(hit.point,normal,tool===1?1.7:1.25);this.itemImpact(tool===1?'mallet':'bat',hit.point,tool===1?1.15:1);
       this.shake=tool===1?.10:.06;this.snapshot.impact=1;
     } else if(this.pickup&&this.pickup.group.position.distanceTo(this.arena.camera.position)<4.5){
-      this.pickup.body.applyImpulse(dir.multiplyScalar((tool===1?9:15)*this.pickup.body.mass()),true);this.audio.thump(1);this.snapshot.impact=1;
+      this.pickup.body.applyImpulse(dir.multiplyScalar((tool===1?9:15)*this.pickup.body.mass()),true);this.itemImpact(tool===1?'mallet':'bat',this.pickup.group.position,1);this.snapshot.impact=1;
     }
   }
   private trimProjectiles(){
@@ -295,9 +295,17 @@ export class BubbleGame {
     if(item.kind==='bomb')return;
     const radius=item.kind==='shot'?.48:THREE.MathUtils.clamp(.25+speed*.065+(item.kind==='ball'?.28:.16),.4,1.75);
     this.burst(point,radius,Math.min(2,speed*.14),.04);
-    this.audio.thump(Math.min(1.1,speed*.07));
+    this.itemImpact(item.kind==='shot'?'pellet':item.kind,point,Math.min(1.25,speed*.085));
     if(item.kind==='shot'){item.born=-100;this.effects.burst(point,this.direction().negate(),.7,0xdfffbe);this.snapshot.impact=1;}
     else if(item.kind==='ball')this.effects.burst(point,new THREE.Vector3(0,1,0),Math.min(2,speed*.12),0xb8e8ff);
+  }
+  private soundPosition(point:THREE.Vector3) {
+    const relative=point.clone().sub(this.arena.camera.position);
+    const right=new THREE.Vector3(1,0,0).applyQuaternion(this.arena.camera.quaternion);
+    return {pan:relative.clone().normalize().dot(right),distance:relative.length()};
+  }
+  private itemImpact(kind:'mallet'|'bat'|'ball'|'parcel'|'pellet',point:THREE.Vector3,strength:number) {
+    const {pan,distance}=this.soundPosition(point);this.audio.impact(kind,strength,pan,distance);
   }
   private burst(point:THREE.Vector3,radius:number,strength:number,spread=0) {
     const local=new THREE.Vector3();
@@ -335,7 +343,8 @@ export class BubbleGame {
   }
   private explode(item:PhysicsItem) {
     const point=item.impactPoint?.clone()??item.group.position.clone(),rocket=item.kind==='rocket',radius=rocket?4.7:5.8,color=rocket?0xffc485:0xd7ffa8;
-    this.removeItem(item);this.burst(point,radius,2.7,rocket?.055:.085);this.physics?.blast(point,rocket?6.2:7.4,rocket?13:11);this.audio.thump(2.8,true);
+    this.removeItem(item);this.burst(point,radius,2.7,rocket?.055:.085);this.physics?.blast(point,rocket?6.2:7.4,rocket?13:11);
+    const {pan,distance}=this.soundPosition(point);this.audio.blast(rocket,pan,distance);
     this.shake=.32;this.snapshot.impact=1;
     this.effects.burst(point,new THREE.Vector3(0,1,0),3,color,true);
     for(const normal of [new THREE.Vector3(0,1,0),new THREE.Vector3(0,0,1)])this.effects.ripple(point,normal,radius,color,.6);

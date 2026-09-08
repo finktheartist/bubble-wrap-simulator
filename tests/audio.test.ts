@@ -3,8 +3,9 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { PopVoiceScheduler, synthesizePop } from '../lib/game/pop-synthesis';
-import { synthesizeTool } from '../lib/game/tool-synthesis';
-import { PopAudio, splitPopAtlas, POP_ATLAS } from '../lib/game/audio';
+import { synthesizeTool, TOOL_SOUNDS } from '../lib/game/tool-synthesis';
+import { PopAudio, splitPopAtlas, splitToolAtlas, POP_ATLAS } from '../lib/game/audio';
+import { TOOL_ATLAS } from '../lib/game/tool-bank';
 import { AudioContextStub, BufferStub } from './helpers/audio-context';
 
 function random(seed = 739) { return () => { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; return seed / 4294967296; }; }
@@ -13,6 +14,8 @@ function rms(samples: Float32Array, from = 0, to = samples.length) {
   for (let i = from; i < to; i++) energy += samples[i] ** 2;
   return Math.sqrt(energy / (to - from));
 }
+const itemBytes = readFileSync(new URL('../public/audio/item-sounds.wav', import.meta.url));
+const itemManifest = JSON.parse(readFileSync(new URL('../tools/audio/items-manifest.json', import.meta.url), 'utf8'));
 const bytes = readFileSync(new URL('../public/audio/bubble-pops.wav', import.meta.url));
 const manifest = JSON.parse(readFileSync(new URL('../tools/audio/pops-manifest.json', import.meta.url), 'utf8'));
 function recorded() {
@@ -93,7 +96,7 @@ await test('a sustained recorded crackle has headroom and stops without a long s
 });
 
 await test('tool cues have finite samples, bounded peaks and a seamless motor loop', () => {
-  for (const rate of [44100, 48000]) for (const kind of ['impact', 'explosion', 'pistol', 'launcher', 'cannon', 'swish', 'heavy-swish', 'vacuum'] as const) {
+  for (const rate of [44100, 48000]) for (const kind of TOOL_SOUNDS) {
     const sound = synthesizeTool(rate, kind, random());
     assert.ok(sound.every(Number.isFinite)); assert.ok(Math.max(...sound.map(Math.abs)) < 1);
     assert.ok(rms(sound) > .005); assert.ok(Math.abs(sound[0]) < .0001);
@@ -101,24 +104,26 @@ await test('tool cues have finite samples, bounded peaks and a seamless motor lo
   }
 });
 
-await test('audio resumes immediately, shares one recording download, and cancels motors and queued pops on mute/pause/dispose', async t => {
+await test('audio resumes immediately, shares one download per bank, and cancels motors and queued pops on mute/pause/dispose', async t => {
   const prior = Object.getOwnPropertyDescriptor(globalThis, 'AudioContext');
   Object.defineProperty(globalThis, 'AudioContext', { value: AudioContextStub, configurable: true });
   t.after(() => { if (prior) Object.defineProperty(globalThis, 'AudioContext', prior); else Reflect.deleteProperty(globalThis, 'AudioContext'); });
-  let release!: (response: Response) => void, downloads = 0;
-  t.mock.method(globalThis, 'fetch', () => { downloads++; return new Promise<Response>(resolve => { release = resolve; }); });
+  const releases = new Map<string, (response: Response) => void>(); let downloads = 0;
+  t.mock.method(globalThis, 'fetch', (url: string) => { downloads++; return new Promise<Response>(resolve => { releases.set(url, resolve); }); });
   const audio = new PopAudio(), first = audio.start(), second = audio.start();
   const ctx = audio.context as unknown as AudioContextStub;
   assert.equal(ctx.state, 'running', 'resume happens inside the gesture before awaiting download');
-  assert.equal(downloads, 1);
+  assert.equal(downloads, 2);
   audio.pop(); assert.equal(ctx.sources.length, 1, 'first actions retain an offline fallback');
-  release(new Response(bytes)); await Promise.all([first, second]); assert.equal(ctx.decodeCalls, 1);
+  releases.get(POP_ATLAS.url)!(new Response(bytes)); releases.get(TOOL_ATLAS.url)!(new Response(itemBytes));
+  await Promise.all([first, second]); assert.equal(ctx.decodeCalls, 2);
   ctx.currentTime = 1;
   for (let i = 0; i < 6; i++) { audio.pop(); ctx.currentTime += .2; }
   for (let i = 2; i < 7; i++) assert.notEqual(ctx.sources[i].buffer, ctx.sources[i - 1].buffer, 'no consecutive sample repeats');
   const before = ctx.sources.length;
   for (let i = 0; i < 60; i++) audio.vacuum(true);
-  assert.equal(ctx.sources.length, before + 1, 'holding creates only one loop');
+  assert.equal(ctx.sources.length, before + 2, 'holding creates one start and one loop');
+  assert.equal(ctx.sources.slice(before).filter(source => source.loop).length, 1);
   const motor = ctx.sources.at(-1)!; audio.vacuum(false); assert.ok(motor.stops.length > 0);
   motor.finish();
   audio.vacuum(true); audio.pop(); audio.pop();
@@ -141,7 +146,84 @@ await test('a failed sample download preserves usable fallback sounds and does n
   t.mock.method(globalThis, 'fetch', async () => { downloads++; throw new Error('Offline'); });
   const audio = new PopAudio(); await audio.start(); await audio.start(); audio.pop();
   const ctx = audio.context as unknown as AudioContextStub;
-  assert.equal(downloads, 1); assert.equal(ctx.sources.length, 1);
+  assert.equal(downloads, 2); assert.equal(ctx.sources.length, 1);
   assert.ok(ctx.sources[0].buffer!.data.some(sample => sample !== 0));
   audio.dispose();
+});
+
+await test('the item bank covers every action with sourced, bounded samples and a continuous motor seam', () => {
+  assert.equal(createHash('sha256').update(itemBytes).digest('hex'), itemManifest.sha256);
+  assert.ok(itemBytes.length < 900000, 'all item Foley stays below 900 KB on mobile');
+  assert.deepEqual(new Set(TOOL_ATLAS.clips.map(c => c.kind)), new Set(TOOL_SOUNDS));
+  assert.equal(itemBytes.readUInt32LE(24), TOOL_ATLAS.sampleRate);
+  const hashes = new Set<string>(); let end = 0;
+  for (const clip of TOOL_ATLAS.clips) {
+    assert.equal(clip.offsetFrames, end); end += clip.lengthFrames;
+    const samples = Float32Array.from({length:clip.lengthFrames}, (_, i) => itemBytes.readInt16LE(44 + (clip.offsetFrames + i)*2)/32768);
+    assert.ok(samples.every(Number.isFinite));
+    assert.ok(Math.max(...samples.map(Math.abs)) < .721);
+    assert.ok(rms(samples) > .01, clip.kind + ' is audible');
+    if (clip.kind !== 'vacuum') { assert.equal(samples[0], 0); assert.equal(samples.at(-1), 0); }
+    else {
+      // Airflow has larger adjacent samples than a tonal motor. Compare the seam
+      // with its own waveform, rather than a fixed threshold for quiet sine waves.
+      let largestStep = 0;
+      for (let i=1;i<samples.length;i++) largestStep=Math.max(largestStep,Math.abs(samples[i]-samples[i-1]));
+      assert.ok(Math.abs(samples[0]-samples.at(-1)!) <= largestStep, 'seam is within the natural airflow slope');
+      const ratio=rms(samples,0,320)/rms(samples,samples.length-320);
+      assert.ok(ratio>.5 && ratio<2, 'loop boundary does not pump or go silent');
+    }
+    hashes.add(createHash('sha256').update(new Uint8Array(samples.buffer)).digest('hex'));
+  }
+  assert.equal(hashes.size, TOOL_ATLAS.clips.length);
+  assert.equal(end, TOOL_ATLAS.frames);
+  for (const recipe of itemManifest.recipes) for (const layer of recipe.layers) assert.match(itemManifest.sourceSha256[layer.source], /^[a-f\d]{64}$/);
+});
+
+await test('item cuts retain their durations after 44.1/48 kHz browser resampling', () => {
+  for (const rate of [44100,48000]) {
+    const ctx = new AudioContextStub(), atlas = new BufferStub(1, Math.round(TOOL_ATLAS.frames/32000*rate), rate);
+    const bank = splitToolAtlas(ctx as unknown as BaseAudioContext, atlas as unknown as AudioBuffer);
+    for (const kind of TOOL_SOUNDS) {
+      const cuts = TOOL_ATLAS.clips.filter(c => c.kind === kind), sounds = bank.get(kind)!;
+      assert.equal(cuts.length, sounds.length);
+      sounds.forEach((sound,i) => assert.ok(Math.abs(sound.buffer.duration-cuts[i].lengthFrames/32000) <= 1/rate + 1e-9));
+    }
+    assert.throws(() => splitToolAtlas(ctx as unknown as BaseAudioContext,new BufferStub(1,100,rate) as unknown as AudioBuffer));
+  }
+});
+
+await test('a failed pop download does not block recorded tools; cancelled cold-start motors do not restart on load', async t => {
+  const prior = Object.getOwnPropertyDescriptor(globalThis, 'AudioContext');
+  Object.defineProperty(globalThis, 'AudioContext', { value: AudioContextStub, configurable: true });
+  t.after(() => { if (prior) Object.defineProperty(globalThis, 'AudioContext', prior); else Reflect.deleteProperty(globalThis, 'AudioContext'); });
+  let release!: (response: Response) => void;
+  t.mock.method(globalThis, 'fetch', (url: string) => url === POP_ATLAS.url ? Promise.reject(new Error('offline')) : new Promise<Response>(resolve => { release = resolve; }));
+  const audio = new PopAudio(), pending = audio.start(), ctx = audio.context as unknown as AudioContextStub;
+  audio.vacuum(true); const count = ctx.sources.length;
+  audio.vacuum(false); const released = ctx.sources.length;
+  assert.equal(count,2); assert.equal(released,2, 'very short taps fade their start instead of jumping to a full-speed wind-down');
+  assert.ok(ctx.sources[1].loop && ctx.sources[1].stops[0] <= ctx.sources[1].starts[0], 'queued loop is cancelled before its start');
+  release(new Response(itemBytes)); await pending;
+  assert.equal(ctx.sources.length,released,'loading only replaces buffers, never restarts released actions');
+  audio.fire('pistol'); assert.ok(ctx.sources.at(-1)!.buffer!.duration > .24,'the independent tool bank loaded');
+  audio.pop(); assert.ok(ctx.sources.at(-1)!.buffer!.data.some(v=>v!==0),'pop fallback still works');
+  audio.dispose();
+});
+
+await test('swing timing follows visual contact, tool storms reserve pop voices, and pause cancels every queued cue', async t => {
+  const prior = Object.getOwnPropertyDescriptor(globalThis, 'AudioContext');
+  Object.defineProperty(globalThis, 'AudioContext', { value: AudioContextStub, configurable: true });
+  t.after(() => { if (prior) Object.defineProperty(globalThis, 'AudioContext', prior); else Reflect.deleteProperty(globalThis, 'AudioContext'); });
+  t.mock.method(globalThis, 'fetch', async (url: string) => new Response(url === POP_ATLAS.url ? bytes : itemBytes));
+  const audio = new PopAudio(); await audio.start(); const ctx=audio.context as unknown as AudioContextStub;
+  audio.swish(true); const swing=ctx.sources.at(-1)!;
+  assert.ok(swing.starts[0]>.04 && swing.starts[0]<.2,'sound waits until the mallet leaves its wind-up');
+  audio.stop(); assert.ok(swing.stops[0] <= swing.starts[0]); swing.finish();
+  for(let i=0;i<40;i++){audio.fire('pistol');ctx.currentTime+=.11;}
+  assert.equal(ctx.sources.length,17,'tool voices are capped even when ended callbacks are delayed');
+  const toolBuffers=ctx.sources.slice(1).map(s=>s.buffer);
+  toolBuffers.slice(1).forEach((b,i)=>assert.notEqual(b,toolBuffers[i],'recorded pistol alternates between real takes'));
+  audio.pop(); assert.equal(ctx.sources.length,18,'a busy tool bus cannot starve the bubble snaps');
+  audio.stop(); assert.ok(ctx.sources.every(s=>s.stops.length>0)); audio.dispose();
 });

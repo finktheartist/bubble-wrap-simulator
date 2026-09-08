@@ -3,6 +3,7 @@ export class AudioParamStub {
   targets: number[] = [];
   setTargetAtTime(value: number) { this.value = value; this.targets.push(value); }
   setValueAtTime(value: number) { this.value = value; }
+  linearRampToValueAtTime(value: number) { this.value = value; }
   cancelScheduledValues() {}
 }
 class NodeStub {

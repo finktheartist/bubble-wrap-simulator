@@ -25,7 +25,7 @@ function fixture(tool:number){
   const physics=new ArenaPhysics([box('Target backing',[2.4,1.8,.12],[0,1.64,6.3])],()=>{});
   const game=Object.create(BubbleGame.prototype) as BubbleGame,effects=new WorldEffects(scene,true),toolEffects=new ToolEffects(new THREE.Scene());
   Object.assign(game,{arena:{camera,scene,surfaces:[surface]},physics,tools,effects,toolEffects,movingTargets:{notePop:()=>null},time:10,nextAction:0,down:false,touch:true,recoil:0,
-    snapshot:{playing:true,tool,pops:0,combo:0,best:0,charge:0},audio:{start:async()=>{},pop:()=>{},thump:()=>{},swish:()=>{},fire:(cue:string)=>sounds.push({cue}),vacuum:(active:boolean)=>sounds.push({cue:'vacuum',active}),stop:()=>sounds.push({cue:'stop'})},
+    snapshot:{playing:true,tool,pops:0,combo:0,best:0,charge:0},audio:{start:async()=>{},pop:()=>{},thump:()=>{},impact:(cue:string)=>sounds.push({cue:cue+'-hit'}),blast:(rocket:boolean)=>sounds.push({cue:rocket?'rocket-blast':'bomb-blast'}),toss:(bomb:boolean)=>sounds.push({cue:bomb?'bomb-arm':'throw'}),swish:()=>{},fire:(cue:string)=>sounds.push({cue}),vacuum:(active:boolean)=>sounds.push({cue:'vacuum',active}),stop:()=>sounds.push({cue:'stop'})},
     activePops:new Map(),queued:[],particles:[],rays:[],pressedBubble:null,lastPop:-10,melee:{advance:()=>null},
   });
   const internal=game as unknown as {impact:(item:PhysicsItem,point:THREE.Vector3,speed:number)=>void;updateInteraction:(dt?:number)=>void;updateProjectiles:(dt:number)=>void;queued:unknown[];rays:{mesh:THREE.Mesh}[]};
@@ -44,7 +44,7 @@ await test('a rocket tap flies forward, hits a physical target, then detonates o
   assert.ok(rocket.impactPoint,'CCD reports an impact on the backing');
   assert.ok(rocket.impactPoint.z>6.2&&rocket.impactPoint.z<6.7);
   assert.equal(f.physics.items.length,1,'callback has not mutated the borrowed physics world');
-  f.internal.updateProjectiles(1/60);assert.equal(f.physics.items.length,0);assert.ok(f.internal.queued.length>20,'blast schedules real bubbles');
+  f.internal.updateProjectiles(1/60);assert.equal(f.physics.items.length,0);assert.equal(f.sounds.filter(sound=>sound.cue==='rocket-blast').length,1);assert.ok(f.internal.queued.length>20,'blast schedules real bubbles');
   const queued=f.internal.queued.length;f.internal.updateProjectiles(1/60);assert.equal(f.internal.queued.length,queued,'one rocket cannot explode twice');
   f.dispose();
 });

@@ -33,3 +33,44 @@ The review page and server are tooling only and are not in the Vercel payload.
 The sound bank, voice queue, mixing headroom, loading/fallback behavior, and
 mute/cancellation cleanup are covered by `tests/audio.test.ts`. Those tests check
 correctness; listening remains the quality check for sound direction.
+
+## Item Foley
+
+The item bank contains 39 clips for 17 actions. Download these public CC0 sources
+into a local source directory (the large originals are not deployed):
+
+| Local path | Download |
+| --- | --- |
+| `kenney-impact/Audio/*` | Extract [Kenney Impact Sounds](https://kenney.nl/assets/impact-sounds) into `kenney-impact/` |
+| `kenney-scifi/Audio/*` | Extract [Kenney Sci-fi Sounds](https://kenney.nl/assets/sci-fi-sounds) into `kenney-scifi/` |
+| `swishes/swishes/*` | Extract [Swishes Sound Pack](https://opengameart.org/content/swishes-sound-pack) into `swishes/` |
+| `firearms/Prepared SFX Library/Walther PPQ/X_31P.wav`, `X_39P.wav` | Extract these two files from [The Free Firearm Sound Library](https://opengameart.org/node/21826) into `firearms/` |
+| `explosion3.ogg` | Download the third file from [Explosions](https://opengameart.org/content/explosions-4) |
+| `vacuumcleaner01.wav` | Download this file from [General Household Sound Effects](https://opengameart.org/content/general-household-sound-effects) |
+
+```sh
+python3 tools/audio/prepare-items.py /path/to/sources
+```
+
+This produces `public/audio/item-sounds.wav`, the matching frame index in
+`lib/game/tool-bank.ts`, and `tools/audio/items-manifest.json` with every layer,
+source hash, cut, filter, pitch, envelope, and loop edit. All sound banks are local
+assets; the game needs no generation API, external media host, or credentials.
+
+The pop and item banks load independently and have immediate synthesized
+fallbacks. Contact sounds depend on the material and impact speed. Swing peaks
+follow the visual contact time. Tool voices are capped separately so they cannot
+starve the bubble pops. The vacuum starts once while held and cancels its queued
+loop on release; short taps fade the startup instead of jumping to a full-speed
+shutdown. Pause, mute, reset, and disposal cancel pending audio.
+
+With the local review server running, open `http://127.0.0.1:4180/items.html`.
+**Record fresh demo silently** captures the actual game mixer and all tool actions
+in about 31 seconds. Individual buttons audition each item. The saved WebM lands
+in `outputs/item-audio/`; export a portable MP3 with:
+
+```sh
+ffmpeg -i outputs/item-audio/item-sounds-demo.webm -c:a libmp3lame -b:a 192k outputs/item-audio/item-sounds-demo.mp3
+```
+
+The review page is authoring tooling and is excluded from the published game.

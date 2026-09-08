@@ -1,8 +1,12 @@
-export type ToolSound = 'impact' | 'explosion' | 'pistol' | 'launcher' | 'cannon' | 'swish' | 'heavy-swish' | 'vacuum';
+export const TOOL_SOUNDS = ['mallet-hit', 'bat-hit', 'ball-hit', 'parcel-hit', 'pellet-hit', 'pistol', 'launcher', 'cannon', 'swish', 'heavy-swish', 'throw', 'bomb-arm', 'bomb-blast', 'rocket-blast', 'vacuum-start', 'vacuum', 'vacuum-stop'] as const;
+export type ToolSound = typeof TOOL_SOUNDS[number];
 
-/** Short, dry tool cues leave the recorded plastic transients in the foreground. */
+/** Cached offline fallback; the recorded atlas replaces these as soon as it loads. */
 export function synthesizeTool(sampleRate: number, kind: ToolSound, random = Math.random): Float32Array {
-  const duration = kind === 'vacuum' ? 1 : kind === 'explosion' ? .42 : kind === 'launcher' ? .3 : kind === 'cannon' ? .2 : kind === 'impact' ? .085 : kind === 'pistol' ? .11 : kind === 'heavy-swish' ? .18 : .14;
+  const explosion = kind === 'bomb-blast' || kind === 'rocket-blast';
+  const impact = kind.endsWith('-hit') || kind === 'bomb-arm';
+  const motor = kind.startsWith('vacuum');
+  const duration = kind === 'vacuum' ? 1 : motor ? .25 : explosion ? .42 : kind === 'launcher' ? .3 : kind === 'cannon' ? .2 : impact ? .085 : kind === 'pistol' ? .11 : kind === 'heavy-swish' ? .18 : .14;
   const result = new Float32Array(Math.ceil(sampleRate * duration));
   let low = 0, mid = 0, phase = 0;
   for (let i = 0; i < result.length; i++) {
@@ -10,16 +14,17 @@ export function synthesizeTool(sampleRate: number, kind: ToolSound, random = Mat
     low += (1 - Math.exp(-2 * Math.PI * 380 / sampleRate)) * (noise - low);
     mid += (1 - Math.exp(-2 * Math.PI * 2900 / sampleRate)) * (noise - mid);
     let value: number;
-    if (kind === 'vacuum') {
+    if (motor) {
       // Whole-number cycles make a seamless, restrained electric motor bed.
       value = (Math.sin(2 * Math.PI * 112 * t) * .15 + Math.sin(2 * Math.PI * 224 * t) * .07
         + Math.sin(2 * Math.PI * 448 * t) * .025) * (1 + .05 * Math.sin(2 * Math.PI * 7 * t));
       value += (mid - low) * .12 * Math.sin(Math.PI * u) ** 2;
-    } else if (kind === 'swish' || kind === 'heavy-swish') {
+      if (kind !== 'vacuum') value *= Math.sin(Math.PI * u) ** 2;
+    } else if (kind === 'swish' || kind === 'heavy-swish' || kind === 'throw') {
       value = (mid - low * .85) * Math.sin(Math.PI * u) ** 2 * .45;
     } else {
-      const big = kind === 'explosion' || kind === 'cannon', launch = kind === 'launcher';
-      const frequency = big ? 48 + 85 * Math.exp(-t / .012) : launch ? 80 : kind === 'impact' ? 155 : 235;
+      const big = explosion || kind === 'cannon', launch = kind === 'launcher';
+      const frequency = big ? 48 + 85 * Math.exp(-t / .012) : launch ? 80 : impact ? (kind === 'ball-hit' ? 85 : 155) : 235;
       phase += 2 * Math.PI * frequency / sampleRate;
       const body = Math.sin(phase) * Math.exp(-t / (big ? .055 : .012)) * (big ? .5 : .12);
       const crack = (mid - low * .6) * Math.exp(-t / (big ? .024 : .006)) * (kind === 'pistol' ? .95 : .6);

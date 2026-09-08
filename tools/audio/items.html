@@ -1,0 +1,45 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bubble Wrap · Item Sound Review</title>
+<style>body{font:17px/1.6 system-ui;background:#112322;color:#eef7ef;max-width:760px;margin:40px auto;padding:24px}h1{font-size:40px;line-height:1.1;letter-spacing:-1px}button,a{font:inherit}button{padding:10px 16px;border:0;border-radius:12px;margin:5px 4px 5px 0;background:#d9ff88;color:#15312e;cursor:pointer}button:disabled{opacity:.4}a{color:#d9ff88}audio{display:block;width:100%;margin:22px 0}small{color:#a9c5bd}#status{min-height:28px}ol{padding-left:22px}#items{margin-top:20px}</style>
+<small>BUBBLE WRAP SIMULATOR · LOCAL AUDIO REVIEW</small><h1>Give every item a little weight.</h1><p>Recorded wood cracks, heavy thuds, air swings, gunshots, rocket pressure, and a motor that winds up and down. The bubble pops stay crisp underneath.</p>
+<audio controls id="player" src="/latest-items.mp3"></audio>
+<ol><li>0–2s: bubble pops</li><li>2–8s: mallet and bat</li><li>8–11s: bowling ball</li><li>11–14s: pistol and rapid fire</li><li>14–17s: bomb</li><li>17–19s: rocket</li><li>19–22s: bowling cannon</li><li>22–27s: vacuum hold and quick tap</li><li>27–31s: overlapping action</li></ol>
+<p id="status" role="status">Play the saved demo, or try each item below.</p><div id="items"></div><button id="stop">Stop</button><button id="record">Record fresh demo silently</button>
+<p><a href="http://127.0.0.1:4173" target="_blank">Play the updated game locally →</a> · <a href="/review.html">Bubble-pop comparison</a></p><small>This demo uses the actual browser game mixer. Recording is silent; the player and item buttons play audio when you select them.</small>
+<script type="module">
+import { PopAudio } from '@game/audio';
+const audio=new PopAudio(),status=document.querySelector('#status'),button=document.querySelector('#record');
+let timers=[],recorder=null,tap=null;
+const later=(seconds,fn)=>timers.push(setTimeout(fn,seconds*1000));
+function stop(){timers.forEach(clearTimeout);timers=[];audio.stop();if(recorder?.state==='recording')recorder.stop();document.querySelector('#player').pause();status.textContent='Stopped.';}
+function pops(n=5,strength=1.2){for(let i=0;i<n;i++)audio.pop(strength,Math.sin(i)*.2,1);}
+function melee(heavy){audio.swish(heavy);later(heavy?.23:.19,()=>{audio.impact(heavy?'mallet':'bat',heavy?1.15:1,0,2);pops(12);});}
+function ball(){audio.toss();later(.6,()=>{audio.impact('ball',1.2,.1,3);pops(10);});}
+function pistol(){audio.fire('pistol');later(.07,()=>{audio.impact('pellet',1,0,3);pops(2);});}
+function bomb(){audio.toss(true);later(1.5,()=>{audio.blast(false,0,4);pops(100,2.7);for(let i=1;i<6;i++)later(i*.055,()=>pops(6,2));});}
+function rocket(){audio.fire('launcher');later(.28,()=>{audio.blast(true,.15,4);pops(100,2.7);for(let i=1;i<5;i++)later(i*.065,()=>pops(5,2));});}
+function cannon(){audio.fire('cannon');later(.28,()=>{audio.impact('ball',1.25,-.1,4);pops(25,2);});}
+function vacuum(duration=2.8){audio.vacuum(true);for(let i=0;i<duration/.085;i++)later(.05+i*.085,()=>audio.pop(.9,.1,2));later(duration,()=>audio.vacuum(false));}
+const actions={'Mallet':()=>melee(true),'Bat':()=>melee(false),'Bowling ball':ball,'Pistol':pistol,'Bomb':bomb,'Rocket':rocket,'Cannon':cannon,'Vacuum':()=>vacuum()};
+for(const [name,fn] of Object.entries(actions)){const b=document.createElement('button');b.textContent=name;b.onclick=async()=>{if(recorder?.state==='recording')return;stop();await audio.start();status.textContent=name;fn();};document.querySelector('#items').append(b);}
+document.querySelector('#stop').onclick=stop;
+button.onclick=async()=>{
+ stop();button.disabled=true;status.textContent='Loading sound banks…';
+ await audio.start();tap=audio.context.createMediaStreamDestination();audio.master.disconnect(audio.context.destination);audio.master.connect(tap);
+ const chunks=[];recorder=new MediaRecorder(tap.stream,{mimeType:'audio/webm;codecs=opus',audioBitsPerSecond:192000});
+ recorder.ondataavailable=e=>{if(e.data.size)chunks.push(e.data);};
+ recorder.onstop=async()=>{
+  audio.stop();const blob=new Blob(chunks,{type:'audio/webm'});document.querySelector('#player').src=URL.createObjectURL(blob);
+  const response=await fetch('/item-capture',{method:'POST',body:blob});
+  audio.master.disconnect(tap);audio.master.connect(audio.context.destination);tap.stream.getTracks().forEach(track=>track.stop());tap=null;
+  button.disabled=false;status.textContent=response.ok?'Demo saved. Use the player to listen.':'Could not save the demo.';
+ };
+ recorder.start();status.textContent='Recording the full item demo silently…';
+ for(const t of [.4,1,1.6])later(t,()=>audio.pop(1.1,0,.4));
+ later(2.4,()=>melee(true));later(4,()=>melee(true));later(5.6,()=>melee(false));later(6.7,()=>melee(false));
+ later(8,ball);later(9.2,ball);later(10.8,pistol);later(11.4,pistol);for(let i=0;i<7;i++)later(12+i*.11,pistol);
+ later(14,bomb);later(17,rocket);later(19,cannon);later(20.4,cannon);later(22,()=>vacuum());
+ later(26,()=>vacuum(.08));later(27,rocket);for(let i=0;i<8;i++)later(27.6+i*.11,pistol);
+ later(31,()=>recorder.stop());
+};
+window.addEventListener('pagehide',()=>{stop();audio.dispose();});
+</script></html>

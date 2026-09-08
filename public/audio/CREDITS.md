@@ -18,5 +18,29 @@ shortened tails, a quiet original synthesized pressure layer, peak normalization
 and packing into a WAV atlas. The preparation
 script and exact source hashes are in `tools/audio/` in the repository.
 
-Other sound layers are synthesized by the game. No audio from the YouTube style
-reference is included in this game.
+## Item sound effects
+
+`item-sounds.wav` contains 39 edited and layered clips from these **CC0 1.0**
+libraries, retrieved September 8, 2026:
+
+- [Impact Sounds](https://kenney.nl/assets/impact-sounds) by **Kenney**: wood,
+  soft, punch, generic, and metal Foley for mallet, bat, ball, parcel, pellet,
+  cannon mechanism, and bomb arming sounds.
+- [Sci-fi Sounds](https://kenney.nl/assets/sci-fi-sounds) by **Kenney**: thruster
+  and low-frequency pressure layers for the rocket and bowling cannon.
+- [Swishes Sound Pack](https://opengameart.org/content/swishes-sound-pack) by
+  **artisticdude**: air movement for swinging and throwing.
+- [The Free Firearm Sound Library](https://opengameart.org/node/21826) by
+  **Ben Jaszczak, Brian Nelson, Kevin Heras, and Matthew Nanney**: four Walther
+  PPQ transients from `X_31P.wav` and `X_39P.wav`, trimmed to remove long range ambience.
+- [Explosions](https://opengameart.org/content/explosions-4) by **EZduzziteh**:
+  `explosion3.ogg`, shortened and pitched for bomb and rocket impacts.
+- [General Household Sound Effects](https://opengameart.org/content/general-household-sound-effects)
+  by **bretbernhoft**: `vacuumcleaner01.wav`, edited into a vacuum loop with
+  original pitch ramps for startup and wind-down.
+
+Edits include mono conversion, 32 kHz resampling, pitch and speed changes,
+filtering, layering, envelopes, loop crossfading, and peak normalization. Exact
+source hashes and edit recipes are in `tools/audio/items-manifest.json`.
+The game synthesizes small fallback sounds if an audio bank cannot load.
+No audio from the YouTube style reference is included in this game.

@@ -1,0 +1,1331 @@
+{
+  "sha256": "46cc144be82b4b478df50a035b21685045cd6c5623410ec7bd0015ded033a66f",
+  "bytes": 834284,
+  "sourceSha256": {
+    "kenney-impact/Audio/impactSoft_heavy_000.ogg": "49e7ca88743fca974bb8676ea138b751cfd8f9033b5e7af8736c2a215d6edbc1",
+    "kenney-impact/Audio/impactPunch_heavy_000.ogg": "b33a8f14068aec24ec69ba85e5e87fdc41228975f6a1a3e44a6e7d6fc3d9f8d8",
+    "kenney-impact/Audio/impactWood_heavy_000.ogg": "15ff82332f342c30e469215539e1cc57e11b221aa2cf7e11e811d313a9927f3d",
+    "kenney-impact/Audio/impactGeneric_light_000.ogg": "f0e982611e97512fee5f777986b67e8b435434b601f94992ec044f7e89fb5acb",
+    "kenney-impact/Audio/impactSoft_heavy_001.ogg": "4d0096364ba9e46119d2ff6df493fdc101bd2e1efae061da5e5f77a53b3fdcb6",
+    "kenney-impact/Audio/impactPunch_heavy_001.ogg": "f92f5cb6ba4ff2766497292ffd90865654317eeca976f5652e0708dbdcdc0dd9",
+    "kenney-impact/Audio/impactWood_heavy_001.ogg": "f1b07a53ac10c615fff9ba470511fdeb722b5902e1a8520759fc20ad6f546015",
+    "kenney-impact/Audio/impactGeneric_light_001.ogg": "c3cd1c073d186ae8fa35788ba94de581f1826e7427a7bb26490b2695fac18efa",
+    "kenney-impact/Audio/impactSoft_heavy_002.ogg": "d130ae541951243d3f6ed963d0057450a445ffe117fbf9a084d34eb1635cb563",
+    "kenney-impact/Audio/impactPunch_heavy_002.ogg": "7993dd4c156b9979ad69f17be5ebe31850b16039a3857f8477141be54dfee1b3",
+    "kenney-impact/Audio/impactWood_heavy_002.ogg": "ce1e06f2a05f2634c645cb72f6a1623e64bc2d92be34917430a61031fb6597d4",
+    "kenney-impact/Audio/impactGeneric_light_002.ogg": "d0bf60905b59ff630ffe01eb0edeeacd2504eaa8fb6523aeef7d2458b78264d3",
+    "kenney-impact/Audio/impactSoft_medium_000.ogg": "7d3ba0bb5e60a11b5d3e558c141303dcf494256675fbf753c0d252d2cf0481e3",
+    "kenney-impact/Audio/impactSoft_medium_001.ogg": "7642a4fd43e547afe4f7adfadb3dabb681c0ff512f52c1674bae30a726841faf",
+    "firearms/Prepared SFX Library/Walther PPQ/X_31P.wav": "b6439228ca46b37c00463265028094559ae5c9896c796b5d40ea4f33247f149c",
+    "firearms/Prepared SFX Library/Walther PPQ/X_39P.wav": "d679a3cd87eae2898d984159f83544392932e6b77526045b672e3aaa9c2dda9f",
+    "kenney-scifi/Audio/thrusterFire_000.ogg": "0fdc474d93f209debf1fc4ea77765a669dcb7676db31b4d8a0a509685bccf374",
+    "kenney-impact/Audio/impactMetal_light_000.ogg": "33b5e6e37c6e9d54e07bf5a89b12c76e879f40c1ea83cdd82714df1d6f9fec6d",
+    "kenney-scifi/Audio/lowFrequency_explosion_001.ogg": "cdda50600a4928f2f1b8371224d53c171ac799c1cf2c30b11999508985250b3b",
+    "kenney-scifi/Audio/thrusterFire_001.ogg": "924636edc923fe4aab5829b69dc5dc1c5d659dec5739865434dabee752a3bb79",
+    "kenney-impact/Audio/impactMetal_light_001.ogg": "fba69c467ddd85da7b1d82e259f936b876d9ba6a3d6f1b24bdd10468e46bfe08",
+    "swishes/swishes/swish-7.wav": "e6de737a34de16afed094d6170d7679149022f149e0a8356d2f029b0e8f4a4d7",
+    "swishes/swishes/swish-8.wav": "113a3709ad889ad2fcf38eaceaf4eb9d67ffe1e96713fed93a6f0aed08769980",
+    "swishes/swishes/swish-9.wav": "123883f006ce55feecbff11eea5f87c4493df4399989983037144570a23723c1",
+    "swishes/swishes/swish-5.wav": "4db41f2d2f97caf94627be05ff2870217fecc86534cf30f2aab413b847a0d50a",
+    "swishes/swishes/swish-6.wav": "edcaacf008da7ae692566f4fe0d6023ea68d0a014149889e95209be7ee0b746d",
+    "explosion3.ogg": "ffacf6f1f6cc8deb364cec27b1b0abcb5191d8c6b4f5dfa5b58b27aef9f75b23",
+    "vacuumcleaner01.wav": "d024cb3839fe14bbb9cb5291ad21ee4d35c3175b1a2b22ffea8ee3351879201a"
+  },
+  "recipes": [
+    {
+      "kind": "mallet-hit",
+      "duration": 0.25,
+      "fadeIn": 0.001,
+      "fadeOut": 0.04,
+      "decayFrom": 0.12,
+      "loop": false,
+      "layers": [
+        {
+          "source": "kenney-impact/Audio/impactSoft_heavy_000.ogg",
+          "start": 0,
+          "duration": 0.25,
+          "pitch": 1,
+          "lowpass": 4200,
+          "highpass": 70,
+          "level": 1,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        },
+        {
+          "source": "kenney-impact/Audio/impactPunch_heavy_000.ogg",
+          "start": 0,
+          "duration": 0.075,
+          "pitch": 0.84,
+          "lowpass": 5000,
+          "highpass": 70,
+          "level": 0.28,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "kind": "bat-hit",
+      "duration": 0.24,
+      "fadeIn": 0.001,
+      "fadeOut": 0.055,
+      "decayFrom": null,
+      "loop": false,
+      "layers": [
+        {
+          "source": "kenney-impact/Audio/impactWood_heavy_000.ogg",
+          "start": 0,
+          "duration": 0.25,
+          "pitch": 0.98,
+          "lowpass": 7600,
+          "highpass": 70,
+          "level": 1,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "kind": "ball-hit",
+      "duration": 0.34,
+      "fadeIn": 0.001,
+      "fadeOut": 0.04,
+      "decayFrom": 0.15,
+      "loop": false,
+      "layers": [
+        {
+          "source": "kenney-impact/Audio/impactSoft_heavy_000.ogg",
+          "start": 0,
+          "duration": 0.3,
+          "pitch": 0.79,
+          "lowpass": 1800,
+          "highpass": 70,
+          "level": 1,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        },
+        {
+          "source": "kenney-impact/Audio/impactWood_heavy_000.ogg",
+          "start": 0,
+          "duration": 0.05,
+          "pitch": 0.8,
+          "lowpass": 2200,
+          "highpass": 70,
+          "level": 0.28,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "kind": "pellet-hit",
+      "duration": 0.085,
+      "fadeIn": 0.001,
+      "fadeOut": 0.04,
+      "decayFrom": null,
+      "loop": false,
+      "layers": [
+        {
+          "source": "kenney-impact/Audio/impactGeneric_light_000.ogg",
+          "start": 0,
+          "duration": 0.075,
+          "pitch": 1.1,
+          "lowpass": 10000,
+          "highpass": 800,
+          "level": 1,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "kind": "mallet-hit",
+      "duration": 0.25,
+      "fadeIn": 0.001,
+      "fadeOut": 0.04,
+      "decayFrom": 0.12,
+      "loop": false,
+      "layers": [
+        {
+          "source": "kenney-impact/Audio/impactSoft_heavy_001.ogg",
+          "start": 0,
+          "duration": 0.25,
+          "pitch": 1,
+          "lowpass": 4200,
+          "highpass": 70,
+          "level": 1,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        },
+        {
+          "source": "kenney-impact/Audio/impactPunch_heavy_001.ogg",
+          "start": 0,
+          "duration": 0.075,
+          "pitch": 0.84,
+          "lowpass": 5000,
+          "highpass": 70,
+          "level": 0.28,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "kind": "bat-hit",
+      "duration": 0.24,
+      "fadeIn": 0.001,
+      "fadeOut": 0.055,
+      "decayFrom": null,
+      "loop": false,
+      "layers": [
+        {
+          "source": "kenney-impact/Audio/impactWood_heavy_001.ogg",
+          "start": 0,
+          "duration": 0.25,
+          "pitch": 0.98,
+          "lowpass": 7600,
+          "highpass": 70,
+          "level": 1,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "kind": "ball-hit",
+      "duration": 0.34,
+      "fadeIn": 0.001,
+      "fadeOut": 0.04,
+      "decayFrom": 0.15,
+      "loop": false,
+      "layers": [
+        {
+          "source": "kenney-impact/Audio/impactSoft_heavy_001.ogg",
+          "start": 0,
+          "duration": 0.3,
+          "pitch": 0.79,
+          "lowpass": 1800,
+          "highpass": 70,
+          "level": 1,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        },
+        {
+          "source": "kenney-impact/Audio/impactWood_heavy_001.ogg",
+          "start": 0,
+          "duration": 0.05,
+          "pitch": 0.8,
+          "lowpass": 2200,
+          "highpass": 70,
+          "level": 0.28,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "kind": "pellet-hit",
+      "duration": 0.085,
+      "fadeIn": 0.001,
+      "fadeOut": 0.04,
+      "decayFrom": null,
+      "loop": false,
+      "layers": [
+        {
+          "source": "kenney-impact/Audio/impactGeneric_light_001.ogg",
+          "start": 0,
+          "duration": 0.075,
+          "pitch": 1.1,
+          "lowpass": 10000,
+          "highpass": 800,
+          "level": 1,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "kind": "mallet-hit",
+      "duration": 0.25,
+      "fadeIn": 0.001,
+      "fadeOut": 0.04,
+      "decayFrom": 0.12,
+      "loop": false,
+      "layers": [
+        {
+          "source": "kenney-impact/Audio/impactSoft_heavy_002.ogg",
+          "start": 0,
+          "duration": 0.25,
+          "pitch": 1,
+          "lowpass": 4200,
+          "highpass": 70,
+          "level": 1,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        },
+        {
+          "source": "kenney-impact/Audio/impactPunch_heavy_002.ogg",
+          "start": 0,
+          "duration": 0.075,
+          "pitch": 0.84,
+          "lowpass": 5000,
+          "highpass": 70,
+          "level": 0.28,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "kind": "bat-hit",
+      "duration": 0.24,
+      "fadeIn": 0.001,
+      "fadeOut": 0.055,
+      "decayFrom": null,
+      "loop": false,
+      "layers": [
+        {
+          "source": "kenney-impact/Audio/impactWood_heavy_002.ogg",
+          "start": 0,
+          "duration": 0.25,
+          "pitch": 0.98,
+          "lowpass": 7600,
+          "highpass": 70,
+          "level": 1,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "kind": "ball-hit",
+      "duration": 0.34,
+      "fadeIn": 0.001,
+      "fadeOut": 0.04,
+      "decayFrom": 0.15,
+      "loop": false,
+      "layers": [
+        {
+          "source": "kenney-impact/Audio/impactSoft_heavy_002.ogg",
+          "start": 0,
+          "duration": 0.3,
+          "pitch": 0.79,
+          "lowpass": 1800,
+          "highpass": 70,
+          "level": 1,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        },
+        {
+          "source": "kenney-impact/Audio/impactWood_heavy_002.ogg",
+          "start": 0,
+          "duration": 0.05,
+          "pitch": 0.8,
+          "lowpass": 2200,
+          "highpass": 70,
+          "level": 0.28,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "kind": "pellet-hit",
+      "duration": 0.085,
+      "fadeIn": 0.001,
+      "fadeOut": 0.04,
+      "decayFrom": null,
+      "loop": false,
+      "layers": [
+        {
+          "source": "kenney-impact/Audio/impactGeneric_light_002.ogg",
+          "start": 0,
+          "duration": 0.075,
+          "pitch": 1.1,
+          "lowpass": 10000,
+          "highpass": 800,
+          "level": 1,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "kind": "parcel-hit",
+      "duration": 0.24,
+      "fadeIn": 0.001,
+      "fadeOut": 0.04,
+      "decayFrom": 0.1,
+      "loop": false,
+      "layers": [
+        {
+          "source": "kenney-impact/Audio/impactSoft_medium_000.ogg",
+          "start": 0,
+          "duration": 0.24,
+          "pitch": 1,
+          "lowpass": 4800,
+          "highpass": 70,
+          "level": 1,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "kind": "parcel-hit",
+      "duration": 0.24,
+      "fadeIn": 0.001,
+      "fadeOut": 0.04,
+      "decayFrom": 0.1,
+      "loop": false,
+      "layers": [
+        {
+          "source": "kenney-impact/Audio/impactSoft_medium_001.ogg",
+          "start": 0,
+          "duration": 0.24,
+          "pitch": 1,
+          "lowpass": 4800,
+          "highpass": 70,
+          "level": 1,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "kind": "pistol",
+      "duration": 0.28,
+      "fadeIn": 0.0004,
+      "fadeOut": 0.06,
+      "decayFrom": 0.14,
+      "loop": false,
+      "layers": [
+        {
+          "source": "firearms/Prepared SFX Library/Walther PPQ/X_31P.wav",
+          "start": 1.078,
+          "duration": 0.28,
+          "pitch": 1,
+          "lowpass": 8800,
+          "highpass": 85,
+          "level": 1,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "kind": "pistol",
+      "duration": 0.28,
+      "fadeIn": 0.0004,
+      "fadeOut": 0.06,
+      "decayFrom": 0.14,
+      "loop": false,
+      "layers": [
+        {
+          "source": "firearms/Prepared SFX Library/Walther PPQ/X_31P.wav",
+          "start": 5.238,
+          "duration": 0.28,
+          "pitch": 1,
+          "lowpass": 8800,
+          "highpass": 85,
+          "level": 1,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "kind": "pistol",
+      "duration": 0.28,
+      "fadeIn": 0.0004,
+      "fadeOut": 0.06,
+      "decayFrom": 0.14,
+      "loop": false,
+      "layers": [
+        {
+          "source": "firearms/Prepared SFX Library/Walther PPQ/X_39P.wav",
+          "start": 1.394,
+          "duration": 0.28,
+          "pitch": 1,
+          "lowpass": 8800,
+          "highpass": 85,
+          "level": 1,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "kind": "pistol",
+      "duration": 0.28,
+      "fadeIn": 0.0004,
+      "fadeOut": 0.06,
+      "decayFrom": 0.14,
+      "loop": false,
+      "layers": [
+        {
+          "source": "firearms/Prepared SFX Library/Walther PPQ/X_39P.wav",
+          "start": 6.433,
+          "duration": 0.28,
+          "pitch": 1,
+          "lowpass": 8800,
+          "highpass": 85,
+          "level": 1,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "kind": "launcher",
+      "duration": 0.58,
+      "fadeIn": 0.003,
+      "fadeOut": 0.15,
+      "decayFrom": 0.3,
+      "loop": false,
+      "layers": [
+        {
+          "source": "kenney-scifi/Audio/thrusterFire_000.ogg",
+          "start": 1.08,
+          "duration": 0.57,
+          "pitch": 1,
+          "lowpass": 7500,
+          "highpass": 70,
+          "level": 1,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        },
+        {
+          "source": "kenney-impact/Audio/impactMetal_light_000.ogg",
+          "start": 0,
+          "duration": 0.045,
+          "pitch": 1,
+          "lowpass": 10000,
+          "highpass": 70,
+          "level": 0.18,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "kind": "cannon",
+      "duration": 0.35,
+      "fadeIn": 0.001,
+      "fadeOut": 0.09,
+      "decayFrom": 0.12,
+      "loop": false,
+      "layers": [
+        {
+          "source": "kenney-scifi/Audio/lowFrequency_explosion_001.ogg",
+          "start": 0.02,
+          "duration": 0.28,
+          "pitch": 1.22,
+          "lowpass": 1500,
+          "highpass": 70,
+          "level": 0.85,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        },
+        {
+          "source": "kenney-scifi/Audio/thrusterFire_000.ogg",
+          "start": 1.08,
+          "duration": 0.23,
+          "pitch": 1,
+          "lowpass": 10000,
+          "highpass": 650,
+          "level": 0.32,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        },
+        {
+          "source": "kenney-impact/Audio/impactMetal_light_000.ogg",
+          "start": 0,
+          "duration": 0.04,
+          "pitch": 1,
+          "lowpass": 10000,
+          "highpass": 70,
+          "level": 0.13,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "kind": "launcher",
+      "duration": 0.58,
+      "fadeIn": 0.003,
+      "fadeOut": 0.15,
+      "decayFrom": 0.3,
+      "loop": false,
+      "layers": [
+        {
+          "source": "kenney-scifi/Audio/thrusterFire_001.ogg",
+          "start": 1.08,
+          "duration": 0.57,
+          "pitch": 1,
+          "lowpass": 7500,
+          "highpass": 70,
+          "level": 1,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        },
+        {
+          "source": "kenney-impact/Audio/impactMetal_light_001.ogg",
+          "start": 0,
+          "duration": 0.045,
+          "pitch": 1,
+          "lowpass": 10000,
+          "highpass": 70,
+          "level": 0.18,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "kind": "cannon",
+      "duration": 0.35,
+      "fadeIn": 0.001,
+      "fadeOut": 0.09,
+      "decayFrom": 0.12,
+      "loop": false,
+      "layers": [
+        {
+          "source": "kenney-scifi/Audio/lowFrequency_explosion_001.ogg",
+          "start": 0.02,
+          "duration": 0.28,
+          "pitch": 1.22,
+          "lowpass": 1500,
+          "highpass": 70,
+          "level": 0.85,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        },
+        {
+          "source": "kenney-scifi/Audio/thrusterFire_001.ogg",
+          "start": 1.08,
+          "duration": 0.23,
+          "pitch": 1,
+          "lowpass": 10000,
+          "highpass": 650,
+          "level": 0.32,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        },
+        {
+          "source": "kenney-impact/Audio/impactMetal_light_001.ogg",
+          "start": 0,
+          "duration": 0.04,
+          "pitch": 1,
+          "lowpass": 10000,
+          "highpass": 70,
+          "level": 0.13,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "kind": "swish",
+      "duration": 0.19,
+      "fadeIn": 0.008,
+      "fadeOut": 0.024,
+      "decayFrom": null,
+      "loop": false,
+      "layers": [
+        {
+          "source": "swishes/swishes/swish-7.wav",
+          "start": 0.008,
+          "duration": 0.18,
+          "pitch": 1.05,
+          "lowpass": 10000,
+          "highpass": 70,
+          "level": 1,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "kind": "heavy-swish",
+      "duration": 0.25,
+      "fadeIn": 0.014,
+      "fadeOut": 0.045,
+      "decayFrom": null,
+      "loop": false,
+      "layers": [
+        {
+          "source": "swishes/swishes/swish-7.wav",
+          "start": 0,
+          "duration": 0.195,
+          "pitch": 0.79,
+          "lowpass": 5600,
+          "highpass": 70,
+          "level": 1,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "kind": "swish",
+      "duration": 0.19,
+      "fadeIn": 0.008,
+      "fadeOut": 0.024,
+      "decayFrom": null,
+      "loop": false,
+      "layers": [
+        {
+          "source": "swishes/swishes/swish-8.wav",
+          "start": 0.008,
+          "duration": 0.18,
+          "pitch": 1.05,
+          "lowpass": 10000,
+          "highpass": 70,
+          "level": 1,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "kind": "heavy-swish",
+      "duration": 0.25,
+      "fadeIn": 0.014,
+      "fadeOut": 0.045,
+      "decayFrom": null,
+      "loop": false,
+      "layers": [
+        {
+          "source": "swishes/swishes/swish-8.wav",
+          "start": 0,
+          "duration": 0.195,
+          "pitch": 0.79,
+          "lowpass": 5600,
+          "highpass": 70,
+          "level": 1,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "kind": "swish",
+      "duration": 0.19,
+      "fadeIn": 0.008,
+      "fadeOut": 0.024,
+      "decayFrom": null,
+      "loop": false,
+      "layers": [
+        {
+          "source": "swishes/swishes/swish-9.wav",
+          "start": 0.008,
+          "duration": 0.18,
+          "pitch": 1.05,
+          "lowpass": 10000,
+          "highpass": 70,
+          "level": 1,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "kind": "heavy-swish",
+      "duration": 0.25,
+      "fadeIn": 0.014,
+      "fadeOut": 0.045,
+      "decayFrom": null,
+      "loop": false,
+      "layers": [
+        {
+          "source": "swishes/swishes/swish-9.wav",
+          "start": 0,
+          "duration": 0.195,
+          "pitch": 0.79,
+          "lowpass": 5600,
+          "highpass": 70,
+          "level": 1,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "kind": "throw",
+      "duration": 0.17,
+      "fadeIn": 0.01,
+      "fadeOut": 0.03,
+      "decayFrom": null,
+      "loop": false,
+      "layers": [
+        {
+          "source": "swishes/swishes/swish-5.wav",
+          "start": 0,
+          "duration": 0.14,
+          "pitch": 0.9,
+          "lowpass": 4500,
+          "highpass": 70,
+          "level": 1,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "kind": "throw",
+      "duration": 0.17,
+      "fadeIn": 0.01,
+      "fadeOut": 0.03,
+      "decayFrom": null,
+      "loop": false,
+      "layers": [
+        {
+          "source": "swishes/swishes/swish-6.wav",
+          "start": 0,
+          "duration": 0.14,
+          "pitch": 0.9,
+          "lowpass": 4500,
+          "highpass": 70,
+          "level": 1,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "kind": "bomb-arm",
+      "duration": 0.18,
+      "fadeIn": 0.001,
+      "fadeOut": 0.024,
+      "decayFrom": null,
+      "loop": false,
+      "layers": [
+        {
+          "source": "kenney-impact/Audio/impactMetal_light_000.ogg",
+          "start": 0,
+          "duration": 0.055,
+          "pitch": 1,
+          "lowpass": 10000,
+          "highpass": 750,
+          "level": 0.7,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        },
+        {
+          "source": "kenney-impact/Audio/impactGeneric_light_000.ogg",
+          "start": 0,
+          "duration": 0.06,
+          "pitch": 0.9,
+          "lowpass": 10000,
+          "highpass": 70,
+          "level": 0.45,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0.09
+        }
+      ]
+    },
+    {
+      "kind": "bomb-arm",
+      "duration": 0.18,
+      "fadeIn": 0.001,
+      "fadeOut": 0.024,
+      "decayFrom": null,
+      "loop": false,
+      "layers": [
+        {
+          "source": "kenney-impact/Audio/impactMetal_light_001.ogg",
+          "start": 0,
+          "duration": 0.055,
+          "pitch": 1,
+          "lowpass": 10000,
+          "highpass": 750,
+          "level": 0.7,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        },
+        {
+          "source": "kenney-impact/Audio/impactGeneric_light_001.ogg",
+          "start": 0,
+          "duration": 0.06,
+          "pitch": 0.9,
+          "lowpass": 10000,
+          "highpass": 70,
+          "level": 0.45,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0.09
+        }
+      ]
+    },
+    {
+      "kind": "bomb-blast",
+      "duration": 0.76,
+      "fadeIn": 0.001,
+      "fadeOut": 0.15,
+      "decayFrom": 0.3,
+      "loop": false,
+      "layers": [
+        {
+          "source": "explosion3.ogg",
+          "start": 0,
+          "duration": 0.74,
+          "pitch": 1,
+          "lowpass": 6400,
+          "highpass": 70,
+          "level": 1,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "kind": "bomb-blast",
+      "duration": 0.76,
+      "fadeIn": 0.001,
+      "fadeOut": 0.15,
+      "decayFrom": 0.3,
+      "loop": false,
+      "layers": [
+        {
+          "source": "explosion3.ogg",
+          "start": 0,
+          "duration": 0.74,
+          "pitch": 0.96,
+          "lowpass": 6400,
+          "highpass": 70,
+          "level": 1,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "kind": "rocket-blast",
+      "duration": 0.5,
+      "fadeIn": 0.001,
+      "fadeOut": 0.1,
+      "decayFrom": 0.18,
+      "loop": false,
+      "layers": [
+        {
+          "source": "explosion3.ogg",
+          "start": 0,
+          "duration": 0.57,
+          "pitch": 1.17,
+          "lowpass": 7500,
+          "highpass": 70,
+          "level": 1,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        },
+        {
+          "source": "kenney-scifi/Audio/thrusterFire_000.ogg",
+          "start": 1.1,
+          "duration": 0.2,
+          "pitch": 1,
+          "lowpass": 10000,
+          "highpass": 70,
+          "level": 0.18,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "kind": "rocket-blast",
+      "duration": 0.5,
+      "fadeIn": 0.001,
+      "fadeOut": 0.1,
+      "decayFrom": 0.18,
+      "loop": false,
+      "layers": [
+        {
+          "source": "explosion3.ogg",
+          "start": 0,
+          "duration": 0.57,
+          "pitch": 1.12,
+          "lowpass": 7500,
+          "highpass": 70,
+          "level": 1,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        },
+        {
+          "source": "kenney-scifi/Audio/thrusterFire_000.ogg",
+          "start": 1.1,
+          "duration": 0.2,
+          "pitch": 1,
+          "lowpass": 10000,
+          "highpass": 70,
+          "level": 0.18,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "kind": "vacuum-start",
+      "duration": 0.44,
+      "fadeIn": 0.12,
+      "fadeOut": 0.075,
+      "decayFrom": null,
+      "loop": false,
+      "layers": [
+        {
+          "source": "vacuumcleaner01.wav",
+          "start": 34,
+          "duration": 0.44,
+          "pitch": 1,
+          "lowpass": 5800,
+          "highpass": 85,
+          "level": 1,
+          "tempo": 1,
+          "ramp": [
+            0.65,
+            1
+          ],
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "kind": "vacuum",
+      "duration": 1.4,
+      "fadeIn": 0.001,
+      "fadeOut": 0.04,
+      "decayFrom": null,
+      "loop": true,
+      "layers": [
+        {
+          "source": "vacuumcleaner01.wav",
+          "start": 35,
+          "duration": 1.4,
+          "pitch": 1,
+          "lowpass": 5800,
+          "highpass": 85,
+          "level": 1,
+          "tempo": 1,
+          "ramp": null,
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "kind": "vacuum-stop",
+      "duration": 0.5,
+      "fadeIn": 0.025,
+      "fadeOut": 0.28,
+      "decayFrom": null,
+      "loop": false,
+      "layers": [
+        {
+          "source": "vacuumcleaner01.wav",
+          "start": 37,
+          "duration": 0.5,
+          "pitch": 1,
+          "lowpass": 5800,
+          "highpass": 85,
+          "level": 1,
+          "tempo": 1,
+          "ramp": [
+            1,
+            0.5
+          ],
+          "offset": 0
+        }
+      ]
+    }
+  ],
+  "url": "/audio/item-sounds.wav",
+  "sampleRate": 32000,
+  "frames": 417120,
+  "clips": [
+    {
+      "kind": "mallet-hit",
+      "offsetFrames": 0,
+      "lengthFrames": 8000,
+      "peakSeconds": 0.01
+    },
+    {
+      "kind": "bat-hit",
+      "offsetFrames": 8000,
+      "lengthFrames": 7680,
+      "peakSeconds": 0.005
+    },
+    {
+      "kind": "ball-hit",
+      "offsetFrames": 15680,
+      "lengthFrames": 10880,
+      "peakSeconds": 0.02
+    },
+    {
+      "kind": "pellet-hit",
+      "offsetFrames": 26560,
+      "lengthFrames": 2720,
+      "peakSeconds": 0.005
+    },
+    {
+      "kind": "mallet-hit",
+      "offsetFrames": 29280,
+      "lengthFrames": 8000,
+      "peakSeconds": 0.01
+    },
+    {
+      "kind": "bat-hit",
+      "offsetFrames": 37280,
+      "lengthFrames": 7680,
+      "peakSeconds": 0.005
+    },
+    {
+      "kind": "ball-hit",
+      "offsetFrames": 44960,
+      "lengthFrames": 10880,
+      "peakSeconds": 0.02
+    },
+    {
+      "kind": "pellet-hit",
+      "offsetFrames": 55840,
+      "lengthFrames": 2720,
+      "peakSeconds": 0.005
+    },
+    {
+      "kind": "mallet-hit",
+      "offsetFrames": 58560,
+      "lengthFrames": 8000,
+      "peakSeconds": 0.01
+    },
+    {
+      "kind": "bat-hit",
+      "offsetFrames": 66560,
+      "lengthFrames": 7680,
+      "peakSeconds": 0.01
+    },
+    {
+      "kind": "ball-hit",
+      "offsetFrames": 74240,
+      "lengthFrames": 10880,
+      "peakSeconds": 0.015
+    },
+    {
+      "kind": "pellet-hit",
+      "offsetFrames": 85120,
+      "lengthFrames": 2720,
+      "peakSeconds": 0.005
+    },
+    {
+      "kind": "parcel-hit",
+      "offsetFrames": 87840,
+      "lengthFrames": 7680,
+      "peakSeconds": 0.01
+    },
+    {
+      "kind": "parcel-hit",
+      "offsetFrames": 95520,
+      "lengthFrames": 7680,
+      "peakSeconds": 0.01
+    },
+    {
+      "kind": "pistol",
+      "offsetFrames": 103200,
+      "lengthFrames": 8960,
+      "peakSeconds": 0.01
+    },
+    {
+      "kind": "pistol",
+      "offsetFrames": 112160,
+      "lengthFrames": 8960,
+      "peakSeconds": 0.01
+    },
+    {
+      "kind": "pistol",
+      "offsetFrames": 121120,
+      "lengthFrames": 8960,
+      "peakSeconds": 0.015
+    },
+    {
+      "kind": "pistol",
+      "offsetFrames": 130080,
+      "lengthFrames": 8960,
+      "peakSeconds": 0.015
+    },
+    {
+      "kind": "launcher",
+      "offsetFrames": 139040,
+      "lengthFrames": 18560,
+      "peakSeconds": 0.06
+    },
+    {
+      "kind": "cannon",
+      "offsetFrames": 157600,
+      "lengthFrames": 11200,
+      "peakSeconds": 0.1
+    },
+    {
+      "kind": "launcher",
+      "offsetFrames": 168800,
+      "lengthFrames": 18560,
+      "peakSeconds": 0.06
+    },
+    {
+      "kind": "cannon",
+      "offsetFrames": 187360,
+      "lengthFrames": 11200,
+      "peakSeconds": 0.1
+    },
+    {
+      "kind": "swish",
+      "offsetFrames": 198560,
+      "lengthFrames": 6080,
+      "peakSeconds": 0.04
+    },
+    {
+      "kind": "heavy-swish",
+      "offsetFrames": 204640,
+      "lengthFrames": 8000,
+      "peakSeconds": 0.065
+    },
+    {
+      "kind": "swish",
+      "offsetFrames": 212640,
+      "lengthFrames": 6080,
+      "peakSeconds": 0.07
+    },
+    {
+      "kind": "heavy-swish",
+      "offsetFrames": 218720,
+      "lengthFrames": 8000,
+      "peakSeconds": 0.1
+    },
+    {
+      "kind": "swish",
+      "offsetFrames": 226720,
+      "lengthFrames": 6080,
+      "peakSeconds": 0.065
+    },
+    {
+      "kind": "heavy-swish",
+      "offsetFrames": 232800,
+      "lengthFrames": 8000,
+      "peakSeconds": 0.1
+    },
+    {
+      "kind": "throw",
+      "offsetFrames": 240800,
+      "lengthFrames": 5440,
+      "peakSeconds": 0.05
+    },
+    {
+      "kind": "throw",
+      "offsetFrames": 246240,
+      "lengthFrames": 5440,
+      "peakSeconds": 0.055
+    },
+    {
+      "kind": "bomb-arm",
+      "offsetFrames": 251680,
+      "lengthFrames": 5760,
+      "peakSeconds": 0.005
+    },
+    {
+      "kind": "bomb-arm",
+      "offsetFrames": 257440,
+      "lengthFrames": 5760,
+      "peakSeconds": 0.005
+    },
+    {
+      "kind": "bomb-blast",
+      "offsetFrames": 263200,
+      "lengthFrames": 24320,
+      "peakSeconds": 0.025
+    },
+    {
+      "kind": "bomb-blast",
+      "offsetFrames": 287520,
+      "lengthFrames": 24320,
+      "peakSeconds": 0.025
+    },
+    {
+      "kind": "rocket-blast",
+      "offsetFrames": 311840,
+      "lengthFrames": 16000,
+      "peakSeconds": 0.02
+    },
+    {
+      "kind": "rocket-blast",
+      "offsetFrames": 327840,
+      "lengthFrames": 16000,
+      "peakSeconds": 0.02
+    },
+    {
+      "kind": "vacuum-start",
+      "offsetFrames": 343840,
+      "lengthFrames": 14080,
+      "peakSeconds": 0.225
+    },
+    {
+      "kind": "vacuum",
+      "offsetFrames": 357920,
+      "lengthFrames": 43200,
+      "peakSeconds": 0.285
+    },
+    {
+      "kind": "vacuum-stop",
+      "offsetFrames": 401120,
+      "lengthFrames": 16000,
+      "peakSeconds": 0.165
+    }
+  ]
+}

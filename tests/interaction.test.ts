@@ -67,7 +67,7 @@ await test('a quick tool-button tap pops immediately and every other tool produc
   Object.assign(game,{
     arena:{camera,scene,surfaces:[surface]},physics,tools,effects,toolEffects,melee:new MeleeSwing(),movingTargets:{notePop:()=>null},time:1,nextAction:0,down:false,
     snapshot:{playing:true,tool:0,pops:0,combo:0,best:0,charge:0},
-    audio:{start:async()=>{},pop:()=>{audiblePops++;},thump:()=>{},swish:()=>{},fire:()=>{},vacuum:()=>{},stop:()=>{}},
+    audio:{start:async()=>{},pop:()=>{audiblePops++;},thump:()=>{},impact:()=>{},blast:()=>{},toss:()=>{},swish:()=>{},fire:()=>{},vacuum:()=>{},stop:()=>{}},
     activePops:new Map(),queued:[],particles:[],pressedBubble:null,lastPop:-10,
   });
   game.tapTool();
