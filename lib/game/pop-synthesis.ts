@@ -1,43 +1,32 @@
-/** A soft pressure pop: rounded membrane transient, warm body, no scratch/crinkle tail. */
+/** Offline fallback: a dry plastic snap, with a small pressure body and short folds. */
 export function synthesizePop(sampleRate: number, variant: number, random = Math.random): Float32Array {
-  const duration = .075;
-  const samples = new Float32Array(Math.ceil(sampleRate * duration));
-  const pitch = .88 + (variant % 16) / 16 * .26;
-  // Two low-pass stages keep even the tiny air-release transient smooth.
-  const airCoefficient = 1 - Math.exp(-2 * Math.PI * 1700 / sampleRate);
-  let air1 = 0, air2 = 0, bodyPhase = 0, membranePhase = 0, peak = 0;
+  const duration = .06, samples = new Float32Array(Math.ceil(sampleRate * duration));
+  const pitch = .91 + (variant % 16) / 15 * .2;
+  const coefficient = 1 - Math.exp(-2 * Math.PI * (5200 + variant % 5 * 280) / sampleRate);
+  let air = 0, phase = 0, peak = 0;
   for (let i = 0; i < samples.length; i++) {
     const t = i / sampleRate;
-    air1 += airCoefficient * (random() * 2 - 1 - air1);
-    air2 += airCoefficient * (air1 - air2);
-    const attack = 1 - Math.exp(-t / .00065);
-    bodyPhase += 2 * Math.PI * pitch * (215 + 205 * Math.exp(-t / .0035)) / sampleRate;
-    membranePhase += 2 * Math.PI * pitch * (610 + 430 * Math.exp(-t / .0018)) / sampleRate;
-    const body = Math.sin(bodyPhase) * Math.exp(-t / .0065) * .88;
-    const membrane = Math.sin(membranePhase) * Math.exp(-t / .0028) * .32;
-    const air = air2 * Math.exp(-t / .0016) * .16;
-    const fade = Math.min(1, (duration - t) / .008);
-    // Linear mixing avoids the bright harmonics introduced by saturation.
-    samples[i] = (body + membrane + air) * attack * fade;
+    air += coefficient * (random() * 2 - 1 - air);
+    phase += 2 * Math.PI * pitch * (260 + 350 * Math.exp(-t / .0018)) / sampleRate;
+    const snap = air * Math.exp(-t / (.0015 + variant % 4 * .00025));
+    const body = Math.sin(phase) * Math.exp(-t / .0032) * .12;
+    const fold = air * .06 * Math.exp(-(((t - .006 - variant % 3 * .002) / .0012) ** 2));
+    samples[i] = (snap + body + fold) * (1 - Math.exp(-t / .00012)) * Math.min(1, (duration - t) / .006);
     peak = Math.max(peak, Math.abs(samples[i]));
   }
-  const gain = .72 / Math.max(peak, .001);
-  for (let i = 0; i < samples.length; i++) samples[i] *= gain;
+  for (let i = 0; i < samples.length; i++) samples[i] *= .78 / Math.max(peak, .001);
   return samples;
 }
 
-/** Resolve dense impacts into discrete pops, with a short, bounded audio queue. */
+/** Thin dense contacts into an irregular crackle, never a long delayed backlog. */
 export class PopVoiceScheduler {
   private next = 0;
-  private sequence = 0;
+  constructor(private random = Math.random) {}
   reserve(now: number): number | null {
     const at = Math.max(now + .003, this.next);
-    if (at > now + .105) return null;
-    // The old 4.5 ms spacing smeared a group of pops into a buzzing scrape.
-    // Slightly irregular 20–28 ms spacing preserves the individual attacks.
-    const spacing = [.023, .028, .021, .026, .020][this.sequence++ % 5];
-    this.next = at + spacing;
+    if (at > now + .085) return null;
+    this.next = at + .024 + this.random() * .018;
     return at;
   }
-  reset() { this.next = 0; this.sequence = 0; }
+  reset() { this.next = 0; }
 }

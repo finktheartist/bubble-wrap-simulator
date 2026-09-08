@@ -1,0 +1,40 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bubble Wrap · Sound Review</title>
+<style>body{font:17px/1.6 system-ui;background:#112322;color:#eef7ef;max-width:740px;margin:70px auto;padding:24px}h1{font-size:42px;line-height:1.1;letter-spacing:-1.5px}button,a{font:inherit}button{padding:12px 18px;border:0;border-radius:12px;margin:6px 4px 6px 0;background:#d9ff88;color:#15312e;cursor:pointer}button:disabled{opacity:.4}a{color:#d9ff88}audio{display:block;width:100%;margin:24px 0}small{color:#a9c5bd}#status{min-height:28px}</style>
+<small>BUBBLE WRAP SIMULATOR · LOCAL SOUND REVIEW</small><h1>A little more snap.</h1><p>Sixteen recorded plastic pops, irregular crackles, and restrained tool sounds. Start with the comparison: <b>old sound first</b>, a pause, then <b>new sound</b>.</p>
+<button id="record">Record comparison</button><button id="pop">Try a new pop</button><button id="tools">Try tool sounds</button><button id="stop">Stop</button><p id="status" role="status">Play the saved comparison below, or record a fresh take.</p><audio controls id="player" src="/latest-comparison.mp3"></audio><p><a href="http://127.0.0.1:4173" target="_blank">Play the updated game locally →</a></p><small>The comparison uses the actual game audio engines and browser mixing. Recording runs silently; use the player to listen. The YouTube reference audio is not included.</small>
+<script type="module">
+import { PopAudio } from '@game/audio';
+import { PopAudio as BeforeAudio } from '@before/audio';
+const after=new PopAudio(),before=new BeforeAudio(),status=document.querySelector('#status'),button=document.querySelector('#record');
+let timers=[],recorder=null;
+const later=(ms,fn)=>timers.push(setTimeout(fn,ms));
+function stop(){timers.forEach(clearTimeout);timers=[];after.stop();before.master?.gain.setValueAtTime(0,before.context.currentTime);if(recorder?.state==='recording')recorder.stop();button.disabled=false;status.textContent='Stopped.';}
+function pattern(audio,offset){
+ for(const at of [.5,1.25,2,2.75])later((offset+at)*1000,()=>audio.pop(1.1,0,.4));
+ let run=4;for(let i=0;i<42;i++){run+=.028+((i*37%43)/43)*.036;later((offset+run)*1000,()=>audio.pop(.85+(i*19%13)/13*.8,Math.sin(i*.38)*.28,.4));}
+ later((offset+6.6)*1000,()=>{audio.thump(2.8,true);for(let i=0;i<100;i++)audio.pop(2.7,0,1);});
+}
+document.querySelector('#record').onclick=async()=>{
+ stop();button.disabled=true;status.textContent='Loading sounds…';
+ await Promise.all([before.start(),after.start()]);
+ const context=new AudioContext(),destination=context.createMediaStreamDestination();
+ await context.resume();
+ const beforeTap=before.context.createMediaStreamDestination(),afterTap=after.context.createMediaStreamDestination();
+ before.master.disconnect(before.context.destination);after.master.disconnect(after.context.destination);before.master.connect(beforeTap);after.master.connect(afterTap);
+ const a=context.createMediaStreamSource(beforeTap.stream),b=context.createMediaStreamSource(afterTap.stream);a.connect(destination);b.connect(destination);
+ const chunks=[];recorder=new MediaRecorder(destination.stream,{mimeType:'audio/webm;codecs=opus',audioBitsPerSecond:192000});
+ recorder.ondataavailable=e=>{if(e.data.size)chunks.push(e.data);};
+ recorder.onstop=async()=>{
+   const blob=new Blob(chunks,{type:'audio/webm'});document.querySelector('#player').src=URL.createObjectURL(blob);
+   await fetch('/capture',{method:'POST',body:blob});a.disconnect();b.disconnect();before.master.disconnect(beforeTap);after.master.disconnect(afterTap);before.master.connect(before.context.destination);after.master.connect(after.context.destination);await context.close();
+   button.disabled=false;status.textContent='Comparison recorded. 0–8 seconds: old. 9–17 seconds: new. Replay below.';
+ };
+ recorder.start();status.textContent='OLD SOUND · rounded synthetic pops';pattern(before,0);pattern(after,9);
+ later(9000,()=>{status.textContent='NEW SOUND · recorded plastic snaps';});
+ later(19000,()=>{recorder.stop();after.stop();});
+};
+document.querySelector('#pop').onclick=async()=>{await after.preview();status.textContent='New recorded pop.';};
+document.querySelector('#tools').onclick=async()=>{stop();await after.start();status.textContent='Pistol → launcher → cannon → vacuum';after.fire('pistol');later(650,()=>after.fire('launcher'));later(1450,()=>after.fire('cannon'));later(2300,()=>after.vacuum(true));later(4300,()=>{after.vacuum(false);status.textContent='Tool audition finished.';});};
+document.querySelector('#stop').onclick=stop;
+window.addEventListener('pagehide',()=>{stop();after.dispose();before.dispose();});
+</script></html>

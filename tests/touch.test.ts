@@ -38,10 +38,11 @@ await test('an arena tap activates once, while a drag, long press, cancelled ges
 });
 await test('interrupted charged throws cancel without throwing a ball or held parcel',()=>{
   const game=Object.create(BubbleGame.prototype) as BubbleGame;
-  let throws=0;
-  Object.assign(game,{down:true,snapshot:{playing:true,tool:3,charge:.8},pressedBubble:null,throwItem:()=>{throws++;}});
+  let throws=0;const motorRequests:boolean[]=[];
+  Object.assign(game,{down:true,snapshot:{playing:true,tool:3,charge:.8},pressedBubble:null,throwItem:()=>{throws++;},audio:{vacuum:(active:boolean)=>motorRequests.push(active)}});
   game.actionCancel();game.actionUp();
   assert.equal(throws,0);assert.equal(game.snapshot.charge,0);
+  assert.ok(motorRequests.length>0&&motorRequests.every(active=>!active),'cancel and release also stop sustained audio');
 });
 await test('lighter mobile pockets preserve every bubble, its location and its pop/reset state',()=>{
   const desktop=new WrapSurface(2.6,2.6,0xffffff),mobile=new WrapSurface(2.6,2.6,0xffffff,.26,true);

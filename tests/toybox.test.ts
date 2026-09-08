@@ -17,6 +17,7 @@ function box(name:string,size:[number,number,number],position:[number,number,num
   const group=new THREE.Group();group.position.set(...position);return {group,size:new THREE.Vector3(...size),name,dynamic,color:0xffffff,surfaces:[]};
 }
 function fixture(tool:number){
+  const sounds:{cue:string;active?:boolean}[]=[];
   const surface=new WrapSurface(2.4,1.8,0xd5e5e8);
   surface.group.position.set(0,1.64,6.405);surface.group.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),new THREE.Vector3(0,0,1));
   const scene=new THREE.Scene();scene.add(surface.group);scene.updateMatrixWorld(true);
@@ -24,16 +25,17 @@ function fixture(tool:number){
   const physics=new ArenaPhysics([box('Target backing',[2.4,1.8,.12],[0,1.64,6.3])],()=>{});
   const game=Object.create(BubbleGame.prototype) as BubbleGame,effects=new WorldEffects(scene,true),toolEffects=new ToolEffects(new THREE.Scene());
   Object.assign(game,{arena:{camera,scene,surfaces:[surface]},physics,tools,effects,toolEffects,movingTargets:{notePop:()=>null},time:10,nextAction:0,down:false,touch:true,recoil:0,
-    snapshot:{playing:true,tool,pops:0,combo:0,best:0,charge:0},audio:{start:async()=>{},pop:()=>{},thump:()=>{},swish:()=>{}},
+    snapshot:{playing:true,tool,pops:0,combo:0,best:0,charge:0},audio:{start:async()=>{},pop:()=>{},thump:()=>{},swish:()=>{},fire:(cue:string)=>sounds.push({cue}),vacuum:(active:boolean)=>sounds.push({cue:'vacuum',active}),stop:()=>sounds.push({cue:'stop'})},
     activePops:new Map(),queued:[],particles:[],rays:[],pressedBubble:null,lastPop:-10,melee:{advance:()=>null},
   });
   const internal=game as unknown as {impact:(item:PhysicsItem,point:THREE.Vector3,speed:number)=>void;updateInteraction:(dt?:number)=>void;updateProjectiles:(dt:number)=>void;queued:unknown[];rays:{mesh:THREE.Mesh}[]};
   physics.onImpact=(...args)=>internal.impact(...args);
-  return {game,physics,internal,scene,effects,dispose(){for(const item of physics.items)disposeTool(item.group);for(const {mesh} of internal.rays){mesh.geometry.dispose();(mesh.material as THREE.Material).dispose();}physics.dispose();surface.dispose();effects.dispose();toolEffects.dispose();}};
+  return {game,physics,internal,scene,effects,sounds,dispose(){for(const item of physics.items)disposeTool(item.group);for(const {mesh} of internal.rays){mesh.geometry.dispose();(mesh.material as THREE.Material).dispose();}physics.dispose();surface.dispose();effects.dispose();toolEffects.dispose();}};
 }
 
 await test('a rocket tap flies forward, hits a physical target, then detonates once outside collision dispatch',()=>{
   const f=fixture(6);f.game.tapTool();const rocket=f.physics.items[0];
+  assert.ok(f.sounds.some(sound=>sound.cue==='launcher'));
   assert.equal(rocket.kind,'rocket');assert.equal(rocket.body.gravityScale(),0);assert.equal(Boolean(rocket.impactPoint),false);
   const facing=new THREE.Vector3(0,0,-1).applyQuaternion(rocket.group.quaternion);
   assert.ok(facing.dot(new THREE.Vector3(0,0,-1))>.94,'rocket faces its trajectory toward the crosshair');
@@ -58,6 +60,7 @@ await test('a missed rocket expires, and removing its flight model releases ever
 
 await test('bowling cannon fires heavy balls on tap and repeats only while the action remains held',()=>{
   const f=fixture(7);f.game.actionDown();const ball=f.physics.items[0];
+  assert.ok(f.sounds.some(sound=>sound.cue==='cannon'));
   assert.equal(ball.kind,'ball');assert.ok(Math.abs(ball.body.mass()-7)<.001);assert.ok(ball.speed>30);
   f.game.time+=.3;f.internal.updateInteraction();assert.equal(f.physics.items.length,1);
   f.game.time+=.5;f.internal.updateInteraction();assert.equal(f.physics.items.length,2);
@@ -66,9 +69,10 @@ await test('bowling cannon fires heavy balls on tap and repeats only while the a
 
 await test('vacuum taps pop reachable wrap; holding continues and cancel stops suction',()=>{
   const f=fixture(8);f.game.tapTool();assert.ok(f.internal.queued.length>0,'a quick mobile tap still performs a useful action');
+  assert.deepEqual(f.sounds.slice(-2),[{cue:'vacuum',active:true},{cue:'vacuum',active:false}],'a tap starts and releases its motor');
   const ball=f.physics.spawn(new THREE.Group(),'ball',new THREE.Vector3(.65,1.64,7),new THREE.Vector3(),f.game.time);
   f.physics.step();f.game.time+=.1;f.game.actionDown();assert.ok(ball.body.linvel().x<0,'suction pulls off-center props into a pile');
-  f.game.actionCancel();const velocity=ball.body.linvel();f.game.time+=.1;f.internal.updateInteraction();assert.deepEqual(ball.body.linvel(),velocity,'cancel does not leave an invisible vacuum running');f.dispose();
+  f.game.actionCancel();assert.deepEqual(f.sounds.at(-1),{cue:'vacuum',active:false});const velocity=ball.body.linvel();f.game.time+=.1;f.internal.updateInteraction();assert.deepEqual(ball.body.linvel(),velocity,'cancel does not leave an invisible vacuum running');f.dispose();
 });
 
 await test('suction has bounded reach, respects walls and leaves dynamic collisions and gravity enabled',()=>{

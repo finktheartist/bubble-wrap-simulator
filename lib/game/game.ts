@@ -139,6 +139,7 @@ export class BubbleGame {
     // Mouse lock is an optional control, never a requirement for using a tool.
   }
   pause(exit=true) {
+    this.audio.stop();
     this.snapshot.playing=false;this.down=false;this.keys.clear();this.touchMove={x:0,y:0};this.clearPressure();
     this.snapshot.charge=0;this.melee.reset();this.toolEffects.reset();
     if(exit&&document.pointerLockElement===this.arena.renderer.domElement){this.unlockToCursor=true;document.exitPointerLock();}
@@ -156,6 +157,7 @@ export class BubbleGame {
   }
   selectTool(tool:number) {
     if(!Number.isInteger(tool)||!TOOL_INFO[tool]||tool===this.snapshot.tool||!this.tools)return;
+    this.audio.vacuum(false);
     this.down=false;this.clearPressure();this.snapshot.charge=0;this.melee.reset();this.toolEffects.reset();
     this.snapshot.tool=tool;this.nextAction=0;this.toolRig.remove(this.toolModel);disposeTool(this.toolModel);this.toolModel=this.tools.create(tool);this.toolRig.add(this.toolModel);this.recoil=.2;this.publish();
   }
@@ -171,8 +173,9 @@ export class BubbleGame {
   }
   tapTool(){this.actionDown();this.actionUp();}
   private beginSwing(tool:MeleeTool,buffer=false){if(this.melee.trigger(tool,this.time,buffer))this.audio.swish(tool===1);}
-  actionCancel(){this.down=false;this.snapshot.charge=0;this.clearPressure();}
+  actionCancel(){this.down=false;this.snapshot.charge=0;this.clearPressure();this.audio.vacuum(false);}
   actionUp() {
+    this.audio.vacuum(false);
     if(!this.down)return;
     if(this.snapshot.playing&&(this.snapshot.tool===3||this.physics?.held))this.throwItem();
     this.down=false;this.snapshot.charge=0;this.clearPressure();
@@ -201,10 +204,11 @@ export class BubbleGame {
   grab() {
     if(!this.physics)return;
     if(this.physics.held){this.physics.release();this.publish();return;}
-    if(this.pickup&&this.pickup.kind!=='shot'&&this.pickup.kind!=='rocket'){this.physics.grab(this.pickup);this.melee.reset();this.toolEffects.reset();this.clearPressure();this.publish();}
+    if(this.pickup&&this.pickup.kind!=='shot'&&this.pickup.kind!=='rocket'){this.audio.vacuum(false);this.physics.grab(this.pickup);this.melee.reset();this.toolEffects.reset();this.clearPressure();this.publish();}
   }
   reset() {
     if(!this.physics)return;
+    this.audio.stop();
     for(const item of this.physics.items)if(item.kind!=='parcel')disposeTool(item.group);
     this.physics.reset();this.arena.surfaces.forEach(s=>s.reset());
     this.activePops.clear();this.queued=[];this.particles=[];this.lastPop=-10;this.melee.reset();this.effects.reset();this.toolEffects.reset();this.movingTargets.reset();this.snapshot.targets=0;this.snapshot.impact=0;
@@ -224,6 +228,7 @@ export class BubbleGame {
   private useTool(dt=1/60) {
     if(!this.physics)return;
     const tool=this.snapshot.tool,dir=this.direction(),origin=this.arena.camera.position.clone();
+    if(tool===8)this.audio.vacuum(true);
     const gathered=tool===8?this.physics.suction(origin,dir,dt):[];
     if(this.time<this.nextAction)return;
     if(tool===4) {
@@ -232,7 +237,7 @@ export class BubbleGame {
       this.effects.streak(muzzle,origin.clone().addScaledVector(dir,Math.min(8,this.aimed?.distance??8)));
       const pos=origin.addScaledVector(dir,.6);
       const g=new THREE.Group();const pellet=new THREE.Mesh(new THREE.SphereGeometry(.07,8,6),new THREE.MeshBasicMaterial({color:0xd9ff65}));g.add(pellet);this.arena.scene.add(g);
-      this.physics.spawn(g,'shot',pos,dir.multiplyScalar(42),this.time);this.audio.pop(.35,0,1);this.trimProjectiles();
+      this.physics.spawn(g,'shot',pos,dir.multiplyScalar(42),this.time);this.audio.fire('pistol');this.trimProjectiles();
     } else if(tool===5) {
       this.nextAction=this.time+.8;this.swing=.75;
       const g=this.tools!.create(5,true);this.arena.scene.add(g);
@@ -246,7 +251,7 @@ export class BubbleGame {
       const item=this.physics.spawn(g,'rocket',muzzle,velocity,this.time);
       // Close walls cannot be skipped by the initial muzzle offset.
       if(this.aimed&&this.aimed.distance<muzzle.distanceTo(origin)+.25)item.impactPoint=this.aimed.point.clone();
-      this.audio.swish(true);this.audio.thump(.9);this.trimProjectiles();
+      this.audio.fire('launcher');this.trimProjectiles();
     } else if(tool===7){
       const muzzle=toolMuzzlePosition(tool,this.arena.camera,this.recoil);
       const pos=this.aimed&&this.aimed.distance<muzzle.distanceTo(origin)+.3?origin.clone().addScaledVector(dir,.4):muzzle;
@@ -254,7 +259,7 @@ export class BubbleGame {
       this.nextAction=this.time+.72;this.recoil=.95;this.toolEffects.fire();
       const g=this.tools!.create(3,true);this.arena.scene.add(g);
       this.physics.spawn(g,'ball',pos,velocity,this.time);this.effects.ripple(pos,dir,.75,0xffdda1,.3);
-      this.audio.thump(1.2);this.trimProjectiles();
+      this.audio.fire('cannon');this.trimProjectiles();
     } else if(tool===8){
       this.nextAction=this.time+.07;this.recoil=.08;
       const nozzle=toolMuzzlePosition(tool,this.arena.camera,this.recoil);

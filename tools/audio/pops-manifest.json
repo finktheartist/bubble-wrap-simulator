@@ -1,0 +1,126 @@
+{
+  "sampleRate": 48000,
+  "framesPerSlot": 2880,
+  "slots": [
+    {
+      "slot": 0,
+      "sourceId": 399334,
+      "sourceStartSeconds": 0.0,
+      "durationSeconds": 0.03,
+      "peak": 0.78
+    },
+    {
+      "slot": 1,
+      "sourceId": 399330,
+      "sourceStartSeconds": 0.1355,
+      "durationSeconds": 0.03,
+      "peak": 0.78
+    },
+    {
+      "slot": 2,
+      "sourceId": 399330,
+      "sourceStartSeconds": 0.17297916666666666,
+      "durationSeconds": 0.032,
+      "peak": 0.78
+    },
+    {
+      "slot": 3,
+      "sourceId": 399330,
+      "sourceStartSeconds": 0.2115,
+      "durationSeconds": 0.034,
+      "peak": 0.78
+    },
+    {
+      "slot": 4,
+      "sourceId": 399336,
+      "sourceStartSeconds": 0.0555,
+      "durationSeconds": 0.036,
+      "peak": 0.78
+    },
+    {
+      "slot": 5,
+      "sourceId": 399336,
+      "sourceStartSeconds": 0.1215,
+      "durationSeconds": 0.03,
+      "peak": 0.78
+    },
+    {
+      "slot": 6,
+      "sourceId": 399336,
+      "sourceStartSeconds": 0.15966666666666668,
+      "durationSeconds": 0.04,
+      "peak": 0.78
+    },
+    {
+      "slot": 7,
+      "sourceId": 399341,
+      "sourceStartSeconds": 0.0555625,
+      "durationSeconds": 0.036,
+      "peak": 0.78
+    },
+    {
+      "slot": 8,
+      "sourceId": 399341,
+      "sourceStartSeconds": 0.1005,
+      "durationSeconds": 0.04,
+      "peak": 0.78
+    },
+    {
+      "slot": 9,
+      "sourceId": 399339,
+      "sourceStartSeconds": 0.1145,
+      "durationSeconds": 0.032,
+      "peak": 0.78
+    },
+    {
+      "slot": 10,
+      "sourceId": 399339,
+      "sourceStartSeconds": 0.1545,
+      "durationSeconds": 0.028,
+      "peak": 0.78
+    },
+    {
+      "slot": 11,
+      "sourceId": 399339,
+      "sourceStartSeconds": 0.1905,
+      "durationSeconds": 0.02,
+      "peak": 0.78
+    },
+    {
+      "slot": 12,
+      "sourceId": 399339,
+      "sourceStartSeconds": 0.2425,
+      "durationSeconds": 0.04,
+      "peak": 0.78
+    },
+    {
+      "slot": 13,
+      "sourceId": 399339,
+      "sourceStartSeconds": 0.2945,
+      "durationSeconds": 0.02,
+      "peak": 0.78
+    },
+    {
+      "slot": 14,
+      "sourceId": 399339,
+      "sourceStartSeconds": 0.3743958333333333,
+      "durationSeconds": 0.034,
+      "peak": 0.78
+    },
+    {
+      "slot": 15,
+      "sourceId": 399339,
+      "sourceStartSeconds": 0.4165,
+      "durationSeconds": 0.04,
+      "peak": 0.78
+    }
+  ],
+  "sha256": "542fcbac79a7fa888e5e3d5d3b2cf3590aae3952870b68a4f51caa0d515461f4",
+  "sourceSha256": {
+    "399334": "3456858cdf9834871d4cbe09064928bc7a6e76da2e8b24ad413eae45c6554b01",
+    "399330": "b8365de08dfc681b2fb898c1b557c2cc7c11a1a13e6b0d84a97aeba2dbf28842",
+    "399336": "cc1af184eb7220911d106257ed852e6b3b4af13b5846bc374fd655eacb1de150",
+    "399341": "59e9d44f0e6fb4df01cabe9b0d79ce668cf9bc8e07af93c3723bcfb0569b35ed",
+    "399339": "469aef9285a02aad7fd067045fec0454ea915df74601d85e9d44d194968c82d1"
+  }
+}

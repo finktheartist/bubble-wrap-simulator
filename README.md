@@ -6,7 +6,7 @@ A first person Three.js playground built around the extremely reasonable desire 
 
 [![Bubble Wrap Simulator gameplay: nine tools in a room made of bubble wrap](docs/gameplay-poster.jpg)](https://raw.githubusercontent.com/finktheartist/bubble-wrap-simulator/main/docs/gameplay.mp4)
 
-Nine tools. Three moving targets. A room with more than 43,000 bubbles. Built with React, Three.js, Rapier physics, Blender models, and synthesized Web Audio. Plays on desktop, phones, and tablets.
+Nine tools. Three moving targets. A room with more than 43,000 bubbles. Built with React, Three.js, Rapier physics, Blender models, recorded bubble wrap, and Web Audio. Plays on desktop, phones, and tablets.
 
 All nine tools now use Meshy materials. Seven have new Meshy 7 geometry; the bowling ball and bomb use Meshy retextures of the original Blender props. Every model is fitted and finished in Blender. The [model contact sheet](docs/meshy-toolkit.png) shows the current set; the gameplay video predates this upgrade.
 
@@ -84,7 +84,7 @@ Bubble spacing is 0.26 world units throughout the room and 0.22 on loose parcels
 - Bowling balls, parcels, pellets, bombs, and rockets are dynamic bodies. Contact position and impact speed determine pop radius. Rockets maintain their flight orientation with gravity disabled, record contacts during collision dispatch, and detonate after the physics step. Misses expire after 3.5 seconds. Explosions apply distance-based impulses and schedule outward-moving crackles. The vacuum uses a damped, mass-independent pull within an eight-unit cone, checks occlusion, and preserves rigid collisions.
 - Hammer and bat attacks pivot around the grip, with distinct wind-up, strike, follow-through, and recovery poses. A short tap commits the whole swing; hits land at the visible contact time, and a rapid follow-up tap can buffer one swing. A brief trail follows the actual tool tip, with a soft movement sound and reticle feedback on contact.
 - Three bubble targets move on kinematic paths, keeping their rendered wrap and collision bodies synchronized. Popping twelve bubbles scores a target hit; the target reinflates after 3.2 seconds. Air ripples, film flecks, shot streaks, muzzle flashes, and target bursts use bounded pools; phones allow at most 180 effect fragments.
-- Web Audio synthesizes rounded pressure pops with a short, warm membrane body and a softly filtered air transient. There are no crinkle tails, distortion, or added room echoes. Twenty-four variants and stereo placement provide variation; dense impacts resolve into distinct pops spaced 20–28 ms apart. Conservative voice gain, a short queue, filtered treble, and a gentle limiter prevent harsh stacking. Impact thumps are quieter and rate-limited. No audio assets or external services are needed during play.
+- Pop audio uses 16 distinct pops cut from five CC0 bubble-wrap recordings, packed into a 92 KB local sound bank with a quiet synthesized pressure layer. Subtle pitch and level variation, irregular 24–42 ms voice spacing, an 85 ms queue limit, and controlled treble keep dense impacts clear. Pistol, launcher, cannon, and vacuum have separate cues; pause, mute, reset, and input cancellation stop sustained sounds. A synthesized pop remains available if the sound bank cannot load. See [audio sources](public/audio/CREDITS.md).
 - Nine self-contained GLBs supply the held tools: a suede glove, rubber mallet, maple bat, drilled resin bowling ball, teal sidearm with a dark polymer grip, enamel bomb, hollow teal rocket launcher, red bowling cannon with a pressure gauge, and yellow vacuum with an open nozzle. Seven meshes were generated with Meshy 7 Ultra and reviewed before texturing. The ball and bomb were retextured from their Blender sources; the ball uses its exact original drilled mesh under the new marble finish. All nine were fitted in Blender, with 1024 px color and 512 px normal/material maps. The complete set is 13.99 MB; meshes and textures are shared by held tools, portraits, and thrown instances. Meshy is used only during authoring: play requires no API key or external asset service. Small finned rockets use a separate lightweight flight mesh with owned, deduplicated GPU resources.
 - Mobile rendering uses 10-segment bubble pockets without changing cell counts, 1× balanced pixel density, a 45% transmission buffer, and at most 24 projectiles. Paused scenes redraw at 10 Hz; hidden tabs skip rendering.
 - Menu icons are transparent portraits rendered once from the same Three.js models and materials used by the held tools. Shapes, colors, grips, and bowling-ball finger holes match the items in the arena.
@@ -94,11 +94,11 @@ The wrap itself uses a hybrid approximation: rigid backing plus individually ani
 
 ## Validation
 
-Thirty-five automated tests cover all nine tool actions, mouse/keyboard/touch gesture ownership, timed melee contact, buffered swings, moving targets, wrap reinflation, audio headroom, player movement, high-speed collisions, grabbing, blast falloff, and reset. The expansion checks actual rocket contact and deferred one-time detonation, missed-rocket cleanup, cannon mass and held-fire behavior, vacuum activation/cancellation, bounded suction and wall occlusion, the phone VFX budget, and alignment of world effects with the separate held-tool camera. Asset checks parse shipped GLBs for finite geometry, UVs, triangle budgets, real bowling-ball wells, embedded textures, and shared-resource disposal. Actual new-tool vertices are projected into phone, tablet, square, and desktop views at rest and during recoil to check framing and reticle clearance.
+Forty automated tests cover all nine tool actions, mouse/keyboard/touch gesture ownership, timed melee contact, buffered swings, moving targets, wrap reinflation, audio headroom, recording integrity, sample-rate handling, offline fallback, mute/motor cleanup, player movement, high-speed collisions, grabbing, blast falloff, and reset. The expansion checks actual rocket contact and deferred one-time detonation, missed-rocket cleanup, cannon mass and held-fire behavior, vacuum activation/cancellation, bounded suction and wall occlusion, the phone VFX budget, and alignment of world effects with the separate held-tool camera. Asset checks parse shipped GLBs for finite geometry, UVs, triangle budgets, real bowling-ball wells, embedded textures, and shared-resource disposal. Actual new-tool vertices are projected into phone, tablet, square, and desktop views at rest and during recoil to check framing and reticle clearance.
 
 The nine GLBs are re-imported and rendered in Blender to inspect exported materials and silhouettes. Desktop and phone swing poses, plus the new tools in desktop, portrait, and landscape, are rendered using matrices sampled from the actual game pose function. TypeScript checks the full project. Lint checks application, game, and test sources; the untouched generated component catalog has pre-existing lint failures and is outside that command.
 
-The [gameplay recording](https://raw.githubusercontent.com/finktheartist/bubble-wrap-simulator/main/docs/gameplay.mp4) uses the actual browser build, physics, UI, and game audio, with scripted camera direction and tool inputs. It shows the earlier model set. The Meshy replacements were also checked in the browser at desktop, portrait, and landscape sizes. Touch controls have automated coverage but have not yet been verified on a physical device.
+The [gameplay recording](https://raw.githubusercontent.com/finktheartist/bubble-wrap-simulator/main/docs/gameplay.mp4) uses the actual browser build, physics, UI, and game audio, with scripted camera direction and tool inputs. It shows the earlier model set and earlier audio. The Meshy replacements were also checked in the browser at desktop, portrait, and landscape sizes. Touch controls have automated coverage but have not yet been verified on a physical device.
 
 ## Architecture
 
@@ -122,9 +122,12 @@ The [gameplay recording](https://raw.githubusercontent.com/finktheartist/bubble-
 - `tools/blender/`: shared model review and library assembly, game-pose review, plus the original procedural modeling and export scripts.
 - `lib/game/touch.ts`: pointer ownership, stick dead zone and touch look scaling.
 - `components/game/touch-controls.tsx`: independent look and movement controls.
-- `lib/game/audio.ts`: procedural sound routing.
+- `lib/game/audio.ts`: recorded pop loading, sound routing, mixing, and voice cleanup.
 - `lib/game/tool-icons.ts`: menu portraits rendered from the live tool models.
-- `lib/game/pop-synthesis.ts`: pressure-release synthesis and voice scheduling.
+- `lib/game/pop-synthesis.ts`: offline fallback synthesis and bounded voice scheduling.
+- `lib/game/tool-synthesis.ts`: cached tool effects and the vacuum loop.
+- `public/audio/`: the local pop bank and its source credits.
+- `tools/audio/`: reproducible transient preparation, a local browser audition, and source hashes.
 - `lib/game/input.ts`: tool input with or without mouse capture.
 - `components/game/use-tool-button.tsx`: pointer and keyboard action button.
 
