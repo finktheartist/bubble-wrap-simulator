@@ -1,6 +1,6 @@
 {
-  "sha256": "1b1c1dd3f3ff32d4d21f7433beba6844f20df3550dad49088262197e30a7fd9d",
-  "bytes": 1106924,
+  "sha256": "b362c681cb1ca90cb3b193de3aee09f96507291dada309577c1eb1a094ffb737",
+  "bytes": 1076204,
   "sourceSha256": {
     "kenney-impact/Audio/impactSoft_heavy_000.ogg": "49e7ca88743fca974bb8676ea138b751cfd8f9033b5e7af8736c2a215d6edbc1",
     "kenney-impact/Audio/impactPunch_heavy_000.ogg": "b33a8f14068aec24ec69ba85e5e87fdc41228975f6a1a3e44a6e7d6fc3d9f8d8",
@@ -29,7 +29,8 @@
     "kenney-impact/Audio/impactMetal_light_001.ogg": "fba69c467ddd85da7b1d82e259f936b876d9ba6a3d6f1b24bdd10468e46bfe08",
     "fireworks/cannon_02.ogg": "716392af61b29dabe637c2616091207f390d25357aae3d4c625df5dfea7e961d",
     "fireworks/cannon_01.ogg": "e87ca0ee6b53da1f21cd9086cb75f456495871618fdfed63388bd2208a872596",
-    "vacuumcleaner01.wav": "d024cb3839fe14bbb9cb5291ad21ee4d35c3175b1a2b22ffea8ee3351879201a",
+    "@/lib/game/suction-synthesis.ts": "48352229e8c2a16e4d70fe52ffa79c95c81fc959afa5a8211afcbf4a056b5f50",
+    "@/tools/audio/render-suction.ts": "3fe1a7d65b4fe557824f41527315a5412b52c9e56a29ccc56f786c992dfb7197",
     "@/public/audio/bubble-pops.wav": "542fcbac79a7fa888e5e3d5d3b2cf3590aae3952870b68a4f51caa0d515461f4"
   },
   "recipes": [
@@ -1251,106 +1252,28 @@
     },
     {
       "kind": "vacuum-start",
-      "duration": 0.44,
-      "fadeIn": 0.12,
-      "fadeOut": 0.075,
-      "decayFrom": null,
-      "loop": false,
-      "rmsCeiling": null,
+      "duration": 0.32,
       "layers": [
         {
-          "source": "vacuumcleaner01.wav",
-          "start": 34,
-          "duration": 0.44,
-          "pitch": 1,
-          "lowpass": 1500,
-          "highpass": 75,
-          "level": 1,
-          "tempo": 1,
-          "ramp": [
-            0.65,
-            1
-          ],
-          "eq": [
-            "equalizer=f=360:t=q:w=5:g=-10",
-            "equalizer=f=740:t=q:w=2.5:g=-24",
-            "equalizer=f=1082:t=q:w=8:g=-18",
-            "equalizer=f=1800:t=q:w=4:g=-18",
-            "equalizer=f=2164:t=q:w=10:g=-12",
-            "equalizer=f=3246:t=q:w=7:g=-24",
-            "equalizer=f=6492:t=q:w=6:g=-24",
-            "lowpass=f=1500:p=2"
-          ],
-          "compression": false,
+          "source": "@/lib/game/suction-synthesis.ts",
+          "renderer": "@/tools/audio/render-suction.ts",
+          "seed": 68127,
+          "kind": "vacuum-start",
+          "sampleRate": 32000,
           "offset": 0
         }
       ]
     },
     {
       "kind": "vacuum",
-      "duration": 1.4,
-      "fadeIn": 0.001,
-      "fadeOut": 0.04,
-      "decayFrom": null,
-      "loop": true,
-      "rmsCeiling": null,
+      "duration": 1.31,
       "layers": [
         {
-          "source": "vacuumcleaner01.wav",
-          "start": 35,
-          "duration": 1.4,
-          "pitch": 1,
-          "lowpass": 1500,
-          "highpass": 75,
-          "level": 1,
-          "tempo": 1,
-          "ramp": null,
-          "eq": [
-            "equalizer=f=360:t=q:w=5:g=-10",
-            "equalizer=f=740:t=q:w=2.5:g=-24",
-            "equalizer=f=1082:t=q:w=8:g=-18",
-            "equalizer=f=1800:t=q:w=4:g=-18",
-            "equalizer=f=2164:t=q:w=10:g=-12",
-            "equalizer=f=3246:t=q:w=7:g=-24",
-            "equalizer=f=6492:t=q:w=6:g=-24",
-            "lowpass=f=1500:p=2"
-          ],
-          "compression": false,
-          "offset": 0
-        }
-      ]
-    },
-    {
-      "kind": "vacuum-stop",
-      "duration": 0.32,
-      "fadeIn": 0.012,
-      "fadeOut": 0.28,
-      "decayFrom": 0.025,
-      "loop": false,
-      "rmsCeiling": 0.12,
-      "layers": [
-        {
-          "source": "vacuumcleaner01.wav",
-          "start": 35.4,
-          "duration": 0.32,
-          "pitch": 1,
-          "lowpass": 800,
-          "highpass": 75,
-          "level": 1,
-          "tempo": 1,
-          "ramp": null,
-          "eq": [
-            "equalizer=f=360:t=q:w=5:g=-10",
-            "equalizer=f=740:t=q:w=2.5:g=-24",
-            "equalizer=f=1082:t=q:w=8:g=-18",
-            "equalizer=f=1800:t=q:w=4:g=-18",
-            "equalizer=f=2164:t=q:w=10:g=-12",
-            "equalizer=f=3246:t=q:w=7:g=-24",
-            "equalizer=f=6492:t=q:w=6:g=-24",
-            "lowpass=f=1500:p=2",
-            "lowpass=f=800:p=2"
-          ],
-          "compression": false,
+          "source": "@/lib/game/suction-synthesis.ts",
+          "renderer": "@/tools/audio/render-suction.ts",
+          "seed": 68127,
+          "kind": "vacuum",
+          "sampleRate": 32000,
           "offset": 0
         }
       ]
@@ -1590,9 +1513,9 @@
       ]
     }
   ],
-  "url": "/audio/item-sounds.wav",
+  "url": "/audio/item-sounds.wav?v=b362c681cb1c",
   "sampleRate": 32000,
-  "frames": 553440,
+  "frames": 538080,
   "clips": [
     {
       "kind": "mallet-hit",
@@ -1813,54 +1736,48 @@
     {
       "kind": "vacuum-start",
       "offsetFrames": 466720,
-      "lengthFrames": 14080,
-      "peakSeconds": 0.15
+      "lengthFrames": 10240,
+      "peakSeconds": 0
     },
     {
       "kind": "vacuum",
-      "offsetFrames": 480800,
-      "lengthFrames": 43200,
-      "peakSeconds": 0.655
-    },
-    {
-      "kind": "vacuum-stop",
-      "offsetFrames": 524000,
-      "lengthFrames": 10240,
-      "peakSeconds": 0.02
+      "offsetFrames": 476960,
+      "lengthFrames": 41920,
+      "peakSeconds": 0
     },
     {
       "kind": "big-pop",
-      "offsetFrames": 534240,
+      "offsetFrames": 518880,
       "lengthFrames": 3200,
       "peakSeconds": 0.005
     },
     {
       "kind": "big-pop",
-      "offsetFrames": 537440,
+      "offsetFrames": 522080,
       "lengthFrames": 3200,
       "peakSeconds": 0.005
     },
     {
       "kind": "big-pop",
-      "offsetFrames": 540640,
+      "offsetFrames": 525280,
       "lengthFrames": 3200,
       "peakSeconds": 0.005
     },
     {
       "kind": "big-pop",
-      "offsetFrames": 543840,
+      "offsetFrames": 528480,
       "lengthFrames": 3200,
       "peakSeconds": 0.005
     },
     {
       "kind": "big-pop",
-      "offsetFrames": 547040,
+      "offsetFrames": 531680,
       "lengthFrames": 3200,
       "peakSeconds": 0.005
     },
     {
       "kind": "big-pop",
-      "offsetFrames": 550240,
+      "offsetFrames": 534880,
       "lengthFrames": 3200,
       "peakSeconds": 0.005
     }

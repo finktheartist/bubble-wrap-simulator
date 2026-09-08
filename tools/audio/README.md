@@ -36,7 +36,7 @@ correctness; listening remains the quality check for sound direction.
 
 ## Item Foley
 
-The item bank contains 45 clips for 18 sound types in a 1.11 MB WAV. Download these public CC0 sources
+The item bank contains 44 clips for 17 sound types in a 1.08 MB WAV. Download these public CC0 sources
 into a local source directory (the large originals are not deployed):
 
 | Local path | Download |
@@ -46,7 +46,6 @@ into a local source directory (the large originals are not deployed):
 | `firearms/Prepared SFX Library/1911/A_42P.wav`, `A_34P.wav` | Extract these two files from [The Free Firearm Sound Library](https://opengameart.org/node/21826) into `firearms/` |
 | `fireworks/fw_04.ogg`, `cannon_01.ogg`, `cannon_02.ogg` | Extract [25 CC0 Bang / Firework SFX](https://opengameart.org/content/25-cc0-bang-firework-sfx) into `fireworks/` |
 | `cannon-fire.ogg` | Save `cannon_fire_0.ogg` from [Cannon Fire](https://opengameart.org/content/cannon-fire) under this local name |
-| `vacuumcleaner01.wav` | Download this file from [General Household Sound Effects](https://opengameart.org/content/general-household-sound-effects) |
 
 ```sh
 python3 tools/audio/prepare-items.py /path/to/sources
@@ -64,17 +63,18 @@ the initial microphone spike. Rapid pistol shots fade the preceding tail so it d
 not build into a muddy wash. Rocket and cannon cues use recorded blast/exhaust
 sources. Strong contacts (strength 1.6 or greater) select larger, layered plastic
 snaps; ordinary finger and suction pops keep the original small bank. The vacuum
-suppresses motor harmonics and rolls off above 1.5 kHz. The startup retains a
-pitch ramp; shutdown uses a short unpitched air release rolled off at 800 Hz.
-Its level falls throughout the tail, avoiding the descending note and late swell
-that remained after the first high-frequency correction.
+uses original air noise from `lib/game/suction-synthesis.ts`, with no motor
+recording, tonal oscillator, or pitch sweep. Release fades the same source over
+100 ms; it never starts a shutdown cue. This generator also replaces the offline
+motor fallback. `prepare-items.py` invokes `node --import tsx` to render the two
+suction clips, so install the project dependencies before rebuilding the bank.
+The atlas URL includes its content hash to prevent a stale cached sound bank.
 
 The pop and item banks load independently and have immediate synthesized
 fallbacks. Contact sounds depend on the material and impact speed. Swing peaks
 follow the visual contact time. Tool voices are capped separately so they cannot
 starve the bubble pops. The vacuum starts once while held and cancels its queued
-loop on release; short taps fade the startup instead of jumping to a full-speed
-shutdown. Pause, mute, reset, and disposal cancel pending audio.
+loop on release; all releases fade the existing air without an extra sound. Pause, mute, reset, and disposal cancel pending audio.
 
 With the local review server running, open `http://127.0.0.1:4180/items.html`.
 **Record fresh demo silently** captures the actual game mixer and all tool actions
@@ -99,13 +99,10 @@ ffmpeg -i outputs/audio-weight-pass/comparison.webm -c:a libmp3lame -b:a 192k ou
 ffmpeg -i outputs/audio-weight-pass/comparison.webm -ss 15 -c:a libmp3lame -b:a 192k outputs/audio-weight-pass/revised-demo.mp3
 ```
 
-For the isolated vacuum ending, open `http://127.0.0.1:4180/vacuum.html`.
-The comparison includes a long hold/release and two short taps: the previous
-version from `d092b3f` occupies the first six seconds and the revision the last six.
-**Record vacuum comparison silently** writes `outputs/vacuum-tail/comparison.webm`.
-The preview players use these unnormalized exports:
-
-```sh
-ffmpeg -i outputs/vacuum-tail/comparison.webm -c:a libmp3lame -b:a 192k outputs/vacuum-tail/comparison.mp3
-ffmpeg -i outputs/vacuum-tail/comparison.webm -ss 6 -c:a libmp3lame -b:a 192k outputs/vacuum-tail/revised.mp3
-```
+For the replacement vacuum, open `http://127.0.0.1:4180/vacuum.html`.
+This page contains only the new suction sound. Expand **Recording tools**, then
+choose **Record new suction silently**. An AudioWorklet captures the actual game
+mixer directly into an uncompressed PCM WAV, avoiding Opus/MP3 encoding artifacts.
+The six-second capture includes a long hold/release and two short taps, and saves
+as `outputs/vacuum-replacement/new-suction-only.wav`. The server disables caching
+for this preview. No prior vacuum sound is mixed into it.

@@ -1,15 +1,16 @@
 import { synthesizePop } from './pop-synthesis';
+import { synthesizeSuction, type SuctionSound } from './suction-synthesis';
 
-export const TOOL_SOUNDS = ['mallet-hit', 'bat-hit', 'ball-hit', 'parcel-hit', 'pellet-hit', 'pistol', 'launcher', 'cannon', 'swish', 'heavy-swish', 'throw', 'bomb-arm', 'bomb-blast', 'rocket-blast', 'vacuum-start', 'vacuum', 'vacuum-stop', 'big-pop'] as const;
+export const TOOL_SOUNDS = ['mallet-hit', 'bat-hit', 'ball-hit', 'parcel-hit', 'pellet-hit', 'pistol', 'launcher', 'cannon', 'swish', 'heavy-swish', 'throw', 'bomb-arm', 'bomb-blast', 'rocket-blast', 'vacuum-start', 'vacuum', 'big-pop'] as const;
 export type ToolSound = typeof TOOL_SOUNDS[number];
 
 /** Cached offline fallback; the recorded atlas replaces these as soon as it loads. */
 export function synthesizeTool(sampleRate: number, kind: ToolSound, random = Math.random): Float32Array {
   if (kind === 'big-pop') return synthesizePop(sampleRate, 12, random);
+  if (kind.startsWith('vacuum')) return synthesizeSuction(sampleRate, kind as SuctionSound, random);
   const explosion = kind === 'bomb-blast' || kind === 'rocket-blast';
   const impact = kind.endsWith('-hit') || kind === 'bomb-arm';
-  const motor = kind.startsWith('vacuum');
-  const duration = kind === 'vacuum' ? 1 : motor ? .25 : explosion ? .42 : kind === 'launcher' ? .3 : kind === 'cannon' ? .2 : impact ? .085 : kind === 'pistol' ? .11 : kind === 'heavy-swish' ? .18 : .14;
+  const duration = explosion ? .42 : kind === 'launcher' ? .3 : kind === 'cannon' ? .2 : impact ? .085 : kind === 'pistol' ? .11 : kind === 'heavy-swish' ? .18 : .14;
   const result = new Float32Array(Math.ceil(sampleRate * duration));
   let low = 0, mid = 0, phase = 0;
   for (let i = 0; i < result.length; i++) {
@@ -17,13 +18,7 @@ export function synthesizeTool(sampleRate: number, kind: ToolSound, random = Mat
     low += (1 - Math.exp(-2 * Math.PI * 380 / sampleRate)) * (noise - low);
     mid += (1 - Math.exp(-2 * Math.PI * 2900 / sampleRate)) * (noise - mid);
     let value: number;
-    if (motor) {
-      // Whole-number cycles make a seamless, restrained electric motor bed.
-      value = (Math.sin(2 * Math.PI * 112 * t) * .15 + Math.sin(2 * Math.PI * 224 * t) * .07
-        + Math.sin(2 * Math.PI * 448 * t) * .025) * (1 + .05 * Math.sin(2 * Math.PI * 7 * t));
-      value += (mid - low) * .12 * Math.sin(Math.PI * u) ** 2;
-      if (kind !== 'vacuum') value *= Math.sin(Math.PI * u) ** 2;
-    } else if (kind === 'swish' || kind === 'heavy-swish' || kind === 'throw') {
+    if (kind === 'swish' || kind === 'heavy-swish' || kind === 'throw') {
       value = (mid - low * .85) * Math.sin(Math.PI * u) ** 2 * .45;
     } else {
       const big = explosion || kind === 'cannon', launch = kind === 'launcher';

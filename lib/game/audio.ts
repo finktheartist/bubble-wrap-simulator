@@ -47,7 +47,6 @@ export class PopAudio {
   private active = new Set<Voice>();
   private motorVoices: Voice[] = [];
   private motorRunning = false;
-  private motorStartedAt = 0;
   private lastCue = new Map<ToolSound, number>();
   private previousTool = new Map<ToolSound, number>();
   private previousPop = -1;
@@ -193,11 +192,8 @@ export class PopAudio {
   vacuum(active: boolean) {
     const ctx = this.context;
     if (!active || this.muted) {
-      const running = this.motorRunning;
-      for (const voice of this.motorVoices) this.release(voice, .12);
+      for (const voice of this.motorVoices) this.release(voice, .1);
       this.motorVoices = []; this.motorRunning = false;
-      const held = ctx ? ctx.currentTime - this.motorStartedAt : 0;
-      if (running && !this.muted && held >= .14) this.cue('vacuum-stop', .16 * Math.min(1, held / .36), .1);
       return;
     }
     if (!ctx || ctx.state !== 'running' || this.motorRunning) return;
@@ -205,7 +201,7 @@ export class PopAudio {
     const a = this.play(start.buffer, ctx.currentTime, .23, .1);
     const b = this.play(loop.buffer, ctx.currentTime + Math.max(0, start.buffer.duration - .075), .18, .1, 1, true);
     if (!b) { if (a) this.release(a); return; }
-    this.motorVoices = a ? [a, b] : [b]; this.motorRunning = true; this.motorStartedAt = ctx.currentTime;
+    this.motorVoices = a ? [a, b] : [b]; this.motorRunning = true;
   }
   private release(voice: Voice, fade = .045) {
     const ctx = this.context;

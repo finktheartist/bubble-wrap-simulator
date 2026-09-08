@@ -1,26 +1,40 @@
-<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bubble Wrap · Vacuum Review</title>
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bubble Wrap · New Suction Sound</title>
 <style>body{font:17px/1.6 system-ui;background:#112322;color:#eef7ef;max-width:680px;margin:40px auto;padding:24px}h1{font-size:38px;line-height:1.15}button{font:inherit;padding:12px 18px;margin:6px 6px 6px 0;border:0;border-radius:12px;background:#d9ff88;color:#15312e;cursor:pointer}button:disabled{opacity:.4}audio{display:block;width:100%;margin:12px 0 28px}a{color:#d9ff88}small{color:#a9c5bd}#status{min-height:28px}</style>
-<small>BUBBLE WRAP · VACUUM SOUND CHECK</small><h1>A softer finish.</h1><p>The descending motor note is replaced with a short airflow release. This clip isolates the vacuum so the ending is easy to hear.</p>
-<p><b>Revised vacuum</b> · hold, release, then quick taps</p><audio controls src="/vacuum-revised.mp3"></audio>
-<p><b>Before and after</b> · previous first; revised starts at 6 seconds</p><audio id="comparison" controls src="/vacuum-comparison.mp3"></audio>
-<button id="try">Try revised vacuum</button><button id="stop">Stop</button><p id="status" role="status">The vacuum releases after 2.5 seconds.</p><button id="record">Record vacuum comparison silently</button><p><a href="/weight.html">All revised sounds →</a> · <a href="http://127.0.0.1:4173">Play locally →</a></p>
+<small>VACUUM REPLACEMENT · NEW SUCTION SOUND</small><h1>Soft suction.</h1><p>The entire vacuum sound has been replaced with a low rush of air. Releasing the button fades the same sound to silence.</p>
+<p><b>New vacuum only</b> · hold, release, then two quick taps</p><audio id="player" controls src="/new-suction-only.wav?v=suction-1"></audio>
+<button id="try">Try new suction sound</button><button id="stop">Stop</button><p id="status" role="status">This page plays only the new sound.</p>
+<details><summary>Recording tools</summary><p><button id="record">Record new suction silently</button></p><small>Captures the actual game mixer as an uncompressed WAV.</small></details>
+<p><a href="http://127.0.0.1:4173">Play the local game →</a></p>
 <script type="module">
 import { PopAudio } from '@game/audio';
-import { PopAudio as PreviousAudio } from '@itemsBefore/audio';
-const current=new PopAudio(),previous=new PreviousAudio(),status=document.querySelector('#status'),record=document.querySelector('#record');
-let timers=[],recorder;
+const current=new PopAudio(),status=document.querySelector('#status'),record=document.querySelector('#record');
+let timers=[],capturing=false,finish;
 const later=(t,fn)=>timers.push(setTimeout(fn,t*1000));
-function stop(){timers.forEach(clearTimeout);timers=[];current.stop();previous.stop();for(const player of document.querySelectorAll('audio'))player.pause();if(recorder?.state==='recording')recorder.stop();status.textContent='Stopped.';}
-function pattern(a,offset=0){for(const [at,held] of [[.3,2.5],[3.6,.09],[4.3,.24]]){later(offset+at,()=>a.vacuum(true));later(offset+at+held,()=>a.vacuum(false));}}
-document.querySelector('#try').onclick=async()=>{if(record.disabled)return;stop();await current.start();pattern(current);status.textContent='Revised vacuum · hold and release, then two short taps.';};
+function stop(){timers.forEach(clearTimeout);timers=[];current.stop();document.querySelector('#player').pause();if(capturing)finish?.();status.textContent='Stopped.';}
+function pattern(){for(const [at,held] of [[.3,2.5],[3.6,.09],[4.3,.24]]){later(at,()=>current.vacuum(true));later(at+held,()=>current.vacuum(false));}}
+document.querySelector('#try').onclick=async()=>{if(capturing)return;stop();await current.start();pattern();status.textContent='New suction · hold, release, then two short taps.';};
 document.querySelector('#stop').onclick=stop;
+function wav(chunks,rate){
+ const frames=chunks.reduce((n,channels)=>n+channels[0].length,0),bytes=new ArrayBuffer(44+frames*4),view=new DataView(bytes);
+ const text=(at,value)=>{for(let i=0;i<value.length;i++)view.setUint8(at+i,value.charCodeAt(i));};
+ text(0,'RIFF');view.setUint32(4,36+frames*4,true);text(8,'WAVE');text(12,'fmt ');view.setUint32(16,16,true);view.setUint16(20,1,true);view.setUint16(22,2,true);view.setUint32(24,rate,true);view.setUint32(28,rate*4,true);view.setUint16(32,4,true);view.setUint16(34,16,true);text(36,'data');view.setUint32(40,frames*4,true);
+ let offset=44;for(const channels of chunks)for(let i=0;i<channels[0].length;i++)for(let c=0;c<2;c++){view.setInt16(offset,Math.round(Math.max(-1,Math.min(1,channels[c][i]))*32767),true);offset+=2;}
+ return new Blob([bytes],{type:'audio/wav'});
+}
 record.onclick=async()=>{
- stop();record.disabled=true;status.textContent='Loading both versions…';await Promise.all([current.start(),previous.start()]);
- const context=new AudioContext(),destination=context.createMediaStreamDestination();await context.resume();
- const taps=[previous,current].map(a=>{const tap=a.context.createMediaStreamDestination();a.master.disconnect(a.context.destination);a.master.connect(tap);const source=context.createMediaStreamSource(tap.stream);source.connect(destination);return {a,tap,source};});
- const chunks=[];recorder=new MediaRecorder(destination.stream,{mimeType:'audio/webm;codecs=opus',audioBitsPerSecond:192000});recorder.ondataavailable=e=>{if(e.data.size)chunks.push(e.data);};
- recorder.onstop=async()=>{current.stop();previous.stop();const blob=new Blob(chunks,{type:'audio/webm'});document.querySelector('#comparison').src=URL.createObjectURL(blob);const response=await fetch('/vacuum-capture',{method:'POST',body:blob});for(const {a,tap,source} of taps){source.disconnect();a.master.disconnect(tap);a.master.connect(a.context.destination);tap.stream.getTracks().forEach(t=>t.stop());}await context.close();record.disabled=false;status.textContent=response.ok?'Saved. Revised vacuum starts at 6 seconds.':'Could not save recording.';};
- recorder.start();pattern(previous);pattern(current,6);status.textContent='Recording silently…';later(12,()=>recorder.stop());
+ stop();capturing=true;record.disabled=true;status.textContent='Loading the new sound…';await current.start();
+ const context=new AudioContext();await context.audioWorklet.addModule('/record-pcm.js');
+ const capture=new AudioWorkletNode(context,'record-pcm'),tap=current.context.createMediaStreamDestination();
+ current.master.disconnect(current.context.destination);current.master.connect(tap);
+ const source=context.createMediaStreamSource(tap.stream);source.connect(capture);capture.connect(context.destination);
+ const chunks=[];finish=()=>capture.port.postMessage('finish');
+ capture.port.onmessage=async event=>{
+  if(event.data.channels){chunks.push(event.data.channels);return;}
+  if(!event.data.done)return;
+  current.stop();const blob=wav(chunks,context.sampleRate);document.querySelector('#player').src=URL.createObjectURL(blob);
+  const response=await fetch('/suction-capture',{method:'POST',body:blob});source.disconnect();capture.disconnect();current.master.disconnect(tap);current.master.connect(current.context.destination);tap.stream.getTracks().forEach(t=>t.stop());await context.close();capturing=false;record.disabled=false;finish=null;status.textContent=response.ok?'New uncompressed suction preview saved.':'Could not save recording.';
+ };
+ await context.resume();status.textContent='Recording the new sound silently…';pattern();later(6,finish);
 };
-window.addEventListener('pagehide',()=>{stop();current.dispose();previous.dispose();});
+window.addEventListener('pagehide',()=>{stop();current.dispose();});
 </script></html>

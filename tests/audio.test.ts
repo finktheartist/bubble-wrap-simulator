@@ -112,8 +112,12 @@ await test('tool cues have finite samples, bounded peaks and a seamless motor lo
   for (const rate of [44100, 48000]) for (const kind of TOOL_SOUNDS) {
     const sound = synthesizeTool(rate, kind, random());
     assert.ok(sound.every(Number.isFinite)); assert.ok(Math.max(...sound.map(Math.abs)) < 1);
-    assert.ok(rms(sound) > .005); assert.ok(Math.abs(sound[0]) < .0001);
-    assert.ok(Math.abs(sound.at(-1)!) < (kind === 'vacuum' ? .01 : .001));
+    assert.ok(rms(sound) > .005);
+    if (kind === 'vacuum') {
+      let step = 0;
+      for (let i = 1; i < sound.length; i++) step = Math.max(step, Math.abs(sound[i] - sound[i - 1]));
+      assert.ok(Math.abs(sound[0] - sound.at(-1)!) <= step, 'fallback airflow has no seam click');
+    } else { assert.ok(Math.abs(sound[0]) < .0001); assert.ok(Math.abs(sound.at(-1)!) < .001); }
   }
 });
 
@@ -166,6 +170,7 @@ await test('a failed sample download preserves usable fallback sounds and does n
 
 await test('the item bank covers every action with sourced, bounded samples and a continuous motor seam', () => {
   assert.equal(createHash('sha256').update(itemBytes).digest('hex'), itemManifest.sha256);
+  assert.equal(new URL(TOOL_ATLAS.url, 'https://game.invalid').searchParams.get('v'), itemManifest.sha256.slice(0, 12), 'new sound bytes use a fresh cache key');
   assert.ok(itemBytes.length < 1200000, 'all item Foley stays below 1.2 MB on mobile');
   assert.deepEqual(new Set(TOOL_ATLAS.clips.map(c => c.kind)), new Set(TOOL_SOUNDS));
   assert.equal(itemBytes.readUInt32LE(24), TOOL_ATLAS.sampleRate);
@@ -193,7 +198,7 @@ await test('the item bank covers every action with sourced, bounded samples and 
   for (const recipe of itemManifest.recipes) for (const layer of recipe.layers) assert.match(itemManifest.sourceSha256[layer.source], /^[a-f\d]{64}$/);
 });
 
-await test('the recorded vacuum does not concentrate energy in its piercing motor harmonics', () => {
+await test('the suction bank does not concentrate energy in upper motor harmonics', () => {
   const clip = TOOL_ATLAS.clips.find(c => c.kind === 'vacuum')!;
   const length = 8192, rate = TOOL_ATLAS.sampleRate;
   const samples = Float32Array.from({length}, (_, i) => itemBytes.readInt16LE(44 + (clip.offsetFrames + i) * 2) / 32768);
@@ -201,19 +206,31 @@ await test('the recorded vacuum does not concentrate energy in its piercing moto
   assert.ok(spectralFraction(samples, rate, 6200, 6800) < .002, '6.5 kHz harmonic remains below 0.2% of energy');
 });
 
-await test('the vacuum release stays dark throughout its tail and fades without a late swell', () => {
-  const clip = TOOL_ATLAS.clips.find(c => c.kind === 'vacuum-stop')!, rate = TOOL_ATLAS.sampleRate;
-  const samples = Float32Array.from({length:clip.lengthFrames}, (_, i) => itemBytes.readInt16LE(44 + (clip.offsetFrames + i) * 2) / 32768);
-  for (let start = 0; start + 2048 <= samples.length; start += 1024) {
-    assert.ok(spectralFraction(samples.subarray(start, start + 2048), rate, 900, rate / 2) < .015,
-      'no short section brings back an upper motor whistle');
+await test('releasing suction fades the existing air and never starts a shutdown sound, online or offline', async t => {
+  const prior = Object.getOwnPropertyDescriptor(globalThis, 'AudioContext');
+  Object.defineProperty(globalThis, 'AudioContext', { value: AudioContextStub, configurable: true });
+  t.after(() => { if (prior) Object.defineProperty(globalThis, 'AudioContext', prior); else Reflect.deleteProperty(globalThis, 'AudioContext'); });
+  for (const online of [true, false]) {
+    t.mock.method(globalThis, 'fetch', async (url: string) => { if (!online) throw new Error('offline'); return new Response(url === POP_ATLAS.url ? bytes : itemBytes); });
+    const audio = new PopAudio(); await audio.start(); const ctx = audio.context as unknown as AudioContextStub;
+    for (const held of [.05, .24, 2.5]) {
+      audio.vacuum(true); const count = ctx.sources.length, voices = ctx.sources.slice(-2);
+      ctx.currentTime += held; audio.vacuum(false);
+      assert.equal(ctx.sources.length, count, 'release never adds a new note');
+      voices.forEach(voice => assert.ok(voice.stops[0] <= ctx.currentTime + .101, 'air stops within the short fade'));
+      voices.forEach(voice => voice.finish());ctx.currentTime += .2;
+    }
+    audio.dispose();t.mock.restoreAll();
   }
-  const step = Math.round(.05 * rate);
-  for (let start = Math.round(.075 * rate); start + 2 * step <= samples.length; start += step) {
-    assert.ok(rms(samples, start + step, start + 2 * step) < rms(samples, start, start + step), 'release keeps getting quieter');
+});
+
+await test('the offline suction sounds remain softly filtered at both browser rates', () => {
+  for (const rate of [44100, 48000]) for (const kind of ['vacuum', 'vacuum-start'] as const) {
+    const samples = synthesizeTool(rate, kind, random());
+    for (let start = 0; start + 4096 <= samples.length; start += 4096) {
+      assert.ok(spectralFraction(samples.subarray(start, start + 4096), rate, 1000, rate / 2) < .015);
+    }
   }
-  assert.ok(rms(samples, 0, Math.round(.08 * rate)) > .02, 'the air release remains audible');
-  assert.ok(rms(samples, samples.length - Math.round(.08 * rate)) < .004, 'no note hangs at the end');
 });
 
 await test('heavy hits use fuller pops while finger and vacuum hits retain the small recorded snaps', async t => {
