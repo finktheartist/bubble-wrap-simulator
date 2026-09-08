@@ -1,0 +1,195 @@
+{
+  "pop-blaster": {
+    "stage": "refine",
+    "rotation_degrees": [
+      0,
+      0,
+      -90
+    ],
+    "length_axis": 1,
+    "length": 0.52,
+    "muzzle_axis": 0,
+    "muzzle_end": "min",
+    "muzzle_band": 0.008,
+    "target_anchor": [
+      0,
+      0.405,
+      0.062
+    ],
+    "roughness_floor": 0.12,
+    "metallic_scale": 0.9,
+    "normal_strength": 0.65,
+    "rubber_grip": {
+      "max_forward": 0.09,
+      "max_height": -0.1
+    }
+  },
+  "rocket-launcher": {
+    "stage": "refine",
+    "rotation_degrees": [
+      0,
+      0,
+      -90
+    ],
+    "length_axis": 1,
+    "length": 1.02,
+    "muzzle_axis": 0,
+    "muzzle_end": "min",
+    "muzzle_band": 0.008,
+    "target_anchor": [
+      0,
+      0.635,
+      0.11
+    ],
+    "roughness_floor": 0.15,
+    "metallic_scale": 0.9,
+    "normal_strength": 0.6
+  },
+  "bowling-ball": {
+    "stage": "retexture",
+    "rotation_degrees": [
+      0,
+      0,
+      0
+    ],
+    "length_axis": 0,
+    "length": 0.56,
+    "source_anchor": [
+      0,
+      0,
+      0
+    ],
+    "target_anchor": [
+      0,
+      0,
+      0
+    ],
+    "roughness_floor": 0,
+    "metallic_scale": 0,
+    "normal_strength": 0,
+    "hole_inserts": true,
+    "insert_radius": 0.049,
+    "geometry_source": "outputs/meshy/input/bowling-ball.glb"
+  },
+  "pop-bomb": {
+    "stage": "retexture",
+    "rotation_degrees": [
+      0,
+      0,
+      0
+    ],
+    "length_axis": 2,
+    "length": 0.5285,
+    "source_anchor": [
+      0,
+      0,
+      0
+    ],
+    "target_anchor": [
+      0,
+      0,
+      0.07425
+    ],
+    "roughness_floor": 0.1,
+    "metallic_scale": 0.9,
+    "normal_strength": 0.5
+  },
+  "fingertip": {
+    "stage": "refine",
+    "trim_min_z": -0.16,
+    "rotation_degrees": [
+      0,
+      0,
+      -45
+    ],
+    "length_axis": 2,
+    "length": 0.421594,
+    "target_anchor": [
+      -0.016353,
+      0.018988,
+      -0.018203
+    ],
+    "roughness_floor": 0.25,
+    "metallic_scale": 0,
+    "normal_strength": 0.55
+  },
+  "bat": {
+    "stage": "refine",
+    "align_long_axis": true,
+    "rotation_degrees": [
+      0,
+      0,
+      0
+    ],
+    "length_axis": 2,
+    "length": 0.961913,
+    "target_anchor": [
+      0,
+      0,
+      0.0009565
+    ],
+    "roughness_floor": 0.12,
+    "metallic_scale": 0,
+    "normal_strength": 0.5
+  },
+  "pop-vacuum": {
+    "stage": "refine",
+    "rotation_degrees": [
+      0,
+      0,
+      180
+    ],
+    "length_axis": 1,
+    "length": 1.05,
+    "muzzle_axis": 1,
+    "muzzle_end": "min",
+    "muzzle_band": 0.008,
+    "target_anchor": [
+      0,
+      0.73,
+      -0.015
+    ],
+    "roughness_floor": 0.15,
+    "metallic_scale": 0.9,
+    "normal_strength": 0.65
+  },
+  "mallet": {
+    "stage": "refine",
+    "rotation_degrees": [
+      0,
+      0,
+      0
+    ],
+    "length_axis": 2,
+    "length": 0.651,
+    "target_anchor": [
+      0,
+      0,
+      -0.0395
+    ],
+    "roughness_floor": 0.15,
+    "metallic_scale": 0.8,
+    "normal_strength": 0.55
+  },
+  "ball-cannon": {
+    "stage": "refine",
+    "rotation_degrees": [
+      0,
+      0,
+      -90
+    ],
+    "length_axis": 1,
+    "length": 0.943,
+    "muzzle_axis": 0,
+    "muzzle_end": "min",
+    "muzzle_band": 0.008,
+    "target_anchor": [
+      0,
+      0.53,
+      0.085
+    ],
+    "roughness_floor": 0.15,
+    "metallic_scale": 0.85,
+    "normal_strength": 0.25
+  }
+}

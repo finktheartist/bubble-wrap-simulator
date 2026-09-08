@@ -8,7 +8,7 @@ A first person Three.js playground built around the extremely reasonable desire 
 
 Nine tools. Three moving targets. A room with more than 43,000 bubbles. Built with React, Three.js, Rapier physics, Blender models, and synthesized Web Audio. Plays on desktop, phones, and tablets.
 
-Seven tools now use Tripo-generated meshes, finished and fitted in Blender. The existing bowling ball and bomb remain because their shapes work better for the game's physics. The [model contact sheet](docs/tripo-toolkit.png) shows the current set; the gameplay video predates this model upgrade.
+All nine tools now use Meshy materials. Seven have new Meshy 7 geometry; the bowling ball and bomb use Meshy retextures of the original Blender props. Every model is fitted and finished in Blender. The [model contact sheet](docs/meshy-toolkit.png) shows the current set; the gameplay video predates this upgrade.
 
 ## Play
 
@@ -85,7 +85,7 @@ Bubble spacing is 0.26 world units throughout the room and 0.22 on loose parcels
 - Hammer and bat attacks pivot around the grip, with distinct wind-up, strike, follow-through, and recovery poses. A short tap commits the whole swing; hits land at the visible contact time, and a rapid follow-up tap can buffer one swing. A brief trail follows the actual tool tip, with a soft movement sound and reticle feedback on contact.
 - Three bubble targets move on kinematic paths, keeping their rendered wrap and collision bodies synchronized. Popping twelve bubbles scores a target hit; the target reinflates after 3.2 seconds. Air ripples, film flecks, shot streaks, muzzle flashes, and target bursts use bounded pools; phones allow at most 180 effect fragments.
 - Web Audio synthesizes rounded pressure pops with a short, warm membrane body and a softly filtered air transient. There are no crinkle tails, distortion, or added room echoes. Twenty-four variants and stereo placement provide variation; dense impacts resolve into distinct pops spaced 20–28 ms apart. Conservative voice gain, a short queue, filtered treble, and a gentle limiter prevent harsh stacking. Impact thumps are quieter and rate-limited. No audio assets or external services are needed during play.
-- Nine self-contained GLBs supply the held tools: a suede glove, rubber mallet, maple bat, drilled resin bowling ball, teal sidearm with a dark polymer grip, enamel bomb, hollow teal rocket launcher, red bowling cannon with a pressure gauge, and yellow vacuum with an open nozzle. Seven meshes were generated with Tripo v3.1, reviewed from four directions, and fitted and finished in Blender; the original ball and bomb retain their established shapes. New assets embed 1024 px color and 512 px normal/material maps with restrained PBR finishes. The complete set is 9.73 MB; meshes and textures are shared by held tools, portraits, and thrown instances. Tripo is used only during authoring: play requires no API key or external asset service. Small finned rockets use a separate lightweight flight mesh with owned, deduplicated GPU resources.
+- Nine self-contained GLBs supply the held tools: a suede glove, rubber mallet, maple bat, drilled resin bowling ball, teal sidearm with a dark polymer grip, enamel bomb, hollow teal rocket launcher, red bowling cannon with a pressure gauge, and yellow vacuum with an open nozzle. Seven meshes were generated with Meshy 7 Ultra and reviewed before texturing. The ball and bomb were retextured from their Blender sources; the ball uses its exact original drilled mesh under the new marble finish. All nine were fitted in Blender, with 1024 px color and 512 px normal/material maps. The complete set is 13.99 MB; meshes and textures are shared by held tools, portraits, and thrown instances. Meshy is used only during authoring: play requires no API key or external asset service. Small finned rockets use a separate lightweight flight mesh with owned, deduplicated GPU resources.
 - Mobile rendering uses 10-segment bubble pockets without changing cell counts, 1× balanced pixel density, a 45% transmission buffer, and at most 24 projectiles. Paused scenes redraw at 10 Hz; hidden tabs skip rendering.
 - Menu icons are transparent portraits rendered once from the same Three.js models and materials used by the held tools. Shapes, colors, grips, and bowling-ball finger holes match the items in the arena.
 - GPU instancing, bounded projectiles, bounded particles, and a balanced render setting keep the room practical for a browser.
@@ -98,7 +98,7 @@ Thirty-five automated tests cover all nine tool actions, mouse/keyboard/touch ge
 
 The nine GLBs are re-imported and rendered in Blender to inspect exported materials and silhouettes. Desktop and phone swing poses, plus the new tools in desktop, portrait, and landscape, are rendered using matrices sampled from the actual game pose function. TypeScript checks the full project. Lint checks application, game, and test sources; the untouched generated component catalog has pre-existing lint failures and is outside that command.
 
-The [gameplay recording](https://raw.githubusercontent.com/finktheartist/bubble-wrap-simulator/main/docs/gameplay.mp4) uses the actual browser build, physics, UI, and game audio, with scripted camera direction and tool inputs. It shows the earlier model set. The Tripo replacements were also checked in the browser at desktop, portrait, and landscape sizes. Touch controls have automated coverage but have not yet been verified on a physical device.
+The [gameplay recording](https://raw.githubusercontent.com/finktheartist/bubble-wrap-simulator/main/docs/gameplay.mp4) uses the actual browser build, physics, UI, and game audio, with scripted camera direction and tool inputs. It shows the earlier model set. The Meshy replacements were also checked in the browser at desktop, portrait, and landscape sizes. Touch controls have automated coverage but have not yet been verified on a physical device.
 
 ## Architecture
 
@@ -115,10 +115,11 @@ The [gameplay recording](https://raw.githubusercontent.com/finktheartist/bubble-
 - `lib/game/tool-info.ts`: shared lightweight catalog, action labels, and keyboard shortcuts.
 - `lib/game/projectiles.ts`: finned rocket flight model.
 - `public/models/`: nine self-contained GLBs and their asset budget manifest.
-- `art/tripo-tool-library.blend`: current editable nine-tool library and product studio; see [asset workflow](art/README.md).
+- `art/meshy-tool-library.blend`: current editable nine-tool library and product studio; see [asset workflow](art/README.md).
 - `art/bubble-wrap-tools.blend`: original procedural library, retained as the source for the ball and bomb.
-- `tools/tripo/`: offline generation, fitting, texture optimization, and review scripts; see [Tripo workflow](art/TRIPO.md).
-- `tools/blender/`: original procedural modeling, baking, export, and game-pose review scripts.
+- `tools/meshy/`: offline generation, retexturing, fitting, and texture optimization; see [Meshy workflow](art/MESHY.md).
+- `art/tripo-tool-library.blend` and `tools/tripo/`: archived experiment, superseded by Meshy.
+- `tools/blender/`: shared model review and library assembly, game-pose review, plus the original procedural modeling and export scripts.
 - `lib/game/touch.ts`: pointer ownership, stick dead zone and touch look scaling.
 - `components/game/touch-controls.tsx`: independent look and movement controls.
 - `lib/game/audio.ts`: procedural sound routing.

@@ -1,0 +1,68 @@
+{
+  "preview": {
+    "mode": "preview",
+    "model_type": "standard",
+    "ai_model": "meshy-7",
+    "ultra_mode": true,
+    "should_remesh": true,
+    "topology": "triangle",
+    "target_formats": [
+      "glb"
+    ]
+  },
+  "refine": {
+    "mode": "refine",
+    "enable_pbr": true,
+    "texture_resolution": "4k",
+    "target_formats": [
+      "glb"
+    ]
+  },
+  "assets": {
+    "pop-blaster": {
+      "target_polycount": 24000,
+      "prompt": "One realistic modern sporting pistol, an isolated complete handheld object. Clean straight horizontal machined metal slide with rear serrations, separate round barrel with an actual deep open muzzle, small aligned front and rear sights, gently angled ergonomic polymer grip with a flat magazine base, and a continuous curved trigger guard with a visible trigger inside. Believable manufactured proportions and crisp planar surfaces with small rounded edges. The slide, frame, barrel and grip are clearly separate forms. Restrained functional details, no ornamental greebles. No hands, person, ammunition, holster, display stand, floor, text or logo. Straight barrel, centered bore, clean solid silhouette. Full exterior model viewed from every side.",
+      "texture_prompt": "Realistic manufactured sporting pistol. Satin dark gunmetal slide and barrel, muted deep petrol teal frame panels, charcoal black stippled polymer grip and trigger guard. Visible fine slide machining, shallow grip texture, subtle edge wear on exposed metal only, clean matte polymer. Medium roughness metal, never chrome. Keep individual materials crisply separated. No text, logos, camouflage, decals, painted reflections, baked shadows or dirt encrustation. Physically based metal, rubber and polymer materials."
+    },
+    "rocket-launcher": {
+      "target_polycount": 26000,
+      "prompt": "One realistic compact shoulder-fired rocket launcher prop. Its unmistakable main form is a long straight cylindrical launch tube, much longer than it is wide, with a thick metal front rim and deep visibly hollow circular muzzle. Two reinforcing bands surround the tube. A pistol grip and trigger guard sit below the rear half, a small vertical supporting foregrip sits farther forward, and a compact folding sight sits on top. Simple protective rear collar and a small side shoulder pad. Believable industrial construction, clean purposeful geometry, crisp separate metal fittings. No rocket or ammunition, no person, hands, tripod, stand, scene, lettering or logos. The tube is straight, centered and horizontal. Complete isolated full exterior object.",
+      "texture_prompt": "Photoreal industrial launcher prop: muted deep petrol teal powder-coated tube, dark graphite machined front rim and reinforcing bands, charcoal rubber grips and shoulder pad, steel fasteners. Interior bore is deep dark matte graphite. Fine powder-coat grain, subtle contact scuffs at edges, medium roughness brushed metal. Clean maintained equipment. No random wires, symbols, labels, rust, glowing parts or painted lighting."
+    },
+    "mallet": {
+      "target_polycount": 18000,
+      "prompt": "A single ordinary rubber mallet standing upright. Exactly one horizontal cylindrical rubber head, and exactly one straight wooden handle attached vertically to the center of its underside. A clean capital T silhouette. The head has two broad flat circular end faces with small chamfers. The single long handle tapers slightly and ends with a short rubber grip sleeve. Solid believable workshop tool, simple clean manufacturing, one head and one handle only. Complete isolated object without a hand, duplicate handle, diagonal support, extra rod, other tool, floor, stand, lettering or logo. The straight vertical handle is the only part below the head.",
+      "texture_prompt": "Real replaceable-face workshop mallet. Two dense charcoal matte rubber striking faces with fine molded grain and light contact scuffs. Satin dark steel central head hub. Warm pale ash wood handle with straight longitudinal grain and a satin clear finish. Charcoal textured rubber sleeve only at the lower grip, with dark end collars. Crisp boundaries between rubber, wood and steel, believable maintained tool, no rust, lettering, logos or painted shadows."
+    },
+    "bat": {
+      "target_polycount": 15000,
+      "prompt": "One realistic full-size wooden baseball bat. A single perfectly straight continuous lathed wood form with a thick gently rounded cylindrical barrel, smooth long taper into a thin handle, and a small round flared safety knob at the butt. A tightly wound thin leather tape grip covers only the lower handle, terminating cleanly just above the knob. Rounded closed barrel end, rotationally symmetric core, conventional professional baseball bat proportions. Isolated complete bat, vertical orientation, no ball, person, hands, base, scene, lettering or logos. Refined physical shape with continuous smooth taper and no bending, fins or extra ridges.",
+      "texture_prompt": "Real maple baseball bat with warm pale honey wood, subtle straight longitudinal grain and a smooth satin varnish. Deep brown tightly wound leather grip with visible narrow overlapping edges and fine pores, darker brown safety knob edge. Restrained natural wood variation, slight wear at the grip. No painted logos, symbols, text, stripes, grime or baked lighting. Wood and leather are nonmetallic."
+    },
+    "fingertip": {
+      "target_polycount": 26000,
+      "prompt": "One right hand wearing a realistic tan suede work glove, cut off at a short open wrist cuff. A pointing gesture: the index finger extended straight upward, the middle ring and little fingers naturally curled together against the palm, and the thumb resting along the curled fingers. Exactly five fingers total, anatomically convincing connected palm, correct knuckles and thumb joint. Real seams follow the fingers and palm, soft folds where the fingers bend, smooth padded fingertips. Index finger clearly separate from the other fingers. Complete single glove with volume, no forearm, body, other hand, tools, base, floor or text. An isolated believable physical suede glove in a clear pointing pose.",
+      "texture_prompt": "Warm tan golden suede work glove. Fine short suede nap, soft natural material variation, darker recessed sewn seams, gently worn palm and fingertips, dark brown leather cuff binding. Nonmetallic soft matte finish, realistic fine stitching and restrained crease shadows. No plastic shine, wood texture, metal, logos, lettering or painted lighting."
+    },
+    "ball-cannon": {
+      "target_polycount": 26000,
+      "prompt": "One handheld bowling-ball launcher game prop. An oversized wide hollow metal tube forms the front barrel, with a thick clean circular rim and a completely open dark bore wide enough for a bowling ball. A compact rounded air tank sits below the rear of the barrel, connected as one sturdy object. A pistol grip and curved trigger guard are beneath the air tank, and a small carrying handle and round side pressure gauge complete the rear assembly. Chunky practical industrial proportions, short wide barrel, distinct clean structural parts. The front is an OPEN HOLE with no plate, disk, bolt, piston or projectile covering it. No person, hands, tripod, stand, text, logo, long rear rod or extra barrel. Isolated full exterior object.",
+      "texture_prompt": "Maintained industrial air cannon: muted oxblood red enamel pressure vessel and barrel jacket, satin dark graphite barrel rim, charcoal rubber pistol grip and carrying handle, brushed steel bands and fasteners. Round side gauge with an off-white dial and one dark needle. Deep matte dark bore. Fine enamel grain and subtle edge scuffs, no rust, random labels, text, glowing parts or baked reflections."
+    },
+    "pop-vacuum": {
+      "target_polycount": 24000,
+      "prompt": "One realistic vintage industrial handheld vacuum blower. Compact rounded rectangular metal motor housing, a thick closed carrying handle on top, parallel ventilation louvers on both side panels, and a short corrugated flexible throat at the front connected to a broad round flared open suction nozzle. The nozzle has a real hollow funnel opening facing forward, clean circular rim and visible inner throat. Four small rubber feet underneath. Simple removable rear service plate with corner screws, believable appliance proportions and sturdy connections. Complete isolated object, no long hose, cable, person, hand, stand, floor, dust, scene, lettering or logo.",
+      "texture_prompt": "Vintage industrial vacuum with warm mustard ochre powder-coated metal housing, dark brown rubber top handle, charcoal corrugated throat and nozzle interior, satin graphite nozzle rim, small steel screws and metal vent slats. Fine powder-coat grain, clean maintained surfaces with very subtle edge wear. Nonmetallic rubber and medium roughness painted metal. No rust, dirt, text, decals, baked shadows or glossy plastic."
+    },
+    "bowling-ball": {
+      "target_polycount": 20000,
+      "prompt": "One realistic regulation bowling ball. A perfectly round smooth sphere with exactly three deep clean cylindrical finger wells on one small area of the sphere: two smaller holes side by side above one larger thumb hole, forming a compact triangle. All three wells point into the center, with subtly rounded lips and dark real interior cavities. The rest of the entire sphere is continuous and perfectly smooth with no other holes, dents, grooves, seams, base or stand. Conventional recognizable bowling ball, isolated full object. No hands, people, lettering or logos. True sphere shape and exactly three physical recessed finger wells are essential.",
+      "texture_prompt": "Polished real bowling-ball resin, rich dark navy blue and petrol teal with restrained flowing ivory marble swirls across the spherical shell. Glossy resin with broad soft reflections supplied by the scene, not painted highlights. The three actual finger-well interiors are dark navy and rougher than the exterior. No painted holes, circles, logos, numbers, text or dirt. Nonmetallic material."
+    },
+    "pop-bomb": {
+      "target_polycount": 18000,
+      "prompt": "One classic cartoon round bomb rendered as a believable manufactured physical game prop. Main body is an exactly spherical smooth metal shell. At the very top a short centered cylindrical threaded metal neck holds one short thick curved braided fuse. The fuse is unlit with a clean loose end. Simple iconic round silhouette, subtle narrow equatorial joining line flush with the surface, no protruding ridge. No face, feet, arms, handle, labels, logos, base, floor, scene, explosion or additional parts. Complete isolated object. The main shell must stay perfectly round, symmetrical and spherical, never egg shaped.",
+      "texture_prompt": "Believable game prop with a smooth muted petrol teal enamel spherical shell, satin brushed steel threaded neck and warm beige braided cotton fuse with distinct fibers. A fine flush equatorial seam, subtle edge wear around the neck only. Enamel is mostly nonmetallic with a soft clearcoat response, neck is metallic. No rust, text, symbols, glowing fuse or baked lighting."
+    }
+  }
+}

@@ -1,4 +1,6 @@
-# Tripo item upgrade
+# Archived Tripo item upgrade
+
+This experiment was superseded by the [Meshy model pass](MESHY.md) before publication. Its source library and contact sheet are retained for comparison. The notes below describe the earlier pass, not the models currently loaded by the game. To reproduce that pass, use commit `ec34847` in a separate checkout; rebuilding a library from the current public assets produces the Meshy set.
 
 Seven Tripo v3.1 models are integrated into the game: the suede glove, rubber mallet, maple bat, pop blaster, rocket launcher, bowling cannon, and pop vacuum. All were inspected from four directions, fitted to the existing game rig, and exported with mobile-sized PBR textures. The [contact sheet](../docs/tripo-toolkit.png) shows the final set; `tripo-tool-library.blend` contains editable copies of all nine playable tools.
 
@@ -23,7 +25,7 @@ Raw generations are kept locally. Cloning the repository provides the finished m
 ## Review and fit
 
 ```sh
-/Applications/Blender.app/Contents/MacOS/Blender --background --factory-startup --python tools/tripo/review_model.py -- --source outputs/tripo/first-pass/pop-blaster/source.glb --out outputs/tripo/first-pass/pop-blaster/review
+/Applications/Blender.app/Contents/MacOS/Blender --background --factory-startup --python tools/blender/review_model.py -- --source outputs/tripo/first-pass/pop-blaster/source.glb --out outputs/tripo/first-pass/pop-blaster/review
 /Applications/Blender.app/Contents/MacOS/Blender --background --factory-startup --python tools/tripo/prepare_model.py -- --asset pop-blaster
 ```
 
@@ -36,7 +38,7 @@ Color maps use 1024 px JPEGs; normal and packed occlusion/roughness/metallic map
 After replacing an export, update its manifest entry and rebuild the current library:
 
 ```sh
-/Applications/Blender.app/Contents/MacOS/Blender --background --factory-startup --python tools/tripo/build_library.py
+/Applications/Blender.app/Contents/MacOS/Blender --background --factory-startup --python tools/blender/build_library.py -- --edition tripo
 npm test
 npm run typecheck
 npm run lint

@@ -1,12 +1,17 @@
 """Pack the shipped tools into an editable library and render a contact sheet."""
+import argparse
 import json
 import math
+import sys
 from pathlib import Path
 
 import bpy
 from mathutils import Euler, Matrix, Vector
 
 ROOT = Path(__file__).resolve().parents[2]
+parser = argparse.ArgumentParser()
+parser.add_argument('--edition', choices=['meshy', 'tripo'], default='meshy')
+args = parser.parse_args(sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else [])
 bpy.ops.wm.read_factory_settings(use_empty=True)
 scene = bpy.context.scene
 scene.render.engine = 'CYCLES'
@@ -76,10 +81,12 @@ for entry in manifest:
     source.hide_render = True
     source.hide_viewport = True
     label(names[index], x, z - .58)
-    label('TRIPO + BLENDER' if 'generator' in entry else 'RETAINED PHYSICS PROP', x, z - .70, .044)
+    generator = entry.get('generator', '')
+    credit = 'MESHY TEXTURE / BLENDER MESH' if 'retexture' in generator.lower() else 'MESHY + BLENDER' if 'Meshy' in generator else 'TRIPO + BLENDER' if 'Tripo' in generator else 'BLENDER'
+    label(credit, x, z - .70, .044)
 
 label('bubble wrap / model upgrade', 0, 3.83, .16)
-label('Seven new textured tools, fitted for the existing game.', 0, 3.60, .066)
+label(f'{args.edition.title()} materials and geometry, fitted for the game.', 0, 3.60, .066)
 for loc, energy, size in [((-3, -4, 6), 750, 4), ((4, -2, 3), 420, 3), ((0, 2, 6), 550, 3)]:
     bpy.ops.object.light_add(type='AREA', location=loc)
     light = bpy.context.object
@@ -98,7 +105,7 @@ camera = bpy.context.object
 camera.data.type = 'ORTHO'
 camera.data.ortho_scale = 4.9
 scene.camera = camera
-scene.render.filepath = str(ROOT / 'docs/tripo-toolkit.png')
-bpy.ops.wm.save_as_mainfile(filepath=str(ROOT / 'art/tripo-tool-library.blend'), check_existing=False)
+scene.render.filepath = str(ROOT / f'docs/{args.edition}-toolkit.png')
+bpy.ops.wm.save_as_mainfile(filepath=str(ROOT / f'art/{args.edition}-tool-library.blend'), check_existing=False)
 bpy.ops.render.render(write_still=True)
-print('TRIPO_LIBRARY_READY', flush=True)
+print(args.edition.upper() + '_LIBRARY_READY', flush=True)

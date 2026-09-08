@@ -1,4 +1,4 @@
-"""Render an untouched Tripo candidate in a neutral four-view Blender studio."""
+"""Render a generated candidate in a neutral four-view Blender studio."""
 import argparse
 import json
 import sys
@@ -38,6 +38,15 @@ report = {
     'images': [{'name': i.name, 'size': list(i.size)} for i in bpy.data.images],
 }
 (out / 'inspection.json').write_text(json.dumps(report, indent=2) + '\n')
+if any(not any(obj.data.materials) for obj in objects):
+    clay = bpy.data.materials.new('Untextured geometry review')
+    clay.use_nodes = True
+    clay.node_tree.nodes['Principled BSDF'].inputs['Base Color'].default_value = (.22, .25, .28, 1)
+    clay.node_tree.nodes['Principled BSDF'].inputs['Roughness'].default_value = .72
+    for obj in objects:
+        if not any(obj.data.materials):
+            obj.data.materials.clear()
+            obj.data.materials.append(clay)
 scene = bpy.context.scene
 scene.render.engine = 'CYCLES'
 scene.cycles.samples = 24
