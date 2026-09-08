@@ -20,27 +20,31 @@ script and exact source hashes are in `tools/audio/` in the repository.
 
 ## Item sound effects
 
-`item-sounds.wav` contains 39 edited and layered clips from these **CC0 1.0**
+`item-sounds.wav` contains 45 edited and layered clips from these **CC0 1.0**
 libraries, retrieved September 8, 2026:
 
 - [Impact Sounds](https://kenney.nl/assets/impact-sounds) by **Kenney**: wood,
   soft, punch, generic, and metal Foley for mallet, bat, ball, parcel, pellet,
   cannon mechanism, and bomb arming sounds.
-- [Sci-fi Sounds](https://kenney.nl/assets/sci-fi-sounds) by **Kenney**: thruster
-  and low-frequency pressure layers for the rocket and bowling cannon.
 - [Swishes Sound Pack](https://opengameart.org/content/swishes-sound-pack) by
   **artisticdude**: air movement for swinging and throwing.
 - [The Free Firearm Sound Library](https://opengameart.org/node/21826) by
-  **Ben Jaszczak, Brian Nelson, Kevin Heras, and Matthew Nanney**: four Walther
-  PPQ transients from `X_31P.wav` and `X_39P.wav`, trimmed to remove long range ambience.
-- [Explosions](https://opengameart.org/content/explosions-4) by **EZduzziteh**:
-  `explosion3.ogg`, shortened and pitched for bomb and rocket impacts.
+  **Ben Jaszczak, Brian Nelson, Kevin Heras, and Matthew Nanney**: four .45 reports
+  from `1911/A_42P.wav` and `1911/A_34P.wav`, with close and mid-distance body layers.
+- [25 CC0 Bang / Firework SFX](https://opengameart.org/content/25-cc0-bang-firework-sfx)
+  by **rubberduck**: `fw_04.ogg`, `cannon_01.ogg`, and `cannon_02.ogg` for rocket
+  launch, fuse, and explosive impacts.
+- [Cannon Fire](https://opengameart.org/content/cannon-fire) by **Thimras**:
+  `cannon_fire_0.ogg`, edited for the bowling cannon and low blast layers.
 - [General Household Sound Effects](https://opengameart.org/content/general-household-sound-effects)
   by **bretbernhoft**: `vacuumcleaner01.wav`, edited into a vacuum loop with
-  original pitch ramps for startup and wind-down.
+  motor-harmonic suppression and original pitch ramps for startup and wind-down.
+- The **Anthousai** recordings credited above: six larger plastic snaps derived
+  from the game's pop bank. The sixteen small pops remain unchanged.
 
 Edits include mono conversion, 32 kHz resampling, pitch and speed changes,
-filtering, layering, envelopes, loop crossfading, and peak normalization. Exact
+filtering, transient compression, layering, envelopes, loop crossfading, and peak
+normalization. Exact
 source hashes and edit recipes are in `tools/audio/items-manifest.json`.
 The game synthesizes small fallback sounds if an audio bank cannot load.
 No audio from the YouTube style reference is included in this game.

@@ -2,7 +2,7 @@
 export const TOOL_ATLAS = {
   "url": "/audio/item-sounds.wav",
   "sampleRate": 32000,
-  "frames": 417120,
+  "frames": 559200,
   "clips": [
     {
       "kind": "mallet-hit",
@@ -91,152 +91,188 @@ export const TOOL_ATLAS = {
     {
       "kind": "pistol",
       "offsetFrames": 103200,
-      "lengthFrames": 8960,
+      "lengthFrames": 14720,
       "peakSeconds": 0.01
     },
     {
       "kind": "pistol",
-      "offsetFrames": 112160,
-      "lengthFrames": 8960,
+      "offsetFrames": 117920,
+      "lengthFrames": 14720,
       "peakSeconds": 0.01
     },
     {
       "kind": "pistol",
-      "offsetFrames": 121120,
-      "lengthFrames": 8960,
-      "peakSeconds": 0.015
+      "offsetFrames": 132640,
+      "lengthFrames": 14720,
+      "peakSeconds": 0.01
     },
     {
       "kind": "pistol",
-      "offsetFrames": 130080,
-      "lengthFrames": 8960,
-      "peakSeconds": 0.015
+      "offsetFrames": 147360,
+      "lengthFrames": 14720,
+      "peakSeconds": 0.01
     },
     {
       "kind": "launcher",
-      "offsetFrames": 139040,
-      "lengthFrames": 18560,
-      "peakSeconds": 0.06
+      "offsetFrames": 162080,
+      "lengthFrames": 24960,
+      "peakSeconds": 0.035
     },
     {
       "kind": "cannon",
-      "offsetFrames": 157600,
-      "lengthFrames": 11200,
-      "peakSeconds": 0.1
+      "offsetFrames": 187040,
+      "lengthFrames": 25600,
+      "peakSeconds": 0.025
     },
     {
       "kind": "launcher",
-      "offsetFrames": 168800,
-      "lengthFrames": 18560,
-      "peakSeconds": 0.06
+      "offsetFrames": 212640,
+      "lengthFrames": 24960,
+      "peakSeconds": 0.04
     },
     {
       "kind": "cannon",
-      "offsetFrames": 187360,
-      "lengthFrames": 11200,
-      "peakSeconds": 0.1
+      "offsetFrames": 237600,
+      "lengthFrames": 25600,
+      "peakSeconds": 0.025
     },
     {
       "kind": "swish",
-      "offsetFrames": 198560,
+      "offsetFrames": 263200,
       "lengthFrames": 6080,
       "peakSeconds": 0.04
     },
     {
       "kind": "heavy-swish",
-      "offsetFrames": 204640,
+      "offsetFrames": 269280,
       "lengthFrames": 8000,
       "peakSeconds": 0.065
     },
     {
       "kind": "swish",
-      "offsetFrames": 212640,
+      "offsetFrames": 277280,
       "lengthFrames": 6080,
       "peakSeconds": 0.07
     },
     {
       "kind": "heavy-swish",
-      "offsetFrames": 218720,
+      "offsetFrames": 283360,
       "lengthFrames": 8000,
       "peakSeconds": 0.1
     },
     {
       "kind": "swish",
-      "offsetFrames": 226720,
+      "offsetFrames": 291360,
       "lengthFrames": 6080,
       "peakSeconds": 0.065
     },
     {
       "kind": "heavy-swish",
-      "offsetFrames": 232800,
+      "offsetFrames": 297440,
       "lengthFrames": 8000,
       "peakSeconds": 0.1
     },
     {
       "kind": "throw",
-      "offsetFrames": 240800,
+      "offsetFrames": 305440,
       "lengthFrames": 5440,
       "peakSeconds": 0.05
     },
     {
       "kind": "throw",
-      "offsetFrames": 246240,
+      "offsetFrames": 310880,
       "lengthFrames": 5440,
       "peakSeconds": 0.055
     },
     {
       "kind": "bomb-arm",
-      "offsetFrames": 251680,
-      "lengthFrames": 5760,
+      "offsetFrames": 316320,
+      "lengthFrames": 15360,
       "peakSeconds": 0.005
     },
     {
       "kind": "bomb-arm",
-      "offsetFrames": 257440,
-      "lengthFrames": 5760,
+      "offsetFrames": 331680,
+      "lengthFrames": 15360,
       "peakSeconds": 0.005
     },
     {
       "kind": "bomb-blast",
-      "offsetFrames": 263200,
-      "lengthFrames": 24320,
-      "peakSeconds": 0.025
+      "offsetFrames": 347040,
+      "lengthFrames": 33600,
+      "peakSeconds": 0.03
     },
     {
       "kind": "bomb-blast",
-      "offsetFrames": 287520,
-      "lengthFrames": 24320,
-      "peakSeconds": 0.025
+      "offsetFrames": 380640,
+      "lengthFrames": 33600,
+      "peakSeconds": 0.03
     },
     {
       "kind": "rocket-blast",
-      "offsetFrames": 311840,
-      "lengthFrames": 16000,
-      "peakSeconds": 0.02
+      "offsetFrames": 414240,
+      "lengthFrames": 26240,
+      "peakSeconds": 0.015
     },
     {
       "kind": "rocket-blast",
-      "offsetFrames": 327840,
-      "lengthFrames": 16000,
-      "peakSeconds": 0.02
+      "offsetFrames": 440480,
+      "lengthFrames": 26240,
+      "peakSeconds": 0.015
     },
     {
       "kind": "vacuum-start",
-      "offsetFrames": 343840,
+      "offsetFrames": 466720,
       "lengthFrames": 14080,
-      "peakSeconds": 0.225
+      "peakSeconds": 0.125
     },
     {
       "kind": "vacuum",
-      "offsetFrames": 357920,
+      "offsetFrames": 480800,
       "lengthFrames": 43200,
-      "peakSeconds": 0.285
+      "peakSeconds": 0.51
     },
     {
       "kind": "vacuum-stop",
-      "offsetFrames": 401120,
+      "offsetFrames": 524000,
       "lengthFrames": 16000,
-      "peakSeconds": 0.165
+      "peakSeconds": 0.2
+    },
+    {
+      "kind": "big-pop",
+      "offsetFrames": 540000,
+      "lengthFrames": 3200,
+      "peakSeconds": 0.005
+    },
+    {
+      "kind": "big-pop",
+      "offsetFrames": 543200,
+      "lengthFrames": 3200,
+      "peakSeconds": 0.005
+    },
+    {
+      "kind": "big-pop",
+      "offsetFrames": 546400,
+      "lengthFrames": 3200,
+      "peakSeconds": 0.005
+    },
+    {
+      "kind": "big-pop",
+      "offsetFrames": 549600,
+      "lengthFrames": 3200,
+      "peakSeconds": 0.005
+    },
+    {
+      "kind": "big-pop",
+      "offsetFrames": 552800,
+      "lengthFrames": 3200,
+      "peakSeconds": 0.005
+    },
+    {
+      "kind": "big-pop",
+      "offsetFrames": 556000,
+      "lengthFrames": 3200,
+      "peakSeconds": 0.005
     }
   ]
 } as const;

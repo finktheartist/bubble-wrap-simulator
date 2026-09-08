@@ -153,7 +153,7 @@ await test('a failed sample download preserves usable fallback sounds and does n
 
 await test('the item bank covers every action with sourced, bounded samples and a continuous motor seam', () => {
   assert.equal(createHash('sha256').update(itemBytes).digest('hex'), itemManifest.sha256);
-  assert.ok(itemBytes.length < 900000, 'all item Foley stays below 900 KB on mobile');
+  assert.ok(itemBytes.length < 1200000, 'all item Foley stays below 1.2 MB on mobile');
   assert.deepEqual(new Set(TOOL_ATLAS.clips.map(c => c.kind)), new Set(TOOL_SOUNDS));
   assert.equal(itemBytes.readUInt32LE(24), TOOL_ATLAS.sampleRate);
   const hashes = new Set<string>(); let end = 0;
@@ -178,6 +178,58 @@ await test('the item bank covers every action with sourced, bounded samples and 
   assert.equal(hashes.size, TOOL_ATLAS.clips.length);
   assert.equal(end, TOOL_ATLAS.frames);
   for (const recipe of itemManifest.recipes) for (const layer of recipe.layers) assert.match(itemManifest.sourceSha256[layer.source], /^[a-f\d]{64}$/);
+});
+
+await test('the recorded vacuum does not concentrate energy in its piercing motor harmonics', () => {
+  const clip = TOOL_ATLAS.clips.find(c => c.kind === 'vacuum')!;
+  const length = 8192, rate = TOOL_ATLAS.sampleRate;
+  const samples = Float64Array.from({length}, (_, i) =>
+    itemBytes.readInt16LE(44 + (clip.offsetFrames + i) * 2) / 32768 * (.5 - .5 * Math.cos(2 * Math.PI * i / (length - 1))));
+  const total = samples.reduce((sum, value) => sum + value * value, 0) * length / 2;
+  function bandFraction(from: number, to: number) {
+    let power = 0;
+    for (let bin = Math.ceil(from * length / rate); bin <= Math.floor(to * length / rate); bin++) {
+      const coefficient = 2 * Math.cos(2 * Math.PI * bin / length);
+      let a = 0, b = 0;
+      for (const sample of samples) { const next = sample + coefficient * a - b; b = a; a = next; }
+      power += a * a + b * b - coefficient * a * b;
+    }
+    return power / total;
+  }
+  assert.ok(bandFraction(3100, 3400) < .01, '3.25 kHz whine remains below 1% of energy');
+  assert.ok(bandFraction(6200, 6800) < .002, '6.5 kHz harmonic remains below 0.2% of energy');
+});
+
+await test('heavy hits use fuller pops while finger and vacuum hits retain the small recorded snaps', async t => {
+  const prior = Object.getOwnPropertyDescriptor(globalThis, 'AudioContext');
+  Object.defineProperty(globalThis, 'AudioContext', { value: AudioContextStub, configurable: true });
+  t.after(() => { if (prior) Object.defineProperty(globalThis, 'AudioContext', prior); else Reflect.deleteProperty(globalThis, 'AudioContext'); });
+  t.mock.method(globalThis, 'fetch', async (url: string) => new Response(url === POP_ATLAS.url ? bytes : itemBytes));
+  const audio = new PopAudio(); await audio.start();
+  const ctx = audio.context as unknown as AudioContextStub;
+  for (const strength of [1, 1.05, 2, 2.7]) { audio.pop(strength); ctx.currentTime += .2; }
+  assert.deepEqual(ctx.sources.map(source => source.buffer!.duration), [.06, .06, .1, .1]);
+  assert.notEqual(ctx.sources[2].buffer, ctx.sources[3].buffer, 'large snaps also avoid consecutive repeats');
+  audio.stop(); assert.ok(ctx.sources.every(source => source.stops.length > 0));
+  audio.dispose();
+});
+
+await test('rapid pistol shots fade the preceding tail without cancelling their fresh report', async t => {
+  const prior = Object.getOwnPropertyDescriptor(globalThis, 'AudioContext');
+  Object.defineProperty(globalThis, 'AudioContext', { value: AudioContextStub, configurable: true });
+  t.after(() => { if (prior) Object.defineProperty(globalThis, 'AudioContext', prior); else Reflect.deleteProperty(globalThis, 'AudioContext'); });
+  t.mock.method(globalThis, 'fetch', async (url: string) => new Response(url === POP_ATLAS.url ? bytes : itemBytes));
+  const audio = new PopAudio(); await audio.start(); const ctx = audio.context as unknown as AudioContextStub;
+  audio.fire('pistol'); const first = ctx.sources.at(-1)!;
+  ctx.currentTime = .03; audio.fire('pistol');
+  assert.equal(ctx.sources.length, 1); assert.equal(first.stops.length, 0, 'a cooldown-rejected tap leaves the current sound intact');
+  ctx.currentTime = .11; audio.fire('pistol'); const second = ctx.sources.at(-1)!;
+  assert.equal(ctx.sources.length, 2);
+  assert.ok(first.stops[0] > .11 && first.stops[0] <= .18, 'the old tail fades after the new report begins');
+  assert.equal(second.stops.length, 0); assert.equal(second.starts[0], .11);
+  ctx.currentTime = .3; audio.fire('cannon');
+  assert.equal(second.stops.length, 0, 'other weapons do not choke the pistol');
+  audio.dispose();
 });
 
 await test('item cuts retain their durations after 44.1/48 kHz browser resampling', () => {

@@ -51,6 +51,7 @@ export class PopAudio {
   private lastCue = new Map<ToolSound, number>();
   private previousTool = new Map<ToolSound, number>();
   private previousPop = -1;
+  private pistolVoice: Voice | null = null;
   private loads = { pops: newLoad(), tools: newLoad() };
   volume = .65;
   muted = false;
@@ -140,11 +141,14 @@ export class PopAudio {
     const ctx = this.context;
     if (!ctx || ctx.state !== 'running' || this.muted) return;
     const at = this.voices.reserve(ctx.currentTime); if (at === null) return;
-    const index = this.index(this.buffers.length, this.previousPop); this.previousPop = index;
+    const large = strength >= 1.6;
+    const index = this.index(this.buffers.length, this.previousPop);
+    if (!large) this.previousPop = index;
+    const buffer = large ? this.pick('big-pop').buffer : this.buffers[index];
     const queued = at - ctx.currentTime > .02;
-    const gain = (.74 + Math.min(2.7, Math.max(0, strength)) * .035) * (.82 + Math.random() * .3)
+    const gain = ((large ? .92 : .74) + Math.min(2.7, Math.max(0, strength)) * .035) * (.82 + Math.random() * .3)
       * (queued ? .86 : 1) / (1 + Math.max(0, distance) * .04);
-    if (this.play(this.buffers[index], at, gain, pan, .93 + Math.random() * .14, false, 'pop')) {
+    if (this.play(buffer, at, gain, pan, large ? .97 + Math.random() * .07 : .93 + Math.random() * .14, false, 'pop')) {
       const duck = this.toolBus!.gain;
       duck.cancelScheduledValues(ctx.currentTime);
       duck.setTargetAtTime(.86, ctx.currentTime, .008);
@@ -169,7 +173,12 @@ export class PopAudio {
   /** Kept for the existing bubble-pop comparison tool. Gameplay uses item-specific impacts. */
   thump(strength = 1, explosion = false) { if (explosion) this.blast(); else this.impact('parcel', strength); }
   fire(kind: 'pistol' | 'launcher' | 'cannon') {
-    this.cue(kind, kind === 'pistol' ? .77 : kind === 'cannon' ? .66 : .58, .12, 0, .075);
+    const voice = this.cue(kind, kind === 'pistol' ? .77 : kind === 'cannon' ? .56 : .58, .12, 0, .075);
+    if (kind === 'pistol' && voice) {
+      // Keep the newest report clear when rapid shots overlap their acoustic tails.
+      if (this.pistolVoice) this.release(this.pistolVoice, .03);
+      this.pistolVoice = voice;
+    }
   }
   toss(bomb = false) { this.cue(bomb ? 'bomb-arm' : 'throw', .42, .15); }
   swish(heavy = false) {
@@ -211,6 +220,7 @@ export class PopAudio {
   /** Cancel queued pops, swings and motor transitions on pause/reset. */
   stop() {
     for (const voice of this.active) this.release(voice);
+    this.pistolVoice = null;
     this.motorVoices = []; this.motorRunning = false; this.voices.reset(); this.lastCue.clear();
     if (this.context && this.toolBus) {
       this.toolBus.gain.cancelScheduledValues(this.context.currentTime);

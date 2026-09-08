@@ -36,16 +36,16 @@ correctness; listening remains the quality check for sound direction.
 
 ## Item Foley
 
-The item bank contains 39 clips for 17 actions. Download these public CC0 sources
+The item bank contains 45 clips for 18 sound types in a 1.12 MB WAV. Download these public CC0 sources
 into a local source directory (the large originals are not deployed):
 
 | Local path | Download |
 | --- | --- |
 | `kenney-impact/Audio/*` | Extract [Kenney Impact Sounds](https://kenney.nl/assets/impact-sounds) into `kenney-impact/` |
-| `kenney-scifi/Audio/*` | Extract [Kenney Sci-fi Sounds](https://kenney.nl/assets/sci-fi-sounds) into `kenney-scifi/` |
 | `swishes/swishes/*` | Extract [Swishes Sound Pack](https://opengameart.org/content/swishes-sound-pack) into `swishes/` |
-| `firearms/Prepared SFX Library/Walther PPQ/X_31P.wav`, `X_39P.wav` | Extract these two files from [The Free Firearm Sound Library](https://opengameart.org/node/21826) into `firearms/` |
-| `explosion3.ogg` | Download the third file from [Explosions](https://opengameart.org/content/explosions-4) |
+| `firearms/Prepared SFX Library/1911/A_42P.wav`, `A_34P.wav` | Extract these two files from [The Free Firearm Sound Library](https://opengameart.org/node/21826) into `firearms/` |
+| `fireworks/fw_04.ogg`, `cannon_01.ogg`, `cannon_02.ogg` | Extract [25 CC0 Bang / Firework SFX](https://opengameart.org/content/25-cc0-bang-firework-sfx) into `fireworks/` |
+| `cannon-fire.ogg` | Save `cannon_fire_0.ogg` from [Cannon Fire](https://opengameart.org/content/cannon-fire) under this local name |
 | `vacuumcleaner01.wav` | Download this file from [General Household Sound Effects](https://opengameart.org/content/general-household-sound-effects) |
 
 ```sh
@@ -56,6 +56,16 @@ This produces `public/audio/item-sounds.wav`, the matching frame index in
 `lib/game/tool-bank.ts`, and `tools/audio/items-manifest.json` with every layer,
 source hash, cut, filter, pitch, envelope, and loop edit. All sound banks are local
 assets; the game needs no generation API, external media host, or credentials.
+The six larger pops also read the committed `public/audio/bubble-pops.wav`;
+`@/` in the manifest denotes a path relative to the repository root.
+
+The .45 cuts keep a short acoustic tail and use transient compression to control
+the initial microphone spike. Rapid pistol shots fade the preceding tail so it does
+not build into a muddy wash. Rocket and cannon cues use recorded blast/exhaust
+sources. Strong contacts (strength 1.6 or greater) select larger, layered plastic
+snaps; ordinary finger and suction pops keep the original small bank. The vacuum
+suppresses narrow motor harmonics and rolls off above 2.1 kHz before its pitch
+ramps, preserving low airflow without the earlier 3.25/6.5 kHz whine.
 
 The pop and item banks load independently and have immediate synthesized
 fallbacks. Contact sounds depend on the material and impact speed. Swing peaks
@@ -74,3 +84,15 @@ ffmpeg -i outputs/item-audio/item-sounds-demo.webm -c:a libmp3lame -b:a 192k out
 ```
 
 The review page is authoring tooling and is excluded from the published game.
+
+For the firing-weight revision, open `http://127.0.0.1:4180/weight.html`.
+It compares the previous item mix from commit `8eb4dbe` with the current engine,
+at the same master volume. **Record comparison silently** saves a 30-second WebM
+to `outputs/audio-weight-pass/comparison.webm`: previous at 0–15 seconds, revised
+at 15–30 seconds. The individual selector auditions pistol, bomb, rocket, cannon,
+large pops, and vacuum. Export the players without loudness normalization:
+
+```sh
+ffmpeg -i outputs/audio-weight-pass/comparison.webm -c:a libmp3lame -b:a 192k outputs/audio-weight-pass/comparison.mp3
+ffmpeg -i outputs/audio-weight-pass/comparison.webm -ss 15 -c:a libmp3lame -b:a 192k outputs/audio-weight-pass/revised-demo.mp3
+```

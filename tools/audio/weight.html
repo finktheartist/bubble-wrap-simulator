@@ -1,0 +1,37 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bubble Wrap · Firing Sound Review</title>
+<style>body{font:17px/1.6 system-ui;background:#112322;color:#eef7ef;max-width:740px;margin:40px auto;padding:24px}h1{font-size:40px;line-height:1.12;letter-spacing:-1px}button,select,a{font:inherit}button,select{padding:10px 16px;border:0;border-radius:12px;margin:5px 4px 5px 0;background:#d9ff88;color:#15312e;cursor:pointer}button:disabled{opacity:.4}audio{display:block;width:100%;margin:16px 0}small{color:#a9c5bd}a{color:#d9ff88}#status{min-height:28px}label{display:block}</style>
+<small>BUBBLE WRAP SIMULATOR · SOUND REVISION</small><h1>More punch.<br>Less whine.</h1><p>Fuller firing reports and explosive impacts, larger plastic snaps for heavy hits, and warmer vacuum airflow.</p>
+<p><b>Revised sounds</b> · pistol, bomb, rocket, cannon, large pops, vacuum</p><audio id="newPlayer" controls src="/latest-weight-demo.mp3"></audio>
+<p><b>Before and after</b> · earlier mix first, revised mix from about 15 seconds</p><audio id="comparePlayer" controls src="/latest-weight-comparison.mp3"></audio>
+<label for="item">Compare one item</label><select id="item"><option>Pistol</option><option>Bomb</option><option>Rocket</option><option>Cannon</option><option>Large pops</option><option>Vacuum</option></select><button id="old">Play previous</button><button id="new">Play revised</button><button id="stop">Stop</button><p id="status" role="status">Both versions use the same master volume.</p>
+<button id="record">Record comparison silently</button><p><a href="http://127.0.0.1:4173" target="_blank">Play the updated game locally →</a> · <a href="/items.html">All item sounds</a></p><small>The players contain a recording of the browser game mixer. Recording runs silently; the players and audition buttons play only when selected.</small>
+<script type="module">
+import { PopAudio } from '@game/audio';
+import { PopAudio as PreviousAudio } from '@itemsBefore/audio';
+const current=new PopAudio(),previous=new PreviousAudio(),status=document.querySelector('#status'),recordButton=document.querySelector('#record');
+let timers=[],recorder=null;
+const later=(seconds,fn)=>timers.push(setTimeout(fn,seconds*1000));
+function stop(){timers.forEach(clearTimeout);timers=[];current.stop();previous.stop();for(const p of document.querySelectorAll('audio'))p.pause();if(recorder?.state==='recording')recorder.stop();status.textContent='Stopped.';}
+function pops(a,n=4,strength=2){for(let i=0;i<n;i++)a.pop(strength,Math.sin(i)*.15,2);}
+function action(a,name){
+ if(name==='Pistol'){a.fire('pistol');later(.075,()=>{a.impact('pellet',1,0,3);pops(a,2,2);});}
+ if(name==='Bomb'){a.toss(true);later(1.5,()=>{a.blast(false,0,4);for(let i=0;i<6;i++)later(i*.055,()=>pops(a,8,2.7));});}
+ if(name==='Rocket'){a.fire('launcher');later(.3,()=>{a.blast(true,.1,4);for(let i=0;i<5;i++)later(i*.055,()=>pops(a,6,2.7));});}
+ if(name==='Cannon'){a.fire('cannon');later(.28,()=>{a.impact('ball',1.25,-.1,4);pops(a,16,2);});}
+ if(name==='Large pops')for(const t of [0,.22,.44,.66])later(t,()=>a.pop(2.7,0,1));
+ if(name==='Vacuum'){a.vacuum(true);later(2.5,()=>a.vacuum(false));}
+}
+for(const [id,a] of [['old',previous],['new',current]])document.querySelector('#'+id).onclick=async()=>{if(recorder?.state==='recording')return;stop();await a.start();const name=document.querySelector('#item').value;status.textContent=(id==='old'?'Previous · ':'Revised · ')+name;action(a,name);};
+document.querySelector('#stop').onclick=stop;
+function pattern(a,offset){later(offset+.4,()=>action(a,'Pistol'));for(let i=0;i<3;i++)later(offset+1.2+i*.11,()=>action(a,'Pistol'));later(offset+2.3,()=>action(a,'Bomb'));later(offset+5,()=>action(a,'Rocket'));later(offset+7,()=>action(a,'Cannon'));later(offset+8.6,()=>action(a,'Large pops'));later(offset+10,()=>action(a,'Vacuum'));}
+recordButton.onclick=async()=>{
+ stop();recordButton.disabled=true;status.textContent='Loading both sound versions…';await Promise.all([current.start(),previous.start()]);
+ const context=new AudioContext(),destination=context.createMediaStreamDestination();await context.resume();
+ const taps=[previous,current].map(a=>{const tap=a.context.createMediaStreamDestination();a.master.disconnect(a.context.destination);a.master.connect(tap);const source=context.createMediaStreamSource(tap.stream);source.connect(destination);return {a,tap,source};});
+ const chunks=[];recorder=new MediaRecorder(destination.stream,{mimeType:'audio/webm;codecs=opus',audioBitsPerSecond:192000});
+ recorder.ondataavailable=e=>{if(e.data.size)chunks.push(e.data);};
+ recorder.onstop=async()=>{current.stop();previous.stop();const blob=new Blob(chunks,{type:'audio/webm'});document.querySelector('#comparePlayer').src=URL.createObjectURL(blob);const response=await fetch('/weight-capture',{method:'POST',body:blob});for(const {a,tap,source} of taps){source.disconnect();a.master.disconnect(tap);a.master.connect(a.context.destination);tap.stream.getTracks().forEach(t=>t.stop());}await context.close();recordButton.disabled=false;status.textContent=response.ok?'Comparison saved. Previous first; revised from about 15 seconds.':'Could not save comparison.';};
+ recorder.start();status.textContent='Recording silently · previous sounds';pattern(previous,0);pattern(current,15);later(15,()=>{status.textContent='Recording silently · revised sounds';});later(30,()=>recorder.stop());
+};
+window.addEventListener('pagehide',()=>{stop();current.dispose();previous.dispose();});
+</script></html>

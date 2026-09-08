@@ -4,7 +4,7 @@
 <audio controls id="player" src="/latest-items.mp3"></audio>
 <ol><li>0–2s: bubble pops</li><li>2–8s: mallet and bat</li><li>8–11s: bowling ball</li><li>11–14s: pistol and rapid fire</li><li>14–17s: bomb</li><li>17–19s: rocket</li><li>19–22s: bowling cannon</li><li>22–27s: vacuum hold and quick tap</li><li>27–31s: overlapping action</li></ol>
 <p id="status" role="status">Play the saved demo, or try each item below.</p><div id="items"></div><button id="stop">Stop</button><button id="record">Record fresh demo silently</button>
-<p><a href="http://127.0.0.1:4173" target="_blank">Play the updated game locally →</a> · <a href="/review.html">Bubble-pop comparison</a></p><small>This demo uses the actual browser game mixer. Recording is silent; the player and item buttons play audio when you select them.</small>
+<p><a href="/weight.html">Compare the firing and vacuum revision →</a></p><p><a href="http://127.0.0.1:4173" target="_blank">Play the updated game locally →</a> · <a href="/review.html">Bubble-pop comparison</a></p><small>This demo uses the actual browser game mixer. Recording is silent; the player and item buttons play audio when you select them.</small>
 <script type="module">
 import { PopAudio } from '@game/audio';
 const audio=new PopAudio(),status=document.querySelector('#status'),button=document.querySelector('#record');
@@ -12,9 +12,9 @@ let timers=[],recorder=null,tap=null;
 const later=(seconds,fn)=>timers.push(setTimeout(fn,seconds*1000));
 function stop(){timers.forEach(clearTimeout);timers=[];audio.stop();if(recorder?.state==='recording')recorder.stop();document.querySelector('#player').pause();status.textContent='Stopped.';}
 function pops(n=5,strength=1.2){for(let i=0;i<n;i++)audio.pop(strength,Math.sin(i)*.2,1);}
-function melee(heavy){audio.swish(heavy);later(heavy?.23:.19,()=>{audio.impact(heavy?'mallet':'bat',heavy?1.15:1,0,2);pops(12);});}
-function ball(){audio.toss();later(.6,()=>{audio.impact('ball',1.2,.1,3);pops(10);});}
-function pistol(){audio.fire('pistol');later(.07,()=>{audio.impact('pellet',1,0,3);pops(2);});}
+function melee(heavy){audio.swish(heavy);later(heavy?.23:.19,()=>{audio.impact(heavy?'mallet':'bat',heavy?1.15:1,0,2);pops(12,heavy?2:1.5);});}
+function ball(){audio.toss();later(.6,()=>{audio.impact('ball',1.2,.1,3);pops(10,2);});}
+function pistol(){audio.fire('pistol');later(.07,()=>{audio.impact('pellet',1,0,3);pops(2,2);});}
 function bomb(){audio.toss(true);later(1.5,()=>{audio.blast(false,0,4);pops(100,2.7);for(let i=1;i<6;i++)later(i*.055,()=>pops(6,2));});}
 function rocket(){audio.fire('launcher');later(.28,()=>{audio.blast(true,.15,4);pops(100,2.7);for(let i=1;i<5;i++)later(i*.065,()=>pops(5,2));});}
 function cannon(){audio.fire('cannon');later(.28,()=>{audio.impact('ball',1.25,-.1,4);pops(25,2);});}

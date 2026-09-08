@@ -1,6 +1,6 @@
 {
-  "sha256": "46cc144be82b4b478df50a035b21685045cd6c5623410ec7bd0015ded033a66f",
-  "bytes": 834284,
+  "sha256": "0351c42f9908359e422301a29b94f0dcb460e2fd8b8c36fdbb34beb2eeccb10c",
+  "bytes": 1118444,
   "sourceSha256": {
     "kenney-impact/Audio/impactSoft_heavy_000.ogg": "49e7ca88743fca974bb8676ea138b751cfd8f9033b5e7af8736c2a215d6edbc1",
     "kenney-impact/Audio/impactPunch_heavy_000.ogg": "b33a8f14068aec24ec69ba85e5e87fdc41228975f6a1a3e44a6e7d6fc3d9f8d8",
@@ -16,20 +16,21 @@
     "kenney-impact/Audio/impactGeneric_light_002.ogg": "d0bf60905b59ff630ffe01eb0edeeacd2504eaa8fb6523aeef7d2458b78264d3",
     "kenney-impact/Audio/impactSoft_medium_000.ogg": "7d3ba0bb5e60a11b5d3e558c141303dcf494256675fbf753c0d252d2cf0481e3",
     "kenney-impact/Audio/impactSoft_medium_001.ogg": "7642a4fd43e547afe4f7adfadb3dabb681c0ff512f52c1674bae30a726841faf",
-    "firearms/Prepared SFX Library/Walther PPQ/X_31P.wav": "b6439228ca46b37c00463265028094559ae5c9896c796b5d40ea4f33247f149c",
-    "firearms/Prepared SFX Library/Walther PPQ/X_39P.wav": "d679a3cd87eae2898d984159f83544392932e6b77526045b672e3aaa9c2dda9f",
-    "kenney-scifi/Audio/thrusterFire_000.ogg": "0fdc474d93f209debf1fc4ea77765a669dcb7676db31b4d8a0a509685bccf374",
+    "firearms/Prepared SFX Library/1911/A_42P.wav": "8e84438e771c157155a6a1ff47a6a7a7d81b6f39b185d41e426c57337a82254a",
+    "firearms/Prepared SFX Library/1911/A_34P.wav": "df95fc52049f3d1e4cf0a8c018fc0f0b4abded12de1d615a279422206c415935",
+    "fireworks/fw_04.ogg": "48c5f564ebba962c3f54cd6bc6d4d958c47e9a795aabe8a91643afaa9fdf4c11",
+    "cannon-fire.ogg": "2b21ffa41e5c3be4eecdfbd3490544f5aa8b6d1581787265863e13de1a8e599d",
     "kenney-impact/Audio/impactMetal_light_000.ogg": "33b5e6e37c6e9d54e07bf5a89b12c76e879f40c1ea83cdd82714df1d6f9fec6d",
-    "kenney-scifi/Audio/lowFrequency_explosion_001.ogg": "cdda50600a4928f2f1b8371224d53c171ac799c1cf2c30b11999508985250b3b",
-    "kenney-scifi/Audio/thrusterFire_001.ogg": "924636edc923fe4aab5829b69dc5dc1c5d659dec5739865434dabee752a3bb79",
-    "kenney-impact/Audio/impactMetal_light_001.ogg": "fba69c467ddd85da7b1d82e259f936b876d9ba6a3d6f1b24bdd10468e46bfe08",
     "swishes/swishes/swish-7.wav": "e6de737a34de16afed094d6170d7679149022f149e0a8356d2f029b0e8f4a4d7",
     "swishes/swishes/swish-8.wav": "113a3709ad889ad2fcf38eaceaf4eb9d67ffe1e96713fed93a6f0aed08769980",
     "swishes/swishes/swish-9.wav": "123883f006ce55feecbff11eea5f87c4493df4399989983037144570a23723c1",
     "swishes/swishes/swish-5.wav": "4db41f2d2f97caf94627be05ff2870217fecc86534cf30f2aab413b847a0d50a",
     "swishes/swishes/swish-6.wav": "edcaacf008da7ae692566f4fe0d6023ea68d0a014149889e95209be7ee0b746d",
-    "explosion3.ogg": "ffacf6f1f6cc8deb364cec27b1b0abcb5191d8c6b4f5dfa5b58b27aef9f75b23",
-    "vacuumcleaner01.wav": "d024cb3839fe14bbb9cb5291ad21ee4d35c3175b1a2b22ffea8ee3351879201a"
+    "kenney-impact/Audio/impactMetal_light_001.ogg": "fba69c467ddd85da7b1d82e259f936b876d9ba6a3d6f1b24bdd10468e46bfe08",
+    "fireworks/cannon_02.ogg": "716392af61b29dabe637c2616091207f390d25357aae3d4c625df5dfea7e961d",
+    "fireworks/cannon_01.ogg": "e87ca0ee6b53da1f21cd9086cb75f456495871618fdfed63388bd2208a872596",
+    "vacuumcleaner01.wav": "d024cb3839fe14bbb9cb5291ad21ee4d35c3175b1a2b22ffea8ee3351879201a",
+    "@/public/audio/bubble-pops.wav": "542fcbac79a7fa888e5e3d5d3b2cf3590aae3952870b68a4f51caa0d515461f4"
   },
   "recipes": [
     {
@@ -39,6 +40,7 @@
       "fadeOut": 0.04,
       "decayFrom": 0.12,
       "loop": false,
+      "rmsCeiling": null,
       "layers": [
         {
           "source": "kenney-impact/Audio/impactSoft_heavy_000.ogg",
@@ -50,6 +52,8 @@
           "level": 1,
           "tempo": 1,
           "ramp": null,
+          "eq": [],
+          "compression": false,
           "offset": 0
         },
         {
@@ -62,6 +66,8 @@
           "level": 0.28,
           "tempo": 1,
           "ramp": null,
+          "eq": [],
+          "compression": false,
           "offset": 0
         }
       ]
@@ -73,6 +79,7 @@
       "fadeOut": 0.055,
       "decayFrom": null,
       "loop": false,
+      "rmsCeiling": null,
       "layers": [
         {
           "source": "kenney-impact/Audio/impactWood_heavy_000.ogg",
@@ -84,6 +91,8 @@
           "level": 1,
           "tempo": 1,
           "ramp": null,
+          "eq": [],
+          "compression": false,
           "offset": 0
         }
       ]
@@ -95,6 +104,7 @@
       "fadeOut": 0.04,
       "decayFrom": 0.15,
       "loop": false,
+      "rmsCeiling": null,
       "layers": [
         {
           "source": "kenney-impact/Audio/impactSoft_heavy_000.ogg",
@@ -106,6 +116,8 @@
           "level": 1,
           "tempo": 1,
           "ramp": null,
+          "eq": [],
+          "compression": false,
           "offset": 0
         },
         {
@@ -118,6 +130,8 @@
           "level": 0.28,
           "tempo": 1,
           "ramp": null,
+          "eq": [],
+          "compression": false,
           "offset": 0
         }
       ]
@@ -129,6 +143,7 @@
       "fadeOut": 0.04,
       "decayFrom": null,
       "loop": false,
+      "rmsCeiling": null,
       "layers": [
         {
           "source": "kenney-impact/Audio/impactGeneric_light_000.ogg",
@@ -140,6 +155,8 @@
           "level": 1,
           "tempo": 1,
           "ramp": null,
+          "eq": [],
+          "compression": false,
           "offset": 0
         }
       ]
@@ -151,6 +168,7 @@
       "fadeOut": 0.04,
       "decayFrom": 0.12,
       "loop": false,
+      "rmsCeiling": null,
       "layers": [
         {
           "source": "kenney-impact/Audio/impactSoft_heavy_001.ogg",
@@ -162,6 +180,8 @@
           "level": 1,
           "tempo": 1,
           "ramp": null,
+          "eq": [],
+          "compression": false,
           "offset": 0
         },
         {
@@ -174,6 +194,8 @@
           "level": 0.28,
           "tempo": 1,
           "ramp": null,
+          "eq": [],
+          "compression": false,
           "offset": 0
         }
       ]
@@ -185,6 +207,7 @@
       "fadeOut": 0.055,
       "decayFrom": null,
       "loop": false,
+      "rmsCeiling": null,
       "layers": [
         {
           "source": "kenney-impact/Audio/impactWood_heavy_001.ogg",
@@ -196,6 +219,8 @@
           "level": 1,
           "tempo": 1,
           "ramp": null,
+          "eq": [],
+          "compression": false,
           "offset": 0
         }
       ]
@@ -207,6 +232,7 @@
       "fadeOut": 0.04,
       "decayFrom": 0.15,
       "loop": false,
+      "rmsCeiling": null,
       "layers": [
         {
           "source": "kenney-impact/Audio/impactSoft_heavy_001.ogg",
@@ -218,6 +244,8 @@
           "level": 1,
           "tempo": 1,
           "ramp": null,
+          "eq": [],
+          "compression": false,
           "offset": 0
         },
         {
@@ -230,6 +258,8 @@
           "level": 0.28,
           "tempo": 1,
           "ramp": null,
+          "eq": [],
+          "compression": false,
           "offset": 0
         }
       ]
@@ -241,6 +271,7 @@
       "fadeOut": 0.04,
       "decayFrom": null,
       "loop": false,
+      "rmsCeiling": null,
       "layers": [
         {
           "source": "kenney-impact/Audio/impactGeneric_light_001.ogg",
@@ -252,6 +283,8 @@
           "level": 1,
           "tempo": 1,
           "ramp": null,
+          "eq": [],
+          "compression": false,
           "offset": 0
         }
       ]
@@ -263,6 +296,7 @@
       "fadeOut": 0.04,
       "decayFrom": 0.12,
       "loop": false,
+      "rmsCeiling": null,
       "layers": [
         {
           "source": "kenney-impact/Audio/impactSoft_heavy_002.ogg",
@@ -274,6 +308,8 @@
           "level": 1,
           "tempo": 1,
           "ramp": null,
+          "eq": [],
+          "compression": false,
           "offset": 0
         },
         {
@@ -286,6 +322,8 @@
           "level": 0.28,
           "tempo": 1,
           "ramp": null,
+          "eq": [],
+          "compression": false,
           "offset": 0
         }
       ]
@@ -297,6 +335,7 @@
       "fadeOut": 0.055,
       "decayFrom": null,
       "loop": false,
+      "rmsCeiling": null,
       "layers": [
         {
           "source": "kenney-impact/Audio/impactWood_heavy_002.ogg",
@@ -308,6 +347,8 @@
           "level": 1,
           "tempo": 1,
           "ramp": null,
+          "eq": [],
+          "compression": false,
           "offset": 0
         }
       ]
@@ -319,6 +360,7 @@
       "fadeOut": 0.04,
       "decayFrom": 0.15,
       "loop": false,
+      "rmsCeiling": null,
       "layers": [
         {
           "source": "kenney-impact/Audio/impactSoft_heavy_002.ogg",
@@ -330,6 +372,8 @@
           "level": 1,
           "tempo": 1,
           "ramp": null,
+          "eq": [],
+          "compression": false,
           "offset": 0
         },
         {
@@ -342,6 +386,8 @@
           "level": 0.28,
           "tempo": 1,
           "ramp": null,
+          "eq": [],
+          "compression": false,
           "offset": 0
         }
       ]
@@ -353,6 +399,7 @@
       "fadeOut": 0.04,
       "decayFrom": null,
       "loop": false,
+      "rmsCeiling": null,
       "layers": [
         {
           "source": "kenney-impact/Audio/impactGeneric_light_002.ogg",
@@ -364,6 +411,8 @@
           "level": 1,
           "tempo": 1,
           "ramp": null,
+          "eq": [],
+          "compression": false,
           "offset": 0
         }
       ]
@@ -375,6 +424,7 @@
       "fadeOut": 0.04,
       "decayFrom": 0.1,
       "loop": false,
+      "rmsCeiling": null,
       "layers": [
         {
           "source": "kenney-impact/Audio/impactSoft_medium_000.ogg",
@@ -386,6 +436,8 @@
           "level": 1,
           "tempo": 1,
           "ramp": null,
+          "eq": [],
+          "compression": false,
           "offset": 0
         }
       ]
@@ -397,6 +449,7 @@
       "fadeOut": 0.04,
       "decayFrom": 0.1,
       "loop": false,
+      "rmsCeiling": null,
       "layers": [
         {
           "source": "kenney-impact/Audio/impactSoft_medium_001.ogg",
@@ -408,254 +461,356 @@
           "level": 1,
           "tempo": 1,
           "ramp": null,
+          "eq": [],
+          "compression": false,
           "offset": 0
         }
       ]
     },
     {
       "kind": "pistol",
-      "duration": 0.28,
-      "fadeIn": 0.0004,
-      "fadeOut": 0.06,
+      "duration": 0.46,
+      "fadeIn": 0.0002,
+      "fadeOut": 0.12,
       "decayFrom": 0.14,
       "loop": false,
+      "rmsCeiling": 0.105,
       "layers": [
         {
-          "source": "firearms/Prepared SFX Library/Walther PPQ/X_31P.wav",
-          "start": 1.078,
-          "duration": 0.28,
+          "source": "firearms/Prepared SFX Library/1911/A_42P.wav",
+          "start": 0.936,
+          "duration": 0.46,
           "pitch": 1,
-          "lowpass": 8800,
-          "highpass": 85,
+          "lowpass": 9000,
+          "highpass": 65,
           "level": 1,
           "tempo": 1,
           "ramp": null,
+          "eq": [
+            "equalizer=f=240:t=q:w=.8:g=3"
+          ],
+          "compression": true,
           "offset": 0
+        },
+        {
+          "source": "firearms/Prepared SFX Library/1911/A_34P.wav",
+          "start": 6.65,
+          "duration": 0.25,
+          "pitch": 1,
+          "lowpass": 1300,
+          "highpass": 70,
+          "level": 0.6,
+          "tempo": 1,
+          "ramp": null,
+          "eq": [],
+          "compression": true,
+          "offset": 0.003
         }
       ]
     },
     {
       "kind": "pistol",
-      "duration": 0.28,
-      "fadeIn": 0.0004,
-      "fadeOut": 0.06,
+      "duration": 0.46,
+      "fadeIn": 0.0002,
+      "fadeOut": 0.12,
       "decayFrom": 0.14,
       "loop": false,
+      "rmsCeiling": 0.105,
       "layers": [
         {
-          "source": "firearms/Prepared SFX Library/Walther PPQ/X_31P.wav",
-          "start": 5.238,
-          "duration": 0.28,
+          "source": "firearms/Prepared SFX Library/1911/A_42P.wav",
+          "start": 4.994,
+          "duration": 0.46,
           "pitch": 1,
-          "lowpass": 8800,
-          "highpass": 85,
+          "lowpass": 9000,
+          "highpass": 65,
           "level": 1,
           "tempo": 1,
           "ramp": null,
+          "eq": [
+            "equalizer=f=240:t=q:w=.8:g=3"
+          ],
+          "compression": true,
           "offset": 0
+        },
+        {
+          "source": "firearms/Prepared SFX Library/1911/A_34P.wav",
+          "start": 1.535,
+          "duration": 0.25,
+          "pitch": 1,
+          "lowpass": 1300,
+          "highpass": 70,
+          "level": 0.6,
+          "tempo": 1,
+          "ramp": null,
+          "eq": [],
+          "compression": true,
+          "offset": 0.003
         }
       ]
     },
     {
       "kind": "pistol",
-      "duration": 0.28,
-      "fadeIn": 0.0004,
-      "fadeOut": 0.06,
+      "duration": 0.46,
+      "fadeIn": 0.0002,
+      "fadeOut": 0.12,
       "decayFrom": 0.14,
       "loop": false,
+      "rmsCeiling": 0.105,
       "layers": [
         {
-          "source": "firearms/Prepared SFX Library/Walther PPQ/X_39P.wav",
-          "start": 1.394,
-          "duration": 0.28,
+          "source": "firearms/Prepared SFX Library/1911/A_34P.wav",
+          "start": 1.535,
+          "duration": 0.46,
           "pitch": 1,
-          "lowpass": 8800,
-          "highpass": 85,
+          "lowpass": 9000,
+          "highpass": 65,
           "level": 1,
           "tempo": 1,
           "ramp": null,
+          "eq": [
+            "equalizer=f=240:t=q:w=.8:g=3"
+          ],
+          "compression": true,
           "offset": 0
+        },
+        {
+          "source": "firearms/Prepared SFX Library/1911/A_34P.wav",
+          "start": 6.65,
+          "duration": 0.25,
+          "pitch": 1,
+          "lowpass": 1300,
+          "highpass": 70,
+          "level": 0.6,
+          "tempo": 1,
+          "ramp": null,
+          "eq": [],
+          "compression": true,
+          "offset": 0.003
         }
       ]
     },
     {
       "kind": "pistol",
-      "duration": 0.28,
-      "fadeIn": 0.0004,
-      "fadeOut": 0.06,
+      "duration": 0.46,
+      "fadeIn": 0.0002,
+      "fadeOut": 0.12,
       "decayFrom": 0.14,
       "loop": false,
+      "rmsCeiling": 0.105,
       "layers": [
         {
-          "source": "firearms/Prepared SFX Library/Walther PPQ/X_39P.wav",
-          "start": 6.433,
-          "duration": 0.28,
+          "source": "firearms/Prepared SFX Library/1911/A_34P.wav",
+          "start": 6.65,
+          "duration": 0.46,
           "pitch": 1,
-          "lowpass": 8800,
-          "highpass": 85,
+          "lowpass": 9000,
+          "highpass": 65,
           "level": 1,
           "tempo": 1,
           "ramp": null,
+          "eq": [
+            "equalizer=f=240:t=q:w=.8:g=3"
+          ],
+          "compression": true,
           "offset": 0
+        },
+        {
+          "source": "firearms/Prepared SFX Library/1911/A_34P.wav",
+          "start": 1.535,
+          "duration": 0.25,
+          "pitch": 1,
+          "lowpass": 1300,
+          "highpass": 70,
+          "level": 0.6,
+          "tempo": 1,
+          "ramp": null,
+          "eq": [],
+          "compression": true,
+          "offset": 0.003
         }
       ]
     },
     {
       "kind": "launcher",
-      "duration": 0.58,
-      "fadeIn": 0.003,
-      "fadeOut": 0.15,
-      "decayFrom": 0.3,
+      "duration": 0.78,
+      "fadeIn": 0.0005,
+      "fadeOut": 0.18,
+      "decayFrom": 0.38,
       "loop": false,
+      "rmsCeiling": null,
       "layers": [
         {
-          "source": "kenney-scifi/Audio/thrusterFire_000.ogg",
-          "start": 1.08,
-          "duration": 0.57,
+          "source": "fireworks/fw_04.ogg",
+          "start": 0.014,
+          "duration": 0.125,
           "pitch": 1,
-          "lowpass": 7500,
+          "lowpass": 7200,
           "highpass": 70,
           "level": 1,
           "tempo": 1,
           "ramp": null,
+          "eq": [],
+          "compression": true,
           "offset": 0
         },
         {
-          "source": "kenney-impact/Audio/impactMetal_light_000.ogg",
-          "start": 0,
-          "duration": 0.045,
+          "source": "fireworks/fw_04.ogg",
+          "start": 0.42,
+          "duration": 0.75,
           "pitch": 1,
-          "lowpass": 10000,
-          "highpass": 70,
-          "level": 0.18,
+          "lowpass": 4400,
+          "highpass": 220,
+          "level": 0.48,
           "tempo": 1,
           "ramp": null,
+          "eq": [],
+          "compression": false,
+          "offset": 0.025
+        },
+        {
+          "source": "cannon-fire.ogg",
+          "start": 0,
+          "duration": 0.1,
+          "pitch": 1.18,
+          "lowpass": 1300,
+          "highpass": 70,
+          "level": 0.3,
+          "tempo": 1,
+          "ramp": null,
+          "eq": [],
+          "compression": false,
           "offset": 0
         }
       ]
     },
     {
       "kind": "cannon",
-      "duration": 0.35,
-      "fadeIn": 0.001,
-      "fadeOut": 0.09,
-      "decayFrom": 0.12,
+      "duration": 0.8,
+      "fadeIn": 0.0004,
+      "fadeOut": 0.15,
+      "decayFrom": 0.15,
       "loop": false,
+      "rmsCeiling": null,
       "layers": [
         {
-          "source": "kenney-scifi/Audio/lowFrequency_explosion_001.ogg",
-          "start": 0.02,
-          "duration": 0.28,
-          "pitch": 1.22,
-          "lowpass": 1500,
-          "highpass": 70,
-          "level": 0.85,
-          "tempo": 1,
-          "ramp": null,
-          "offset": 0
-        },
-        {
-          "source": "kenney-scifi/Audio/thrusterFire_000.ogg",
-          "start": 1.08,
-          "duration": 0.23,
+          "source": "cannon-fire.ogg",
+          "start": 0,
+          "duration": 0.82,
           "pitch": 1,
-          "lowpass": 10000,
-          "highpass": 650,
-          "level": 0.32,
+          "lowpass": 6700,
+          "highpass": 45,
+          "level": 1,
           "tempo": 1,
           "ramp": null,
+          "eq": [],
+          "compression": true,
           "offset": 0
         },
         {
           "source": "kenney-impact/Audio/impactMetal_light_000.ogg",
           "start": 0,
-          "duration": 0.04,
+          "duration": 0.055,
           "pitch": 1,
           "lowpass": 10000,
           "highpass": 70,
-          "level": 0.13,
+          "level": 0.12,
           "tempo": 1,
           "ramp": null,
+          "eq": [],
+          "compression": false,
           "offset": 0
         }
       ]
     },
     {
       "kind": "launcher",
-      "duration": 0.58,
-      "fadeIn": 0.003,
-      "fadeOut": 0.15,
-      "decayFrom": 0.3,
+      "duration": 0.78,
+      "fadeIn": 0.0005,
+      "fadeOut": 0.18,
+      "decayFrom": 0.38,
       "loop": false,
+      "rmsCeiling": null,
       "layers": [
         {
-          "source": "kenney-scifi/Audio/thrusterFire_001.ogg",
-          "start": 1.08,
-          "duration": 0.57,
-          "pitch": 1,
-          "lowpass": 7500,
+          "source": "fireworks/fw_04.ogg",
+          "start": 0.014,
+          "duration": 0.125,
+          "pitch": 0.96,
+          "lowpass": 7200,
           "highpass": 70,
           "level": 1,
           "tempo": 1,
           "ramp": null,
+          "eq": [],
+          "compression": true,
           "offset": 0
         },
         {
-          "source": "kenney-impact/Audio/impactMetal_light_001.ogg",
-          "start": 0,
-          "duration": 0.045,
-          "pitch": 1,
-          "lowpass": 10000,
-          "highpass": 70,
-          "level": 0.18,
+          "source": "fireworks/fw_04.ogg",
+          "start": 0.42,
+          "duration": 0.75,
+          "pitch": 0.96,
+          "lowpass": 4400,
+          "highpass": 220,
+          "level": 0.48,
           "tempo": 1,
           "ramp": null,
+          "eq": [],
+          "compression": false,
+          "offset": 0.025
+        },
+        {
+          "source": "cannon-fire.ogg",
+          "start": 0,
+          "duration": 0.1,
+          "pitch": 1.1327999999999998,
+          "lowpass": 1300,
+          "highpass": 70,
+          "level": 0.3,
+          "tempo": 1,
+          "ramp": null,
+          "eq": [],
+          "compression": false,
           "offset": 0
         }
       ]
     },
     {
       "kind": "cannon",
-      "duration": 0.35,
-      "fadeIn": 0.001,
-      "fadeOut": 0.09,
-      "decayFrom": 0.12,
+      "duration": 0.8,
+      "fadeIn": 0.0004,
+      "fadeOut": 0.15,
+      "decayFrom": 0.15,
       "loop": false,
+      "rmsCeiling": null,
       "layers": [
         {
-          "source": "kenney-scifi/Audio/lowFrequency_explosion_001.ogg",
-          "start": 0.02,
-          "duration": 0.28,
-          "pitch": 1.22,
-          "lowpass": 1500,
-          "highpass": 70,
-          "level": 0.85,
-          "tempo": 1,
-          "ramp": null,
-          "offset": 0
-        },
-        {
-          "source": "kenney-scifi/Audio/thrusterFire_001.ogg",
-          "start": 1.08,
-          "duration": 0.23,
-          "pitch": 1,
-          "lowpass": 10000,
-          "highpass": 650,
-          "level": 0.32,
-          "tempo": 1,
-          "ramp": null,
-          "offset": 0
-        },
-        {
-          "source": "kenney-impact/Audio/impactMetal_light_001.ogg",
+          "source": "cannon-fire.ogg",
           "start": 0,
-          "duration": 0.04,
+          "duration": 0.82,
+          "pitch": 0.96,
+          "lowpass": 6700,
+          "highpass": 45,
+          "level": 1,
+          "tempo": 1,
+          "ramp": null,
+          "eq": [],
+          "compression": true,
+          "offset": 0
+        },
+        {
+          "source": "kenney-impact/Audio/impactMetal_light_000.ogg",
+          "start": 0,
+          "duration": 0.055,
           "pitch": 1,
           "lowpass": 10000,
           "highpass": 70,
-          "level": 0.13,
+          "level": 0.12,
           "tempo": 1,
           "ramp": null,
+          "eq": [],
+          "compression": false,
           "offset": 0
         }
       ]
@@ -667,6 +822,7 @@
       "fadeOut": 0.024,
       "decayFrom": null,
       "loop": false,
+      "rmsCeiling": null,
       "layers": [
         {
           "source": "swishes/swishes/swish-7.wav",
@@ -678,6 +834,8 @@
           "level": 1,
           "tempo": 1,
           "ramp": null,
+          "eq": [],
+          "compression": false,
           "offset": 0
         }
       ]
@@ -689,6 +847,7 @@
       "fadeOut": 0.045,
       "decayFrom": null,
       "loop": false,
+      "rmsCeiling": null,
       "layers": [
         {
           "source": "swishes/swishes/swish-7.wav",
@@ -700,6 +859,8 @@
           "level": 1,
           "tempo": 1,
           "ramp": null,
+          "eq": [],
+          "compression": false,
           "offset": 0
         }
       ]
@@ -711,6 +872,7 @@
       "fadeOut": 0.024,
       "decayFrom": null,
       "loop": false,
+      "rmsCeiling": null,
       "layers": [
         {
           "source": "swishes/swishes/swish-8.wav",
@@ -722,6 +884,8 @@
           "level": 1,
           "tempo": 1,
           "ramp": null,
+          "eq": [],
+          "compression": false,
           "offset": 0
         }
       ]
@@ -733,6 +897,7 @@
       "fadeOut": 0.045,
       "decayFrom": null,
       "loop": false,
+      "rmsCeiling": null,
       "layers": [
         {
           "source": "swishes/swishes/swish-8.wav",
@@ -744,6 +909,8 @@
           "level": 1,
           "tempo": 1,
           "ramp": null,
+          "eq": [],
+          "compression": false,
           "offset": 0
         }
       ]
@@ -755,6 +922,7 @@
       "fadeOut": 0.024,
       "decayFrom": null,
       "loop": false,
+      "rmsCeiling": null,
       "layers": [
         {
           "source": "swishes/swishes/swish-9.wav",
@@ -766,6 +934,8 @@
           "level": 1,
           "tempo": 1,
           "ramp": null,
+          "eq": [],
+          "compression": false,
           "offset": 0
         }
       ]
@@ -777,6 +947,7 @@
       "fadeOut": 0.045,
       "decayFrom": null,
       "loop": false,
+      "rmsCeiling": null,
       "layers": [
         {
           "source": "swishes/swishes/swish-9.wav",
@@ -788,6 +959,8 @@
           "level": 1,
           "tempo": 1,
           "ramp": null,
+          "eq": [],
+          "compression": false,
           "offset": 0
         }
       ]
@@ -799,6 +972,7 @@
       "fadeOut": 0.03,
       "decayFrom": null,
       "loop": false,
+      "rmsCeiling": null,
       "layers": [
         {
           "source": "swishes/swishes/swish-5.wav",
@@ -810,6 +984,8 @@
           "level": 1,
           "tempo": 1,
           "ramp": null,
+          "eq": [],
+          "compression": false,
           "offset": 0
         }
       ]
@@ -821,6 +997,7 @@
       "fadeOut": 0.03,
       "decayFrom": null,
       "loop": false,
+      "rmsCeiling": null,
       "layers": [
         {
           "source": "swishes/swishes/swish-6.wav",
@@ -832,17 +1009,20 @@
           "level": 1,
           "tempo": 1,
           "ramp": null,
+          "eq": [],
+          "compression": false,
           "offset": 0
         }
       ]
     },
     {
       "kind": "bomb-arm",
-      "duration": 0.18,
+      "duration": 0.48,
       "fadeIn": 0.001,
-      "fadeOut": 0.024,
+      "fadeOut": 0.12,
       "decayFrom": null,
       "loop": false,
+      "rmsCeiling": null,
       "layers": [
         {
           "source": "kenney-impact/Audio/impactMetal_light_000.ogg",
@@ -851,10 +1031,26 @@
           "pitch": 1,
           "lowpass": 10000,
           "highpass": 750,
-          "level": 0.7,
+          "level": 0.8,
           "tempo": 1,
           "ramp": null,
+          "eq": [],
+          "compression": false,
           "offset": 0
+        },
+        {
+          "source": "fireworks/fw_04.ogg",
+          "start": 1.35,
+          "duration": 0.4,
+          "pitch": 1,
+          "lowpass": 4500,
+          "highpass": 600,
+          "level": 0.3,
+          "tempo": 1,
+          "ramp": null,
+          "eq": [],
+          "compression": false,
+          "offset": 0.06
         },
         {
           "source": "kenney-impact/Audio/impactGeneric_light_000.ogg",
@@ -866,17 +1062,20 @@
           "level": 0.45,
           "tempo": 1,
           "ramp": null,
+          "eq": [],
+          "compression": false,
           "offset": 0.09
         }
       ]
     },
     {
       "kind": "bomb-arm",
-      "duration": 0.18,
+      "duration": 0.48,
       "fadeIn": 0.001,
-      "fadeOut": 0.024,
+      "fadeOut": 0.12,
       "decayFrom": null,
       "loop": false,
+      "rmsCeiling": null,
       "layers": [
         {
           "source": "kenney-impact/Audio/impactMetal_light_001.ogg",
@@ -885,10 +1084,26 @@
           "pitch": 1,
           "lowpass": 10000,
           "highpass": 750,
-          "level": 0.7,
+          "level": 0.8,
           "tempo": 1,
           "ramp": null,
+          "eq": [],
+          "compression": false,
           "offset": 0
+        },
+        {
+          "source": "fireworks/fw_04.ogg",
+          "start": 1.35,
+          "duration": 0.4,
+          "pitch": 1,
+          "lowpass": 4500,
+          "highpass": 600,
+          "level": 0.3,
+          "tempo": 1,
+          "ramp": null,
+          "eq": [],
+          "compression": false,
+          "offset": 0.06
         },
         {
           "source": "kenney-impact/Audio/impactGeneric_light_001.ogg",
@@ -900,118 +1115,136 @@
           "level": 0.45,
           "tempo": 1,
           "ramp": null,
+          "eq": [],
+          "compression": false,
           "offset": 0.09
         }
       ]
     },
     {
       "kind": "bomb-blast",
-      "duration": 0.76,
-      "fadeIn": 0.001,
-      "fadeOut": 0.15,
-      "decayFrom": 0.3,
+      "duration": 1.05,
+      "fadeIn": 0.0004,
+      "fadeOut": 0.2,
+      "decayFrom": 0.53,
       "loop": false,
+      "rmsCeiling": null,
       "layers": [
         {
-          "source": "explosion3.ogg",
+          "source": "fireworks/cannon_02.ogg",
           "start": 0,
-          "duration": 0.74,
-          "pitch": 1,
-          "lowpass": 6400,
-          "highpass": 70,
+          "duration": 1,
+          "pitch": 0.91,
+          "lowpass": 6300,
+          "highpass": 45,
           "level": 1,
           "tempo": 1,
           "ramp": null,
+          "eq": [],
+          "compression": true,
+          "offset": 0
+        },
+        {
+          "source": "cannon-fire.ogg",
+          "start": 0,
+          "duration": 0.35,
+          "pitch": 0.82,
+          "lowpass": 550,
+          "highpass": 40,
+          "level": 0.22,
+          "tempo": 1,
+          "ramp": null,
+          "eq": [],
+          "compression": false,
           "offset": 0
         }
       ]
     },
     {
       "kind": "bomb-blast",
-      "duration": 0.76,
-      "fadeIn": 0.001,
-      "fadeOut": 0.15,
-      "decayFrom": 0.3,
+      "duration": 1.05,
+      "fadeIn": 0.0004,
+      "fadeOut": 0.2,
+      "decayFrom": 0.53,
       "loop": false,
+      "rmsCeiling": null,
       "layers": [
         {
-          "source": "explosion3.ogg",
+          "source": "fireworks/cannon_02.ogg",
           "start": 0,
-          "duration": 0.74,
+          "duration": 1,
           "pitch": 0.96,
-          "lowpass": 6400,
-          "highpass": 70,
+          "lowpass": 6300,
+          "highpass": 45,
           "level": 1,
           "tempo": 1,
           "ramp": null,
+          "eq": [],
+          "compression": true,
+          "offset": 0
+        },
+        {
+          "source": "cannon-fire.ogg",
+          "start": 0,
+          "duration": 0.35,
+          "pitch": 0.82,
+          "lowpass": 550,
+          "highpass": 40,
+          "level": 0.22,
+          "tempo": 1,
+          "ramp": null,
+          "eq": [],
+          "compression": false,
           "offset": 0
         }
       ]
     },
     {
       "kind": "rocket-blast",
-      "duration": 0.5,
-      "fadeIn": 0.001,
-      "fadeOut": 0.1,
-      "decayFrom": 0.18,
+      "duration": 0.82,
+      "fadeIn": 0.0004,
+      "fadeOut": 0.16,
+      "decayFrom": 0.4,
       "loop": false,
+      "rmsCeiling": null,
       "layers": [
         {
-          "source": "explosion3.ogg",
-          "start": 0,
-          "duration": 0.57,
-          "pitch": 1.17,
+          "source": "fireworks/cannon_01.ogg",
+          "start": 0.077,
+          "duration": 0.82,
+          "pitch": 1.03,
           "lowpass": 7500,
-          "highpass": 70,
+          "highpass": 55,
           "level": 1,
           "tempo": 1,
           "ramp": null,
-          "offset": 0
-        },
-        {
-          "source": "kenney-scifi/Audio/thrusterFire_000.ogg",
-          "start": 1.1,
-          "duration": 0.2,
-          "pitch": 1,
-          "lowpass": 10000,
-          "highpass": 70,
-          "level": 0.18,
-          "tempo": 1,
-          "ramp": null,
+          "eq": [],
+          "compression": true,
           "offset": 0
         }
       ]
     },
     {
       "kind": "rocket-blast",
-      "duration": 0.5,
-      "fadeIn": 0.001,
-      "fadeOut": 0.1,
-      "decayFrom": 0.18,
+      "duration": 0.82,
+      "fadeIn": 0.0004,
+      "fadeOut": 0.16,
+      "decayFrom": 0.4,
       "loop": false,
+      "rmsCeiling": null,
       "layers": [
         {
-          "source": "explosion3.ogg",
-          "start": 0,
-          "duration": 0.57,
-          "pitch": 1.12,
+          "source": "fireworks/cannon_01.ogg",
+          "start": 0.077,
+          "duration": 0.82,
+          "pitch": 0.98,
           "lowpass": 7500,
-          "highpass": 70,
+          "highpass": 55,
           "level": 1,
           "tempo": 1,
           "ramp": null,
-          "offset": 0
-        },
-        {
-          "source": "kenney-scifi/Audio/thrusterFire_000.ogg",
-          "start": 1.1,
-          "duration": 0.2,
-          "pitch": 1,
-          "lowpass": 10000,
-          "highpass": 70,
-          "level": 0.18,
-          "tempo": 1,
-          "ramp": null,
+          "eq": [],
+          "compression": true,
           "offset": 0
         }
       ]
@@ -1023,20 +1256,29 @@
       "fadeOut": 0.075,
       "decayFrom": null,
       "loop": false,
+      "rmsCeiling": null,
       "layers": [
         {
           "source": "vacuumcleaner01.wav",
           "start": 34,
           "duration": 0.44,
           "pitch": 1,
-          "lowpass": 5800,
-          "highpass": 85,
+          "lowpass": 2100,
+          "highpass": 75,
           "level": 1,
           "tempo": 1,
           "ramp": [
             0.65,
             1
           ],
+          "eq": [
+            "equalizer=f=1082:t=q:w=12:g=-12",
+            "equalizer=f=2164:t=q:w=10:g=-12",
+            "equalizer=f=3246:t=q:w=7:g=-24",
+            "equalizer=f=6492:t=q:w=6:g=-24",
+            "lowpass=f=2100:p=2"
+          ],
+          "compression": false,
           "offset": 0
         }
       ]
@@ -1048,17 +1290,26 @@
       "fadeOut": 0.04,
       "decayFrom": null,
       "loop": true,
+      "rmsCeiling": null,
       "layers": [
         {
           "source": "vacuumcleaner01.wav",
           "start": 35,
           "duration": 1.4,
           "pitch": 1,
-          "lowpass": 5800,
-          "highpass": 85,
+          "lowpass": 2100,
+          "highpass": 75,
           "level": 1,
           "tempo": 1,
           "ramp": null,
+          "eq": [
+            "equalizer=f=1082:t=q:w=12:g=-12",
+            "equalizer=f=2164:t=q:w=10:g=-12",
+            "equalizer=f=3246:t=q:w=7:g=-24",
+            "equalizer=f=6492:t=q:w=6:g=-24",
+            "lowpass=f=2100:p=2"
+          ],
+          "compression": false,
           "offset": 0
         }
       ]
@@ -1070,28 +1321,271 @@
       "fadeOut": 0.28,
       "decayFrom": null,
       "loop": false,
+      "rmsCeiling": null,
       "layers": [
         {
           "source": "vacuumcleaner01.wav",
           "start": 37,
           "duration": 0.5,
           "pitch": 1,
-          "lowpass": 5800,
-          "highpass": 85,
+          "lowpass": 2100,
+          "highpass": 75,
           "level": 1,
           "tempo": 1,
           "ramp": [
             1,
             0.5
           ],
+          "eq": [
+            "equalizer=f=1082:t=q:w=12:g=-12",
+            "equalizer=f=2164:t=q:w=10:g=-12",
+            "equalizer=f=3246:t=q:w=7:g=-24",
+            "equalizer=f=6492:t=q:w=6:g=-24",
+            "lowpass=f=2100:p=2"
+          ],
+          "compression": false,
           "offset": 0
+        }
+      ]
+    },
+    {
+      "kind": "big-pop",
+      "duration": 0.1,
+      "fadeIn": 0.00015,
+      "fadeOut": 0.018,
+      "decayFrom": null,
+      "loop": false,
+      "rmsCeiling": null,
+      "layers": [
+        {
+          "source": "@/public/audio/bubble-pops.wav",
+          "start": 0.0,
+          "duration": 0.06,
+          "pitch": 0.78,
+          "lowpass": 8500,
+          "highpass": 55,
+          "level": 1,
+          "tempo": 1,
+          "ramp": null,
+          "eq": [],
+          "compression": false,
+          "offset": 0
+        },
+        {
+          "source": "@/public/audio/bubble-pops.wav",
+          "start": 0.0,
+          "duration": 0.06,
+          "pitch": 0.5,
+          "lowpass": 1100,
+          "highpass": 40,
+          "level": 0.48,
+          "tempo": 1,
+          "ramp": null,
+          "eq": [],
+          "compression": false,
+          "offset": 0.002
+        }
+      ]
+    },
+    {
+      "kind": "big-pop",
+      "duration": 0.1,
+      "fadeIn": 0.00015,
+      "fadeOut": 0.018,
+      "decayFrom": null,
+      "loop": false,
+      "rmsCeiling": null,
+      "layers": [
+        {
+          "source": "@/public/audio/bubble-pops.wav",
+          "start": 0.18,
+          "duration": 0.06,
+          "pitch": 0.78,
+          "lowpass": 8500,
+          "highpass": 55,
+          "level": 1,
+          "tempo": 1,
+          "ramp": null,
+          "eq": [],
+          "compression": false,
+          "offset": 0
+        },
+        {
+          "source": "@/public/audio/bubble-pops.wav",
+          "start": 0.18,
+          "duration": 0.06,
+          "pitch": 0.5,
+          "lowpass": 1100,
+          "highpass": 40,
+          "level": 0.48,
+          "tempo": 1,
+          "ramp": null,
+          "eq": [],
+          "compression": false,
+          "offset": 0.002
+        }
+      ]
+    },
+    {
+      "kind": "big-pop",
+      "duration": 0.1,
+      "fadeIn": 0.00015,
+      "fadeOut": 0.018,
+      "decayFrom": null,
+      "loop": false,
+      "rmsCeiling": null,
+      "layers": [
+        {
+          "source": "@/public/audio/bubble-pops.wav",
+          "start": 0.42,
+          "duration": 0.06,
+          "pitch": 0.78,
+          "lowpass": 8500,
+          "highpass": 55,
+          "level": 1,
+          "tempo": 1,
+          "ramp": null,
+          "eq": [],
+          "compression": false,
+          "offset": 0
+        },
+        {
+          "source": "@/public/audio/bubble-pops.wav",
+          "start": 0.42,
+          "duration": 0.06,
+          "pitch": 0.5,
+          "lowpass": 1100,
+          "highpass": 40,
+          "level": 0.48,
+          "tempo": 1,
+          "ramp": null,
+          "eq": [],
+          "compression": false,
+          "offset": 0.002
+        }
+      ]
+    },
+    {
+      "kind": "big-pop",
+      "duration": 0.1,
+      "fadeIn": 0.00015,
+      "fadeOut": 0.018,
+      "decayFrom": null,
+      "loop": false,
+      "rmsCeiling": null,
+      "layers": [
+        {
+          "source": "@/public/audio/bubble-pops.wav",
+          "start": 0.54,
+          "duration": 0.06,
+          "pitch": 0.78,
+          "lowpass": 8500,
+          "highpass": 55,
+          "level": 1,
+          "tempo": 1,
+          "ramp": null,
+          "eq": [],
+          "compression": false,
+          "offset": 0
+        },
+        {
+          "source": "@/public/audio/bubble-pops.wav",
+          "start": 0.54,
+          "duration": 0.06,
+          "pitch": 0.5,
+          "lowpass": 1100,
+          "highpass": 40,
+          "level": 0.48,
+          "tempo": 1,
+          "ramp": null,
+          "eq": [],
+          "compression": false,
+          "offset": 0.002
+        }
+      ]
+    },
+    {
+      "kind": "big-pop",
+      "duration": 0.1,
+      "fadeIn": 0.00015,
+      "fadeOut": 0.018,
+      "decayFrom": null,
+      "loop": false,
+      "rmsCeiling": null,
+      "layers": [
+        {
+          "source": "@/public/audio/bubble-pops.wav",
+          "start": 0.72,
+          "duration": 0.06,
+          "pitch": 0.78,
+          "lowpass": 8500,
+          "highpass": 55,
+          "level": 1,
+          "tempo": 1,
+          "ramp": null,
+          "eq": [],
+          "compression": false,
+          "offset": 0
+        },
+        {
+          "source": "@/public/audio/bubble-pops.wav",
+          "start": 0.72,
+          "duration": 0.06,
+          "pitch": 0.5,
+          "lowpass": 1100,
+          "highpass": 40,
+          "level": 0.48,
+          "tempo": 1,
+          "ramp": null,
+          "eq": [],
+          "compression": false,
+          "offset": 0.002
+        }
+      ]
+    },
+    {
+      "kind": "big-pop",
+      "duration": 0.1,
+      "fadeIn": 0.00015,
+      "fadeOut": 0.018,
+      "decayFrom": null,
+      "loop": false,
+      "rmsCeiling": null,
+      "layers": [
+        {
+          "source": "@/public/audio/bubble-pops.wav",
+          "start": 0.8999999999999999,
+          "duration": 0.06,
+          "pitch": 0.78,
+          "lowpass": 8500,
+          "highpass": 55,
+          "level": 1,
+          "tempo": 1,
+          "ramp": null,
+          "eq": [],
+          "compression": false,
+          "offset": 0
+        },
+        {
+          "source": "@/public/audio/bubble-pops.wav",
+          "start": 0.8999999999999999,
+          "duration": 0.06,
+          "pitch": 0.5,
+          "lowpass": 1100,
+          "highpass": 40,
+          "level": 0.48,
+          "tempo": 1,
+          "ramp": null,
+          "eq": [],
+          "compression": false,
+          "offset": 0.002
         }
       ]
     }
   ],
   "url": "/audio/item-sounds.wav",
   "sampleRate": 32000,
-  "frames": 417120,
+  "frames": 559200,
   "clips": [
     {
       "kind": "mallet-hit",
@@ -1180,152 +1674,188 @@
     {
       "kind": "pistol",
       "offsetFrames": 103200,
-      "lengthFrames": 8960,
+      "lengthFrames": 14720,
       "peakSeconds": 0.01
     },
     {
       "kind": "pistol",
-      "offsetFrames": 112160,
-      "lengthFrames": 8960,
+      "offsetFrames": 117920,
+      "lengthFrames": 14720,
       "peakSeconds": 0.01
     },
     {
       "kind": "pistol",
-      "offsetFrames": 121120,
-      "lengthFrames": 8960,
-      "peakSeconds": 0.015
+      "offsetFrames": 132640,
+      "lengthFrames": 14720,
+      "peakSeconds": 0.01
     },
     {
       "kind": "pistol",
-      "offsetFrames": 130080,
-      "lengthFrames": 8960,
-      "peakSeconds": 0.015
+      "offsetFrames": 147360,
+      "lengthFrames": 14720,
+      "peakSeconds": 0.01
     },
     {
       "kind": "launcher",
-      "offsetFrames": 139040,
-      "lengthFrames": 18560,
-      "peakSeconds": 0.06
+      "offsetFrames": 162080,
+      "lengthFrames": 24960,
+      "peakSeconds": 0.035
     },
     {
       "kind": "cannon",
-      "offsetFrames": 157600,
-      "lengthFrames": 11200,
-      "peakSeconds": 0.1
+      "offsetFrames": 187040,
+      "lengthFrames": 25600,
+      "peakSeconds": 0.025
     },
     {
       "kind": "launcher",
-      "offsetFrames": 168800,
-      "lengthFrames": 18560,
-      "peakSeconds": 0.06
+      "offsetFrames": 212640,
+      "lengthFrames": 24960,
+      "peakSeconds": 0.04
     },
     {
       "kind": "cannon",
-      "offsetFrames": 187360,
-      "lengthFrames": 11200,
-      "peakSeconds": 0.1
+      "offsetFrames": 237600,
+      "lengthFrames": 25600,
+      "peakSeconds": 0.025
     },
     {
       "kind": "swish",
-      "offsetFrames": 198560,
+      "offsetFrames": 263200,
       "lengthFrames": 6080,
       "peakSeconds": 0.04
     },
     {
       "kind": "heavy-swish",
-      "offsetFrames": 204640,
+      "offsetFrames": 269280,
       "lengthFrames": 8000,
       "peakSeconds": 0.065
     },
     {
       "kind": "swish",
-      "offsetFrames": 212640,
+      "offsetFrames": 277280,
       "lengthFrames": 6080,
       "peakSeconds": 0.07
     },
     {
       "kind": "heavy-swish",
-      "offsetFrames": 218720,
+      "offsetFrames": 283360,
       "lengthFrames": 8000,
       "peakSeconds": 0.1
     },
     {
       "kind": "swish",
-      "offsetFrames": 226720,
+      "offsetFrames": 291360,
       "lengthFrames": 6080,
       "peakSeconds": 0.065
     },
     {
       "kind": "heavy-swish",
-      "offsetFrames": 232800,
+      "offsetFrames": 297440,
       "lengthFrames": 8000,
       "peakSeconds": 0.1
     },
     {
       "kind": "throw",
-      "offsetFrames": 240800,
+      "offsetFrames": 305440,
       "lengthFrames": 5440,
       "peakSeconds": 0.05
     },
     {
       "kind": "throw",
-      "offsetFrames": 246240,
+      "offsetFrames": 310880,
       "lengthFrames": 5440,
       "peakSeconds": 0.055
     },
     {
       "kind": "bomb-arm",
-      "offsetFrames": 251680,
-      "lengthFrames": 5760,
+      "offsetFrames": 316320,
+      "lengthFrames": 15360,
       "peakSeconds": 0.005
     },
     {
       "kind": "bomb-arm",
-      "offsetFrames": 257440,
-      "lengthFrames": 5760,
+      "offsetFrames": 331680,
+      "lengthFrames": 15360,
       "peakSeconds": 0.005
     },
     {
       "kind": "bomb-blast",
-      "offsetFrames": 263200,
-      "lengthFrames": 24320,
-      "peakSeconds": 0.025
+      "offsetFrames": 347040,
+      "lengthFrames": 33600,
+      "peakSeconds": 0.03
     },
     {
       "kind": "bomb-blast",
-      "offsetFrames": 287520,
-      "lengthFrames": 24320,
-      "peakSeconds": 0.025
+      "offsetFrames": 380640,
+      "lengthFrames": 33600,
+      "peakSeconds": 0.03
     },
     {
       "kind": "rocket-blast",
-      "offsetFrames": 311840,
-      "lengthFrames": 16000,
-      "peakSeconds": 0.02
+      "offsetFrames": 414240,
+      "lengthFrames": 26240,
+      "peakSeconds": 0.015
     },
     {
       "kind": "rocket-blast",
-      "offsetFrames": 327840,
-      "lengthFrames": 16000,
-      "peakSeconds": 0.02
+      "offsetFrames": 440480,
+      "lengthFrames": 26240,
+      "peakSeconds": 0.015
     },
     {
       "kind": "vacuum-start",
-      "offsetFrames": 343840,
+      "offsetFrames": 466720,
       "lengthFrames": 14080,
-      "peakSeconds": 0.225
+      "peakSeconds": 0.125
     },
     {
       "kind": "vacuum",
-      "offsetFrames": 357920,
+      "offsetFrames": 480800,
       "lengthFrames": 43200,
-      "peakSeconds": 0.285
+      "peakSeconds": 0.51
     },
     {
       "kind": "vacuum-stop",
-      "offsetFrames": 401120,
+      "offsetFrames": 524000,
       "lengthFrames": 16000,
-      "peakSeconds": 0.165
+      "peakSeconds": 0.2
+    },
+    {
+      "kind": "big-pop",
+      "offsetFrames": 540000,
+      "lengthFrames": 3200,
+      "peakSeconds": 0.005
+    },
+    {
+      "kind": "big-pop",
+      "offsetFrames": 543200,
+      "lengthFrames": 3200,
+      "peakSeconds": 0.005
+    },
+    {
+      "kind": "big-pop",
+      "offsetFrames": 546400,
+      "lengthFrames": 3200,
+      "peakSeconds": 0.005
+    },
+    {
+      "kind": "big-pop",
+      "offsetFrames": 549600,
+      "lengthFrames": 3200,
+      "peakSeconds": 0.005
+    },
+    {
+      "kind": "big-pop",
+      "offsetFrames": 552800,
+      "lengthFrames": 3200,
+      "peakSeconds": 0.005
+    },
+    {
+      "kind": "big-pop",
+      "offsetFrames": 556000,
+      "lengthFrames": 3200,
+      "peakSeconds": 0.005
     }
   ]
 }

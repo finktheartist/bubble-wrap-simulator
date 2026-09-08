@@ -1,8 +1,11 @@
-export const TOOL_SOUNDS = ['mallet-hit', 'bat-hit', 'ball-hit', 'parcel-hit', 'pellet-hit', 'pistol', 'launcher', 'cannon', 'swish', 'heavy-swish', 'throw', 'bomb-arm', 'bomb-blast', 'rocket-blast', 'vacuum-start', 'vacuum', 'vacuum-stop'] as const;
+import { synthesizePop } from './pop-synthesis';
+
+export const TOOL_SOUNDS = ['mallet-hit', 'bat-hit', 'ball-hit', 'parcel-hit', 'pellet-hit', 'pistol', 'launcher', 'cannon', 'swish', 'heavy-swish', 'throw', 'bomb-arm', 'bomb-blast', 'rocket-blast', 'vacuum-start', 'vacuum', 'vacuum-stop', 'big-pop'] as const;
 export type ToolSound = typeof TOOL_SOUNDS[number];
 
 /** Cached offline fallback; the recorded atlas replaces these as soon as it loads. */
 export function synthesizeTool(sampleRate: number, kind: ToolSound, random = Math.random): Float32Array {
+  if (kind === 'big-pop') return synthesizePop(sampleRate, 12, random);
   const explosion = kind === 'bomb-blast' || kind === 'rocket-blast';
   const impact = kind.endsWith('-hit') || kind === 'bomb-arm';
   const motor = kind.startsWith('vacuum');
