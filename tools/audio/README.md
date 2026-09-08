@@ -36,7 +36,7 @@ correctness; listening remains the quality check for sound direction.
 
 ## Item Foley
 
-The item bank contains 45 clips for 18 sound types in a 1.12 MB WAV. Download these public CC0 sources
+The item bank contains 45 clips for 18 sound types in a 1.11 MB WAV. Download these public CC0 sources
 into a local source directory (the large originals are not deployed):
 
 | Local path | Download |
@@ -64,8 +64,10 @@ the initial microphone spike. Rapid pistol shots fade the preceding tail so it d
 not build into a muddy wash. Rocket and cannon cues use recorded blast/exhaust
 sources. Strong contacts (strength 1.6 or greater) select larger, layered plastic
 snaps; ordinary finger and suction pops keep the original small bank. The vacuum
-suppresses narrow motor harmonics and rolls off above 2.1 kHz before its pitch
-ramps, preserving low airflow without the earlier 3.25/6.5 kHz whine.
+suppresses motor harmonics and rolls off above 1.5 kHz. The startup retains a
+pitch ramp; shutdown uses a short unpitched air release rolled off at 800 Hz.
+Its level falls throughout the tail, avoiding the descending note and late swell
+that remained after the first high-frequency correction.
 
 The pop and item banks load independently and have immediate synthesized
 fallbacks. Contact sounds depend on the material and impact speed. Swing peaks
@@ -86,7 +88,7 @@ ffmpeg -i outputs/item-audio/item-sounds-demo.webm -c:a libmp3lame -b:a 192k out
 The review page is authoring tooling and is excluded from the published game.
 
 For the firing-weight revision, open `http://127.0.0.1:4180/weight.html`.
-It compares the previous item mix from commit `8eb4dbe` with the current engine,
+It compares the previous item mix from commit `d092b3f` with the current engine,
 at the same master volume. **Record comparison silently** saves a 30-second WebM
 to `outputs/audio-weight-pass/comparison.webm`: previous at 0–15 seconds, revised
 at 15–30 seconds. The individual selector auditions pistol, bomb, rocket, cannon,
@@ -95,4 +97,15 @@ large pops, and vacuum. Export the players without loudness normalization:
 ```sh
 ffmpeg -i outputs/audio-weight-pass/comparison.webm -c:a libmp3lame -b:a 192k outputs/audio-weight-pass/comparison.mp3
 ffmpeg -i outputs/audio-weight-pass/comparison.webm -ss 15 -c:a libmp3lame -b:a 192k outputs/audio-weight-pass/revised-demo.mp3
+```
+
+For the isolated vacuum ending, open `http://127.0.0.1:4180/vacuum.html`.
+The comparison includes a long hold/release and two short taps: the previous
+version from `d092b3f` occupies the first six seconds and the revision the last six.
+**Record vacuum comparison silently** writes `outputs/vacuum-tail/comparison.webm`.
+The preview players use these unnormalized exports:
+
+```sh
+ffmpeg -i outputs/vacuum-tail/comparison.webm -c:a libmp3lame -b:a 192k outputs/vacuum-tail/comparison.mp3
+ffmpeg -i outputs/vacuum-tail/comparison.webm -ss 6 -c:a libmp3lame -b:a 192k outputs/vacuum-tail/revised.mp3
 ```

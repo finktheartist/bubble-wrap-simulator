@@ -197,7 +197,7 @@ export class PopAudio {
       for (const voice of this.motorVoices) this.release(voice, .12);
       this.motorVoices = []; this.motorRunning = false;
       const held = ctx ? ctx.currentTime - this.motorStartedAt : 0;
-      if (running && !this.muted && held >= .14) this.cue('vacuum-stop', .21 * Math.min(1, held / .36), .1);
+      if (running && !this.muted && held >= .14) this.cue('vacuum-stop', .16 * Math.min(1, held / .36), .1);
       return;
     }
     if (!ctx || ctx.state !== 'running' || this.motorRunning) return;

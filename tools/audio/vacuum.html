@@ -1,0 +1,26 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bubble Wrap · Vacuum Review</title>
+<style>body{font:17px/1.6 system-ui;background:#112322;color:#eef7ef;max-width:680px;margin:40px auto;padding:24px}h1{font-size:38px;line-height:1.15}button{font:inherit;padding:12px 18px;margin:6px 6px 6px 0;border:0;border-radius:12px;background:#d9ff88;color:#15312e;cursor:pointer}button:disabled{opacity:.4}audio{display:block;width:100%;margin:12px 0 28px}a{color:#d9ff88}small{color:#a9c5bd}#status{min-height:28px}</style>
+<small>BUBBLE WRAP · VACUUM SOUND CHECK</small><h1>A softer finish.</h1><p>The descending motor note is replaced with a short airflow release. This clip isolates the vacuum so the ending is easy to hear.</p>
+<p><b>Revised vacuum</b> · hold, release, then quick taps</p><audio controls src="/vacuum-revised.mp3"></audio>
+<p><b>Before and after</b> · previous first; revised starts at 6 seconds</p><audio id="comparison" controls src="/vacuum-comparison.mp3"></audio>
+<button id="try">Try revised vacuum</button><button id="stop">Stop</button><p id="status" role="status">The vacuum releases after 2.5 seconds.</p><button id="record">Record vacuum comparison silently</button><p><a href="/weight.html">All revised sounds →</a> · <a href="http://127.0.0.1:4173">Play locally →</a></p>
+<script type="module">
+import { PopAudio } from '@game/audio';
+import { PopAudio as PreviousAudio } from '@itemsBefore/audio';
+const current=new PopAudio(),previous=new PreviousAudio(),status=document.querySelector('#status'),record=document.querySelector('#record');
+let timers=[],recorder;
+const later=(t,fn)=>timers.push(setTimeout(fn,t*1000));
+function stop(){timers.forEach(clearTimeout);timers=[];current.stop();previous.stop();for(const player of document.querySelectorAll('audio'))player.pause();if(recorder?.state==='recording')recorder.stop();status.textContent='Stopped.';}
+function pattern(a,offset=0){for(const [at,held] of [[.3,2.5],[3.6,.09],[4.3,.24]]){later(offset+at,()=>a.vacuum(true));later(offset+at+held,()=>a.vacuum(false));}}
+document.querySelector('#try').onclick=async()=>{if(record.disabled)return;stop();await current.start();pattern(current);status.textContent='Revised vacuum · hold and release, then two short taps.';};
+document.querySelector('#stop').onclick=stop;
+record.onclick=async()=>{
+ stop();record.disabled=true;status.textContent='Loading both versions…';await Promise.all([current.start(),previous.start()]);
+ const context=new AudioContext(),destination=context.createMediaStreamDestination();await context.resume();
+ const taps=[previous,current].map(a=>{const tap=a.context.createMediaStreamDestination();a.master.disconnect(a.context.destination);a.master.connect(tap);const source=context.createMediaStreamSource(tap.stream);source.connect(destination);return {a,tap,source};});
+ const chunks=[];recorder=new MediaRecorder(destination.stream,{mimeType:'audio/webm;codecs=opus',audioBitsPerSecond:192000});recorder.ondataavailable=e=>{if(e.data.size)chunks.push(e.data);};
+ recorder.onstop=async()=>{current.stop();previous.stop();const blob=new Blob(chunks,{type:'audio/webm'});document.querySelector('#comparison').src=URL.createObjectURL(blob);const response=await fetch('/vacuum-capture',{method:'POST',body:blob});for(const {a,tap,source} of taps){source.disconnect();a.master.disconnect(tap);a.master.connect(a.context.destination);tap.stream.getTracks().forEach(t=>t.stop());}await context.close();record.disabled=false;status.textContent=response.ok?'Saved. Revised vacuum starts at 6 seconds.':'Could not save recording.';};
+ recorder.start();pattern(previous);pattern(current,6);status.textContent='Recording silently…';later(12,()=>recorder.stop());
+};
+window.addEventListener('pagehide',()=>{stop();current.dispose();previous.dispose();});
+</script></html>

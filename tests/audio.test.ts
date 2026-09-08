@@ -14,6 +14,19 @@ function rms(samples: Float32Array, from = 0, to = samples.length) {
   for (let i = from; i < to; i++) energy += samples[i] ** 2;
   return Math.sqrt(energy / (to - from));
 }
+function spectralFraction(samples: Float32Array, rate: number, from: number, to: number) {
+  const length = samples.length;
+  const windowed = Float64Array.from(samples, (sample, i) => sample * (.5 - .5 * Math.cos(2 * Math.PI * i / (length - 1))));
+  const total = windowed.reduce((sum, value) => sum + value * value, 0) * length / 2;
+  let power = 0;
+  for (let bin = Math.ceil(from * length / rate); bin <= Math.floor(to * length / rate); bin++) {
+    const coefficient = 2 * Math.cos(2 * Math.PI * bin / length);
+    let a = 0, b = 0;
+    for (const sample of windowed) { const next = sample + coefficient * a - b; b = a; a = next; }
+    power += a * a + b * b - coefficient * a * b;
+  }
+  return power / total;
+}
 const itemBytes = readFileSync(new URL('../public/audio/item-sounds.wav', import.meta.url));
 const itemManifest = JSON.parse(readFileSync(new URL('../tools/audio/items-manifest.json', import.meta.url), 'utf8'));
 const bytes = readFileSync(new URL('../public/audio/bubble-pops.wav', import.meta.url));
@@ -183,21 +196,24 @@ await test('the item bank covers every action with sourced, bounded samples and 
 await test('the recorded vacuum does not concentrate energy in its piercing motor harmonics', () => {
   const clip = TOOL_ATLAS.clips.find(c => c.kind === 'vacuum')!;
   const length = 8192, rate = TOOL_ATLAS.sampleRate;
-  const samples = Float64Array.from({length}, (_, i) =>
-    itemBytes.readInt16LE(44 + (clip.offsetFrames + i) * 2) / 32768 * (.5 - .5 * Math.cos(2 * Math.PI * i / (length - 1))));
-  const total = samples.reduce((sum, value) => sum + value * value, 0) * length / 2;
-  function bandFraction(from: number, to: number) {
-    let power = 0;
-    for (let bin = Math.ceil(from * length / rate); bin <= Math.floor(to * length / rate); bin++) {
-      const coefficient = 2 * Math.cos(2 * Math.PI * bin / length);
-      let a = 0, b = 0;
-      for (const sample of samples) { const next = sample + coefficient * a - b; b = a; a = next; }
-      power += a * a + b * b - coefficient * a * b;
-    }
-    return power / total;
+  const samples = Float32Array.from({length}, (_, i) => itemBytes.readInt16LE(44 + (clip.offsetFrames + i) * 2) / 32768);
+  assert.ok(spectralFraction(samples, rate, 3100, 3400) < .01, '3.25 kHz whine remains below 1% of energy');
+  assert.ok(spectralFraction(samples, rate, 6200, 6800) < .002, '6.5 kHz harmonic remains below 0.2% of energy');
+});
+
+await test('the vacuum release stays dark throughout its tail and fades without a late swell', () => {
+  const clip = TOOL_ATLAS.clips.find(c => c.kind === 'vacuum-stop')!, rate = TOOL_ATLAS.sampleRate;
+  const samples = Float32Array.from({length:clip.lengthFrames}, (_, i) => itemBytes.readInt16LE(44 + (clip.offsetFrames + i) * 2) / 32768);
+  for (let start = 0; start + 2048 <= samples.length; start += 1024) {
+    assert.ok(spectralFraction(samples.subarray(start, start + 2048), rate, 900, rate / 2) < .015,
+      'no short section brings back an upper motor whistle');
   }
-  assert.ok(bandFraction(3100, 3400) < .01, '3.25 kHz whine remains below 1% of energy');
-  assert.ok(bandFraction(6200, 6800) < .002, '6.5 kHz harmonic remains below 0.2% of energy');
+  const step = Math.round(.05 * rate);
+  for (let start = Math.round(.075 * rate); start + 2 * step <= samples.length; start += step) {
+    assert.ok(rms(samples, start + step, start + 2 * step) < rms(samples, start, start + step), 'release keeps getting quieter');
+  }
+  assert.ok(rms(samples, 0, Math.round(.08 * rate)) > .02, 'the air release remains audible');
+  assert.ok(rms(samples, samples.length - Math.round(.08 * rate)) < .004, 'no note hangs at the end');
 });
 
 await test('heavy hits use fuller pops while finger and vacuum hits retain the small recorded snaps', async t => {

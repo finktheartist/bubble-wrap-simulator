@@ -100,11 +100,12 @@ for pitch in [.91,.96]:
         l('cannon-fire.ogg',.35,pitch=.82,lowpass=550,highpass=40,level=.22)],fade_in=.0004,fade_out=.2,decay_from=.53)
 for pitch in [1.03,.98]:
     add('rocket-blast',.82,[l('fireworks/cannon_01.ogg',.82,start=.077,pitch=pitch,lowpass=7500,highpass=55,compression=True)],fade_in=.0004,fade_out=.16,decay_from=.4)
-# Remove narrow motor harmonics before the startup/stop pitch ramps. Keep warm airflow.
-vacuum_eq=tuple(f'equalizer=f={f}:t=q:w={q}:g={g}' for f,q,g in [(1082,12,-12),(2164,10,-12),(3246,7,-24),(6492,6,-24)])+('lowpass=f=2100:p=2',)
-add('vacuum-start',.44,[l('vacuumcleaner01.wav',.44,start=34,lowpass=2100,highpass=75,eq=vacuum_eq,ramp=(.65,1))],fade_in=.12,fade_out=.075)
-add('vacuum',1.4,[l('vacuumcleaner01.wav',1.4,start=35,lowpass=2100,highpass=75,eq=vacuum_eq)],loop=True)
-add('vacuum-stop',.5,[l('vacuumcleaner01.wav',.5,start=37,lowpass=2100,highpass=75,eq=vacuum_eq,ramp=(1,.5))],fade_in=.025,fade_out=.28)
+# Suppress the lower motor whistle too; it survived the first high-frequency cuts.
+vacuum_eq=tuple(f'equalizer=f={f}:t=q:w={q}:g={g}' for f,q,g in [(360,5,-10),(740,2.5,-24),(1082,8,-18),(1800,4,-18),(2164,10,-12),(3246,7,-24),(6492,6,-24)])+('lowpass=f=1500:p=2',)
+add('vacuum-start',.44,[l('vacuumcleaner01.wav',.44,start=34,lowpass=1500,highpass=75,eq=vacuum_eq,ramp=(.65,1))],fade_in=.12,fade_out=.075)
+add('vacuum',1.4,[l('vacuumcleaner01.wav',1.4,start=35,lowpass=1500,highpass=75,eq=vacuum_eq)],loop=True)
+# A brief unpitched air release avoids the descending whistle and late swell.
+add('vacuum-stop',.32,[l('vacuumcleaner01.wav',.32,start=35.4,lowpass=800,highpass=75,eq=vacuum_eq+('lowpass=f=800:p=2',))],fade_in=.012,fade_out=.28,decay_from=.025,rms_ceiling=.12)
 # Strong contacts use a larger plastic snap with a separate low pressure layer.
 # Finger taps and suction continue to use the original, unchanged small-pop bank.
 for slot in [0,3,7,9,12,15]:

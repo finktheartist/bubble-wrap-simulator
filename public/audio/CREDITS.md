@@ -38,7 +38,8 @@ libraries, retrieved September 8, 2026:
   `cannon_fire_0.ogg`, edited for the bowling cannon and low blast layers.
 - [General Household Sound Effects](https://opengameart.org/content/general-household-sound-effects)
   by **bretbernhoft**: `vacuumcleaner01.wav`, edited into a vacuum loop with
-  motor-harmonic suppression and original pitch ramps for startup and wind-down.
+  motor-harmonic suppression, an original startup pitch ramp, and an unpitched
+  filtered airflow release.
 - The **Anthousai** recordings credited above: six larger plastic snaps derived
   from the game's pop bank. The sixteen small pops remain unchanged.
 

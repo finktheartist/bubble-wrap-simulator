@@ -2,7 +2,7 @@
 export const TOOL_ATLAS = {
   "url": "/audio/item-sounds.wav",
   "sampleRate": 32000,
-  "frames": 559200,
+  "frames": 553440,
   "clips": [
     {
       "kind": "mallet-hit",
@@ -224,53 +224,53 @@ export const TOOL_ATLAS = {
       "kind": "vacuum-start",
       "offsetFrames": 466720,
       "lengthFrames": 14080,
-      "peakSeconds": 0.125
+      "peakSeconds": 0.15
     },
     {
       "kind": "vacuum",
       "offsetFrames": 480800,
       "lengthFrames": 43200,
-      "peakSeconds": 0.51
+      "peakSeconds": 0.655
     },
     {
       "kind": "vacuum-stop",
       "offsetFrames": 524000,
-      "lengthFrames": 16000,
-      "peakSeconds": 0.2
+      "lengthFrames": 10240,
+      "peakSeconds": 0.02
     },
     {
       "kind": "big-pop",
-      "offsetFrames": 540000,
+      "offsetFrames": 534240,
       "lengthFrames": 3200,
       "peakSeconds": 0.005
     },
     {
       "kind": "big-pop",
-      "offsetFrames": 543200,
+      "offsetFrames": 537440,
       "lengthFrames": 3200,
       "peakSeconds": 0.005
     },
     {
       "kind": "big-pop",
-      "offsetFrames": 546400,
+      "offsetFrames": 540640,
       "lengthFrames": 3200,
       "peakSeconds": 0.005
     },
     {
       "kind": "big-pop",
-      "offsetFrames": 549600,
+      "offsetFrames": 543840,
       "lengthFrames": 3200,
       "peakSeconds": 0.005
     },
     {
       "kind": "big-pop",
-      "offsetFrames": 552800,
+      "offsetFrames": 547040,
       "lengthFrames": 3200,
       "peakSeconds": 0.005
     },
     {
       "kind": "big-pop",
-      "offsetFrames": 556000,
+      "offsetFrames": 550240,
       "lengthFrames": 3200,
       "peakSeconds": 0.005
     }

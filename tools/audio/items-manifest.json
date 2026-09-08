@@ -1,6 +1,6 @@
 {
-  "sha256": "0351c42f9908359e422301a29b94f0dcb460e2fd8b8c36fdbb34beb2eeccb10c",
-  "bytes": 1118444,
+  "sha256": "1b1c1dd3f3ff32d4d21f7433beba6844f20df3550dad49088262197e30a7fd9d",
+  "bytes": 1106924,
   "sourceSha256": {
     "kenney-impact/Audio/impactSoft_heavy_000.ogg": "49e7ca88743fca974bb8676ea138b751cfd8f9033b5e7af8736c2a215d6edbc1",
     "kenney-impact/Audio/impactPunch_heavy_000.ogg": "b33a8f14068aec24ec69ba85e5e87fdc41228975f6a1a3e44a6e7d6fc3d9f8d8",
@@ -1263,7 +1263,7 @@
           "start": 34,
           "duration": 0.44,
           "pitch": 1,
-          "lowpass": 2100,
+          "lowpass": 1500,
           "highpass": 75,
           "level": 1,
           "tempo": 1,
@@ -1272,11 +1272,14 @@
             1
           ],
           "eq": [
-            "equalizer=f=1082:t=q:w=12:g=-12",
+            "equalizer=f=360:t=q:w=5:g=-10",
+            "equalizer=f=740:t=q:w=2.5:g=-24",
+            "equalizer=f=1082:t=q:w=8:g=-18",
+            "equalizer=f=1800:t=q:w=4:g=-18",
             "equalizer=f=2164:t=q:w=10:g=-12",
             "equalizer=f=3246:t=q:w=7:g=-24",
             "equalizer=f=6492:t=q:w=6:g=-24",
-            "lowpass=f=2100:p=2"
+            "lowpass=f=1500:p=2"
           ],
           "compression": false,
           "offset": 0
@@ -1297,17 +1300,20 @@
           "start": 35,
           "duration": 1.4,
           "pitch": 1,
-          "lowpass": 2100,
+          "lowpass": 1500,
           "highpass": 75,
           "level": 1,
           "tempo": 1,
           "ramp": null,
           "eq": [
-            "equalizer=f=1082:t=q:w=12:g=-12",
+            "equalizer=f=360:t=q:w=5:g=-10",
+            "equalizer=f=740:t=q:w=2.5:g=-24",
+            "equalizer=f=1082:t=q:w=8:g=-18",
+            "equalizer=f=1800:t=q:w=4:g=-18",
             "equalizer=f=2164:t=q:w=10:g=-12",
             "equalizer=f=3246:t=q:w=7:g=-24",
             "equalizer=f=6492:t=q:w=6:g=-24",
-            "lowpass=f=2100:p=2"
+            "lowpass=f=1500:p=2"
           ],
           "compression": false,
           "offset": 0
@@ -1316,32 +1322,33 @@
     },
     {
       "kind": "vacuum-stop",
-      "duration": 0.5,
-      "fadeIn": 0.025,
+      "duration": 0.32,
+      "fadeIn": 0.012,
       "fadeOut": 0.28,
-      "decayFrom": null,
+      "decayFrom": 0.025,
       "loop": false,
-      "rmsCeiling": null,
+      "rmsCeiling": 0.12,
       "layers": [
         {
           "source": "vacuumcleaner01.wav",
-          "start": 37,
-          "duration": 0.5,
+          "start": 35.4,
+          "duration": 0.32,
           "pitch": 1,
-          "lowpass": 2100,
+          "lowpass": 800,
           "highpass": 75,
           "level": 1,
           "tempo": 1,
-          "ramp": [
-            1,
-            0.5
-          ],
+          "ramp": null,
           "eq": [
-            "equalizer=f=1082:t=q:w=12:g=-12",
+            "equalizer=f=360:t=q:w=5:g=-10",
+            "equalizer=f=740:t=q:w=2.5:g=-24",
+            "equalizer=f=1082:t=q:w=8:g=-18",
+            "equalizer=f=1800:t=q:w=4:g=-18",
             "equalizer=f=2164:t=q:w=10:g=-12",
             "equalizer=f=3246:t=q:w=7:g=-24",
             "equalizer=f=6492:t=q:w=6:g=-24",
-            "lowpass=f=2100:p=2"
+            "lowpass=f=1500:p=2",
+            "lowpass=f=800:p=2"
           ],
           "compression": false,
           "offset": 0
@@ -1585,7 +1592,7 @@
   ],
   "url": "/audio/item-sounds.wav",
   "sampleRate": 32000,
-  "frames": 559200,
+  "frames": 553440,
   "clips": [
     {
       "kind": "mallet-hit",
@@ -1807,53 +1814,53 @@
       "kind": "vacuum-start",
       "offsetFrames": 466720,
       "lengthFrames": 14080,
-      "peakSeconds": 0.125
+      "peakSeconds": 0.15
     },
     {
       "kind": "vacuum",
       "offsetFrames": 480800,
       "lengthFrames": 43200,
-      "peakSeconds": 0.51
+      "peakSeconds": 0.655
     },
     {
       "kind": "vacuum-stop",
       "offsetFrames": 524000,
-      "lengthFrames": 16000,
-      "peakSeconds": 0.2
+      "lengthFrames": 10240,
+      "peakSeconds": 0.02
     },
     {
       "kind": "big-pop",
-      "offsetFrames": 540000,
+      "offsetFrames": 534240,
       "lengthFrames": 3200,
       "peakSeconds": 0.005
     },
     {
       "kind": "big-pop",
-      "offsetFrames": 543200,
+      "offsetFrames": 537440,
       "lengthFrames": 3200,
       "peakSeconds": 0.005
     },
     {
       "kind": "big-pop",
-      "offsetFrames": 546400,
+      "offsetFrames": 540640,
       "lengthFrames": 3200,
       "peakSeconds": 0.005
     },
     {
       "kind": "big-pop",
-      "offsetFrames": 549600,
+      "offsetFrames": 543840,
       "lengthFrames": 3200,
       "peakSeconds": 0.005
     },
     {
       "kind": "big-pop",
-      "offsetFrames": 552800,
+      "offsetFrames": 547040,
       "lengthFrames": 3200,
       "peakSeconds": 0.005
     },
     {
       "kind": "big-pop",
-      "offsetFrames": 556000,
+      "offsetFrames": 550240,
       "lengthFrames": 3200,
       "peakSeconds": 0.005
     }
