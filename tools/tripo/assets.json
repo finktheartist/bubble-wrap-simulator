@@ -1,0 +1,48 @@
+{
+  "defaults": {
+    "model": "v3.1-20260211",
+    "texture": true,
+    "pbr": true,
+    "texture_quality": "detailed",
+    "geometry_quality": "standard",
+    "negative_prompt": "person, hand holding the object, background geometry, display stand, pedestal, text, logo, watermark, melted shapes, asymmetry, disconnected fragments, extra handles, flat painted details"
+  },
+  "assets": {
+    "pop-blaster": {
+      "face_limit": 20000,
+      "prompt": "A single realistic compact pneumatic pellet pistol prop for a playful first person game. Clear believable handgun silhouette: straight machined gunmetal upper receiver, short open circular barrel, raised front sight, separate trigger inside an open rounded trigger guard, angled textured charcoal rubber grip. Brushed steel barrel, restrained teal enamel receiver panels, subtle edge wear, screws and crisp part seams. Professionally manufactured proportions and detailed PBR materials, not a chunky toy or futuristic ray gun. Complete isolated object, no person, no ammunition, no stand. Three quarter product view showing the left side and front."
+    },
+    "rocket-launcher": {
+      "face_limit": 24000,
+      "prompt": "One beautifully manufactured shoulder carried rocket launcher prop for a playful first person game. A long hollow cylindrical launch tube with a clearly open dark circular muzzle and thick machined rim, a rear exhaust collar, one black rubber pistol grip beneath the middle, a small folding top sight, and a short padded shoulder rest at the rear. Deep muted teal painted metal body, brushed aluminum hardware, black rubber grips, subtle realistic scratches and panel seams. Strong plausible industrial silhouette, substantial metal thickness, crisp PBR surfaces. Complete single isolated prop with no rocket loaded, no human, no sling, no stand, no labels."
+    },
+    "mallet": {
+      "face_limit": 14000,
+      "prompt": "One realistic premium rubber mallet, complete isolated product. A substantial matte dark charcoal rubber cylindrical barrel head with two flat subtly chamfered striking faces. The head is perfectly perpendicular to a straight natural ash wood handle. The handle has a gentle ergonomic taper and a short textured dark rubber grip sleeve at its bottom. Visible fine wood grain, molded rubber pores, a clean metal neck ferrule and restrained real wear. Crisp clean manufactured geometry, believable weight and proportions. Head at top, handle pointing down. No hands, no stand, no lettering, no extra objects."
+    },
+    "bat": {
+      "face_limit": 12000,
+      "prompt": "One realistic full length maple baseball bat, isolated and complete. Smooth continuous lathed silhouette: broad gently rounded barrel at the top, a long graceful taper into a thin handle, and a distinct flared circular knob at the bottom. Honey colored satin varnished maple with long subtle wood grain. Dark brown tightly wound athletic tape covers only the lower grip, with realistic tape overlap and a few scuffs. Premium sports equipment product realism, straight centerline, round cross sections, correct baseball bat proportions. No ball, no lettering, no logo, no hands, no stand."
+    },
+    "ball-cannon": {
+      "face_limit": 22000,
+      "prompt": "One imaginative but beautifully manufactured handheld pneumatic bowling ball cannon prop for a playful first person game. A short large diameter open barrel sized for a bowling ball, thick brushed aluminum muzzle rim, deep red enamel cylindrical body, a smaller pressure tank mounted beneath the rear, one charcoal rubber pistol grip and a small round pressure gauge on the upper side. The gauge has a glass face, simple tick marks and one needle, no letters. Believable machined fasteners, crisp panel seams, rubber seals, restrained edge wear. Readable compact silhouette, realistic PBR materials, one complete isolated object, no hands, no stand, no projectile."
+    },
+    "pop-vacuum": {
+      "face_limit": 22000,
+      "prompt": "One premium handheld industrial vacuum prop for a playful first person game. Warm mustard yellow enamel motor housing at the rear, a sturdy dark rubber top carry handle, a short ribbed black flexible neck pointing forward, and a broad open flattened funnel nozzle with a thick dark rim and a visibly recessed interior. Brushed aluminum trim, realistic molded vents, clear part seams, screw heads, fine rubber texture and lightly scuffed paint. Compact cohesive practical appliance silhouette with balanced proportions and physically believable PBR materials. Complete single isolated product, no floor hose, no cord, no human, no stand, no labels."
+    },
+    "pop-bomb": {
+      "face_limit": 16000,
+      "prompt": "One classic cartoon spherical fuse bomb rendered as a realistic physical movie prop for a playful game. A smooth round deep navy enamel metal sphere with subtle edge scuffs, a small brushed brass collar at the top and a short curved twisted cotton rope fuse. Beautiful clear material separation, enamel highlights, fine rope fibers and crisp brass machining. Simple instantly readable silhouette. Complete isolated single object centered at the sphere, fuse unlit, no sparks, no human, no stand, no text, no other parts."
+    },
+    "fingertip": {
+      "face_limit": 22000,
+      "prompt": "One complete right hand wearing a fitted honey tan suede work glove, wrist cuff included, posed pointing with the index finger extended straight forward and the other three fingers curled naturally into the palm with the thumb resting against them. Anatomically convincing five fingers, clear joined knuckles, a soft continuous palm, fine suede nap, neatly stitched finger seams, subtle creases at the joints, dark narrow cuff trim. Realistic well made workwear, warm natural materials. Only the gloved hand and short closed cuff, no arm or person, no object held, no stand, no text."
+    },
+    "bowling-ball": {
+      "face_limit": 18000,
+      "prompt": "One realistic regulation bowling ball, perfectly spherical, glossy dark aubergine resin with restrained flowing plum and muted violet marbling. Exactly three actual deep cylindrical finger holes grouped together on the upper front: two smaller holes side by side and one larger thumb hole below them. Rounded hole rims and dark recessed walls, clean polished resin with subtle fine wear. Premium sporting equipment, accurate sphere, real geometric cavities rather than painted dots. Single isolated complete object, no logo, no text, no hand, no stand, no floor."
+    }
+  }
+}

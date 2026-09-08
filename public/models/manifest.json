@@ -2,29 +2,38 @@
   {
     "tool": 0,
     "file": "fingertip.glb",
-    "triangles": 30342,
-    "vertices": 15857,
-    "materials": 7,
-    "bytes": 1821140,
-    "source": "art/bubble-wrap-tools.blend"
+    "triangles": 21154,
+    "vertices": 12480,
+    "materials": 1,
+    "bytes": 1180676,
+    "source": "art/tripo-tool-library.blend",
+    "generator": "Tripo v3.1, fitted and finished in Blender",
+    "colorMap": 1024,
+    "materialMaps": 512
   },
   {
     "tool": 1,
     "file": "mallet.glb",
-    "triangles": 9776,
-    "vertices": 5420,
-    "materials": 6,
-    "bytes": 703940,
-    "source": "art/bubble-wrap-tools.blend"
+    "triangles": 13576,
+    "vertices": 7955,
+    "materials": 1,
+    "bytes": 1156600,
+    "source": "art/tripo-tool-library.blend",
+    "generator": "Tripo v3.1, fitted and finished in Blender",
+    "colorMap": 1024,
+    "materialMaps": 512
   },
   {
     "tool": 2,
     "file": "bat.glb",
-    "triangles": 8588,
-    "vertices": 4715,
-    "materials": 5,
-    "bytes": 451016,
-    "source": "art/bubble-wrap-tools.blend"
+    "triangles": 11284,
+    "vertices": 6876,
+    "materials": 1,
+    "bytes": 805384,
+    "source": "art/tripo-tool-library.blend",
+    "generator": "Tripo v3.1, fitted and finished in Blender",
+    "colorMap": 1024,
+    "materialMaps": 512
   },
   {
     "tool": 3,
@@ -38,11 +47,14 @@
   {
     "tool": 4,
     "file": "pop-blaster.glb",
-    "triangles": 14794,
-    "vertices": 8115,
-    "materials": 12,
-    "bytes": 928972,
-    "source": "art/bubble-wrap-tools.blend"
+    "triangles": 18981,
+    "vertices": 12685,
+    "materials": 2,
+    "bytes": 1242308,
+    "source": "art/tripo-tool-library.blend",
+    "generator": "Tripo v3.1, fitted and finished in Blender",
+    "colorMap": 1024,
+    "materialMaps": 512
   },
   {
     "tool": 5,
@@ -56,28 +68,37 @@
   {
     "tool": 6,
     "file": "rocket-launcher.glb",
-    "triangles": 14940,
-    "vertices": 8624,
-    "materials": 10,
-    "bytes": 806488,
-    "source": "art/bubble-wrap-tools.blend"
+    "triangles": 22376,
+    "vertices": 14854,
+    "materials": 1,
+    "bytes": 1270824,
+    "source": "art/tripo-tool-library.blend",
+    "generator": "Tripo v3.1, fitted and finished in Blender",
+    "colorMap": 1024,
+    "materialMaps": 512
   },
   {
     "tool": 7,
     "file": "ball-cannon.glb",
-    "triangles": 16184,
-    "vertices": 8904,
-    "materials": 8,
-    "bytes": 792696,
-    "source": "art/bubble-wrap-tools.blend"
+    "triangles": 21543,
+    "vertices": 13174,
+    "materials": 1,
+    "bytes": 1107840,
+    "source": "art/tripo-tool-library.blend",
+    "generator": "Tripo v3.1, fitted and finished in Blender",
+    "colorMap": 1024,
+    "materialMaps": 512
   },
   {
     "tool": 8,
     "file": "pop-vacuum.glb",
-    "triangles": 19648,
-    "vertices": 10838,
-    "materials": 8,
-    "bytes": 1038232,
-    "source": "art/bubble-wrap-tools.blend"
+    "triangles": 19599,
+    "vertices": 13432,
+    "materials": 1,
+    "bytes": 1202928,
+    "source": "art/tripo-tool-library.blend",
+    "generator": "Tripo v3.1, fitted and finished in Blender",
+    "colorMap": 1024,
+    "materialMaps": 512
   }
 ]

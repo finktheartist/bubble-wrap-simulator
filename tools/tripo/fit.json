@@ -1,0 +1,73 @@
+{
+  "fingertip": {
+    "rotation_degrees": [0, 0, 180],
+    "length_axis": 2,
+    "length": 0.421594,
+    "source_anchor": [0, 0, 0],
+    "target_anchor": [-0.016353, 0.018988, -0.018203],
+    "roughness_floor": 0.3,
+    "metallic_scale": 0,
+    "normal_strength": 0.5
+  },
+  "pop-blaster": {
+    "rotation_degrees": [0, 0, 180],
+    "length_axis": 1,
+    "length": 0.52,
+    "source_anchor": [-0.015, -0.48, 0.291],
+    "target_anchor": [0, 0.405, 0.062],
+    "roughness_floor": 0.38,
+    "metallic_scale": 0.65,
+    "normal_strength": 0.55,
+    "rubber_grip": { "max_forward": 0.12, "max_height": -0.07 }
+  },
+  "mallet": {
+    "rotation_degrees": [0, 0, 90],
+    "length_axis": 2,
+    "length": 0.651,
+    "source_anchor": [0, 0, 0],
+    "target_anchor": [0, 0, -0.0395],
+    "roughness_floor": 0.15,
+    "metallic_scale": 0.85,
+    "normal_strength": 0.6
+  },
+  "bat": {
+    "rotation_degrees": [0, 0, 0],
+    "length_axis": 2,
+    "length": 0.961913,
+    "source_anchor": [0, 0, 0],
+    "target_anchor": [0, 0, 0.0009565],
+    "roughness_floor": 0.35,
+    "metallic_scale": 0,
+    "normal_strength": 0.5
+  },
+  "ball-cannon": {
+    "rotation_degrees": [22, 0, 180],
+    "length_axis": 1,
+    "length": 0.943,
+    "source_anchor": [0, -0.442, 0.311],
+    "target_anchor": [0, 0.53, 0.085],
+    "roughness_floor": 0.32,
+    "metallic_scale": 0.8,
+    "normal_strength": 0.6
+  },
+  "pop-vacuum": {
+    "rotation_degrees": [0, 0, 90],
+    "length_axis": 1,
+    "length": 1.05,
+    "source_anchor": [0.496, 0, -0.135],
+    "target_anchor": [0, 0.73, -0.015],
+    "roughness_floor": 0.3,
+    "metallic_scale": 0.65,
+    "normal_strength": 0.6
+  },
+  "rocket-launcher": {
+    "rotation_degrees": [0, 0, 180],
+    "length_axis": 1,
+    "length": 1.02,
+    "source_anchor": [0, -0.497, 0.124],
+    "target_anchor": [0, 0.635, 0.11],
+    "roughness_floor": 0.32,
+    "metallic_scale": 0.85,
+    "normal_strength": 0.65
+  }
+}

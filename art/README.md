@@ -1,44 +1,44 @@
 # Blender tool library
 
-`bubble-wrap-tools.blend` contains all nine game tools, packed color and normal maps, and a neutral product studio. The `00 — Toolkit presentation (linked copies)` collection is arranged for review. The nine hidden source collections retain unit scale and the game origin; show one source collection and hide the presentation to edit or export it. The presentation copies share their mesh and materials with the sources.
+`tripo-tool-library.blend` contains the current nine game tools with packed textures and a neutral product studio. Seven tools use Tripo-generated geometry, fitted and finished in Blender. The bowling ball and bomb retain their original Blender geometry. See the [current contact sheet](../docs/tripo-toolkit.png) and [Tripo authoring workflow](TRIPO.md).
 
-The authoring script rebuilds the generated library, exports the nine GLBs to `public/models/`, and renders previews to `outputs/toolkit/`. It runs in a separate background Blender process and does not affect an already open scene. Rebuilding overwrites this generated master and its exports, so save manual revisions separately first.
+The `00 — Toolkit presentation (linked meshes)` collection is arranged for review. The nine hidden source collections retain unit scale and the game origin. Show a source collection and hide the presentation to edit or export it. Presentation copies share meshes and materials with their sources.
+
+| Asset | Triangles | GLB bytes | Color / material maps |
+| --- | ---: | ---: | --- |
+| Suede glove | 21,154 | 1,180,676 | 1024 / 512 px |
+| Rubber mallet | 13,576 | 1,156,600 | 1024 / 512 px |
+| Maple bat | 11,284 | 805,384 | 1024 / 512 px |
+| Bowling ball (retained) | 16,170 | 830,344 | 768 px atlases |
+| Pop blaster | 18,981 | 1,242,308 | 1024 / 512 px |
+| Pop bomb (retained) | 20,040 | 930,716 | 512 px atlases |
+| Rocket launcher | 22,376 | 1,270,824 | 1024 / 512 px |
+| Bowling cannon | 21,543 | 1,107,840 | 1024 / 512 px |
+| Pop vacuum | 19,599 | 1,202,928 | 1024 / 512 px |
+
+All textures are embedded. The complete set totals **9,727,620 bytes**, recorded in `public/models/manifest.json`. The game shares geometry and textures across held tools, menu portraits, and projectiles. It requires no asset service during play.
+
+## Rebuild the current review library
 
 From the project root, using Blender 5.1.2:
 
 ```sh
-/Applications/Blender.app/Contents/MacOS/Blender --background --factory-startup --python tools/blender/build_toolkit.py
-/Applications/Blender.app/Contents/MacOS/Blender --background --factory-startup --python tools/blender/review_exports.py
+/Applications/Blender.app/Contents/MacOS/Blender --background --factory-startup --python tools/tripo/build_library.py
 ```
 
-The second command imports the actual exported GLBs into a fresh studio to inspect their finishes, including an oblique view of the bowling-ball wells. `toolkit-overview.png` is the reviewed source-library overview.
+This imports the current `public/models/*.glb` files and regenerates `art/tripo-tool-library.blend` and `docs/tripo-toolkit.png`. It does not change the GLBs or an already open Blender scene. Save manual changes separately before regenerating the library.
 
-| Asset | Triangles | Color / normal atlas |
-| --- | ---: | ---: |
-| Suede glove | 30,342 | 768 px |
-| Rubber mallet | 9,776 | 512 px |
-| Maple bat | 8,588 | 512 px |
-| Bowling ball | 16,170 | 768 px |
-| Pop blaster | 14,794 | 512 px |
-| Pop bomb | 20,040 | 512 px |
-| Rocket launcher | 14,940 | 512 px |
-| Bowling cannon | 16,184 | 512 px |
-| Pop vacuum | 19,648 | 512 px |
-
-All textures are embedded; the full set totals about 8.3 MB. `public/models/manifest.json` records exact export sizes. The game loads one library and shares geometry and textures across held tools, menu portraits, and projectiles. Procedural shading is baked locally; play requires no asset service.
-
-To review actual game swing poses (without changing the open Blender scene):
+## Review game poses
 
 ```sh
 node_modules/.bin/tsx tools/blender/swing_poses.ts
 /Applications/Blender.app/Contents/MacOS/Blender --background --factory-startup --python tools/blender/review_swings.py
-```
-
-The sampler reads the same grip-pivot pose function used by the renderer. Review outputs include rest, wind-up, contact, and follow-through for the hammer and bat in desktop and portrait framing.
-
-For the three new tools at rest and during recoil, in desktop, portrait and landscape:
-
-```sh
 node_modules/.bin/tsx tools/blender/toybox_poses.ts
 /Applications/Blender.app/Contents/MacOS/Blender --background --factory-startup --python tools/blender/review_toybox.py
 ```
+
+These samplers read the actual game pose functions. Outputs cover mallet and bat rest, wind-up, contact, and follow-through, plus launcher, cannon, and vacuum recoil in desktop and phone framing.
+
+## Original procedural library
+
+`bubble-wrap-tools.blend` and `toolkit-overview.png` preserve the previous tool set. The original `tools/blender/build_toolkit.py` rebuilds that library **and replaces all nine public GLBs with the previous procedural versions**. Use a separate checkout when exploring that workflow. The current Tripo replacements are prepared through `tools/tripo/` instead.
